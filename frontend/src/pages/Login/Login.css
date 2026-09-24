@@ -1,0 +1,513 @@
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns:
+        minmax(0, 51%)
+        minmax(0, 49%);
+
+    background:
+        var(--color-bg);
+}
+
+
+/* ==========================================
+   ÁREA ESQUERDA
+========================================== */
+
+.login-brand {
+    position: relative;
+
+    min-height: 100vh;
+
+    padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+
+    background:
+        #071009;
+
+    overflow: hidden;
+}
+
+
+.login-logo {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    font-family:
+        var(--font-display);
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color:
+        #EFEFE6;
+}
+
+
+.login-logo-icon {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius:
+        11px;
+
+    background:
+        var(--color-primary);
+
+    color:
+        #071009;
+
+    font-size:
+        20px;
+}
+
+
+.login-brand-content {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 448px;
+
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+
+.login-brand-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 15px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(82, 168, 91, 0.15);
+
+    color:
+        var(--color-primary);
+
+    font-size:
+        24px;
+}
+
+
+.login-brand-content h1 {
+    margin:
+        0 0 15px;
+
+    font-family:
+        var(--font-display);
+
+    font-size:
+        30px;
+
+    line-height:
+        1.25;
+
+    font-weight:
+        600;
+
+    color:
+        #EFEFE6;
+}
+
+
+.login-brand-content p {
+    margin: 0;
+
+    max-width: 448px;
+
+    color:
+        rgba(227, 230, 219, 0.7);
+
+    font-size:
+        14px;
+
+    line-height:
+        1.6;
+}
+
+
+.login-copyright {
+    position: relative;
+    z-index: 2;
+
+    color:
+        rgba(227, 230, 219, 0.5);
+
+    font-size:
+        12px;
+}
+
+
+.login-glow {
+    position: absolute;
+
+    width: 384px;
+    height: 384px;
+
+    right: -96px;
+    bottom: -96px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(82, 168, 91, 0.12);
+
+    filter:
+        blur(70px);
+
+    pointer-events: none;
+}
+
+
+/* ==========================================
+   ÁREA DIREITA
+========================================== */
+
+.login-form-area {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding:
+        40px;
+
+    background:
+        #080F0A;
+}
+
+
+.login-form-container {
+    width: 100%;
+    max-width: 384px;
+}
+
+
+.login-header h2 {
+    margin: 0;
+
+    font-family:
+        var(--font-display);
+
+    font-size:
+        24px;
+
+    line-height:
+        32px;
+
+    font-weight:
+        600;
+
+    color:
+        #EFEFE6;
+}
+
+
+.login-header p {
+    margin:
+        6px 0 0;
+
+    color:
+        var(--color-text-muted);
+
+    font-size:
+        14px;
+}
+
+
+.login-form {
+    margin-top:
+        26px;
+}
+
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    margin-bottom:
+        16px;
+}
+
+
+.form-field label {
+    color:
+        #EFEFE6;
+
+    font-size:
+        14px;
+
+    font-weight:
+        500;
+}
+
+
+.form-field input {
+    width: 100%;
+    height: 40px;
+
+    padding:
+        0 13px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.15);
+
+    border-radius:
+        8px;
+
+    outline: none;
+
+    background:
+        #0D140E;
+
+    color:
+        #EFEFE6;
+
+    font-size:
+        14px;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.form-field input::placeholder {
+    color:
+        #A3A799;
+}
+
+
+.form-field input:focus {
+    border-color:
+        var(--color-primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(82, 168, 91, 0.12);
+}
+
+
+.form-field input:disabled {
+    opacity: 0.6;
+}
+
+
+.login-button {
+    width: 100%;
+    min-height: 36px;
+
+    margin-top:
+        16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border: 0;
+
+    border-radius:
+        8px;
+
+    background:
+        var(--color-primary);
+
+    color:
+        #071009;
+
+    font-size:
+        14px;
+
+    font-weight:
+        600;
+
+    transition:
+        background 0.2s,
+        transform 0.1s;
+}
+
+
+.login-button:hover:not(:disabled) {
+    background:
+        #63B76B;
+}
+
+
+.login-button:active:not(:disabled) {
+    transform:
+        translateY(1px);
+}
+
+
+.login-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.7;
+}
+
+
+.login-error {
+    margin-top:
+        10px;
+
+    padding:
+        10px 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    border:
+        1px solid
+        rgba(255, 99, 103, 0.3);
+
+    border-radius:
+        8px;
+
+    background:
+        rgba(255, 99, 103, 0.08);
+
+    color:
+        #FF8588;
+
+    font-size:
+        13px;
+}
+
+
+.login-info {
+    margin-top:
+        16px;
+
+    padding:
+        12px;
+
+    display: flex;
+    align-items:
+        flex-start;
+
+    gap:
+        10px;
+
+    border-radius:
+        8px;
+
+    background:
+        #202921;
+
+    color:
+        var(--color-text-muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+}
+
+
+.login-info i {
+    color:
+        var(--color-primary);
+
+    font-size:
+        16px;
+}
+
+
+/* ==========================================
+   RESPONSIVIDADE
+========================================== */
+
+@media (
+    max-width: 900px
+) {
+    .login-page {
+        grid-template-columns:
+            1fr;
+    }
+
+    .login-brand {
+        min-height:
+            260px;
+
+        padding:
+            24px;
+    }
+
+    .login-brand-content {
+        margin:
+            50px 0;
+    }
+
+    .login-brand-content h1 {
+        font-size:
+            26px;
+    }
+
+    .login-copyright {
+        display: none;
+    }
+
+    .login-form-area {
+        min-height:
+            auto;
+
+        padding:
+            60px 24px;
+    }
+}
+
+
+@media (
+    max-width: 520px
+) {
+    .login-brand {
+        min-height:
+            220px;
+    }
+
+    .login-brand-content {
+        margin:
+            36px 0 10px;
+    }
+
+    .login-brand-content p {
+        display: none;
+    }
+
+    .login-form-area {
+        padding:
+            40px 20px;
+    }
+}

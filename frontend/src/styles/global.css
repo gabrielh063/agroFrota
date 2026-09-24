@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+    --color-bg: #080F0A;
+    --color-bg-secondary: #0D140E;
+    --color-surface: #18221B;
+    --color-surface-light: #202921;
+
+    --color-border: #202921;
+
+    --color-primary: #52A85B;
+    --color-primary-hover: #63B76B;
+
+    --color-text: #E3E6DB;
+    --color-text-muted: #A3A799;
+
+    --color-danger: #FF6367;
+    --color-warning: #E18F37;
+    --color-info: #25AEA7;
+
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "DM Sans", sans-serif;
+    --font-mono: "Geist Mono", monospace;
+
+    --sidebar-width: 256px;
+    --border-radius: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-width: 320px;
+
+    background:
+        var(--color-bg);
+
+    color:
+        var(--color-text);
+
+    font-family:
+        var(--font-body);
+
+    -webkit-font-smoothing:
+        antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
