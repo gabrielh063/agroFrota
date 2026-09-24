@@ -1,0 +1,401 @@
+.nova-os-page {
+    width: 100%;
+    max-width: 900px;
+
+    margin: 0 auto;
+}
+
+
+.nova-os-header {
+    margin-bottom: 24px;
+}
+
+
+.nova-os-back {
+    margin-bottom: 14px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    border: 0;
+
+    background: transparent;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 13px;
+}
+
+
+.nova-os-back:hover {
+    color:
+        var(--color-primary);
+}
+
+
+.nova-os-header h1 {
+    margin: 0;
+
+    font-family:
+        var(--font-display);
+
+    color: #EFEFE6;
+
+    font-size: 30px;
+
+    font-weight: 600;
+}
+
+
+.nova-os-header p {
+    margin: 6px 0 0;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 14px;
+}
+
+
+/* CARDS */
+
+.nova-os-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+
+.nova-os-card {
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    border-radius: 12px;
+
+    background:
+        #0D140E;
+
+    overflow: hidden;
+}
+
+
+.nova-os-card-header {
+    min-height: 68px;
+
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.07);
+}
+
+
+.nova-os-card-header h2 {
+    margin: 0;
+
+    color: #EFEFE6;
+
+    font-family:
+        var(--font-display);
+
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+
+.nova-os-card-header p {
+    margin: 3px 0 0;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 12px;
+}
+
+
+.nova-os-card-body {
+    padding: 20px;
+}
+
+
+/* CAMPOS */
+
+.nova-os-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px 16px;
+}
+
+
+.nova-os-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.nova-os-field.full {
+    grid-column:
+        1 / -1;
+}
+
+
+.nova-os-field label {
+    color: #EFEFE6;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+.nova-os-field input,
+.nova-os-field select,
+.nova-os-field textarea {
+    width: 100%;
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background:
+        #080F0A;
+
+    color:
+        #EFEFE6;
+
+    font-size: 13px;
+}
+
+
+.nova-os-field input,
+.nova-os-field select {
+    height: 40px;
+
+    padding:
+        0 12px;
+}
+
+
+.nova-os-field textarea {
+    min-height: 100px;
+
+    padding: 11px 12px;
+
+    resize: vertical;
+}
+
+
+.nova-os-field input:focus,
+.nova-os-field select:focus,
+.nova-os-field textarea:focus {
+    border-color:
+        var(--color-primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(82,168,91,.1);
+}
+
+
+/* TIPO DO ATIVO */
+
+.asset-type-selector {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+
+.asset-type-selector button {
+    min-height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    border-radius: 9px;
+
+    background:
+        #080F0A;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 13px;
+}
+
+
+.asset-type-selector button:hover {
+    border-color:
+        rgba(82,168,91,.45);
+}
+
+
+.asset-type-selector button.active {
+    border-color:
+        var(--color-primary);
+
+    background:
+        rgba(82,168,91,.1);
+
+    color:
+        var(--color-primary);
+}
+
+
+.asset-select {
+    width: 100%;
+}
+
+
+/* ERRO */
+
+.nova-os-error {
+    padding: 12px 14px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    border:
+        1px solid
+        rgba(255,99,103,.25);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,99,103,.07);
+
+    color:
+        #FF8588;
+
+    font-size: 13px;
+}
+
+
+/* RODAPÉ */
+
+.nova-os-footer {
+    padding-top: 4px;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+
+.nova-os-cancel,
+.nova-os-submit {
+    min-height: 38px;
+
+    padding:
+        0 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+.nova-os-cancel {
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    background:
+        transparent;
+
+    color:
+        #EFEFE6;
+}
+
+
+.nova-os-submit {
+    border: 0;
+
+    background:
+        var(--color-primary);
+
+    color:
+        #071009;
+}
+
+
+.nova-os-submit:hover {
+    background:
+        var(--color-primary-hover);
+}
+
+
+.nova-os-loading {
+    min-height: 350px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    color:
+        var(--color-text-muted);
+}
+
+
+@media (
+    max-width: 650px
+) {
+    .nova-os-grid,
+    .asset-type-selector {
+        grid-template-columns:
+            1fr;
+    }
+
+    .nova-os-field.full {
+        grid-column:
+            auto;
+    }
+}

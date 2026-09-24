@@ -33,9 +33,27 @@ def listar_equipamentos_route(**kwargs):
 
     database_name = kwargs["database_name"]
 
+    incluir_inativos_param = request.args.get(
+        "incluir_inativos",
+        "false"
+    )
+
+    incluir_inativos = (
+        incluir_inativos_param
+        .strip()
+        .lower()
+        in {
+            "1",
+            "true",
+            "sim",
+            "yes"
+        }
+    )
+
     equipamentos = listar_equipamentos(
         config=Config,
-        database_name=database_name
+        database_name=database_name,
+        incluir_inativos=incluir_inativos
     )
 
     return jsonify({
@@ -56,7 +74,6 @@ def listar_equipamentos_route(**kwargs):
             for equipamento in equipamentos
         ]
     })
-
 
 @equipamentos_bp.post("/")
 @autenticar()

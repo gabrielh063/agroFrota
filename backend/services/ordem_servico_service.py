@@ -27,6 +27,8 @@ STATUS_OS = {
     "CANCELADA",
 }
 
+_NAO_INFORMADO = object()
+
 def _validar_relacionamentos(
     session,
     maquina_id: int | None = None,
@@ -274,16 +276,16 @@ def atualizar_ordem_servico(
     config,
     database_name: str,
     ordem_servico_id: int,
-    tipo: str | None = None,
-    titulo: str | None = None,
-    descricao: str | None = None,
-    maquina_id: int | None = None,
-    equipamento_id: int | None = None,
-    operador_id: int | None = None,
-    responsavel_id: int | None = None,
-    prioridade: str | None = None,
-    status: str | None = None,
-    prazo=None
+    tipo=_NAO_INFORMADO,
+    titulo=_NAO_INFORMADO,
+    descricao=_NAO_INFORMADO,
+    maquina_id=_NAO_INFORMADO,
+    equipamento_id=_NAO_INFORMADO,
+    operador_id=_NAO_INFORMADO,
+    responsavel_id=_NAO_INFORMADO,
+    prioridade=_NAO_INFORMADO,
+    status=_NAO_INFORMADO,
+    prazo=_NAO_INFORMADO
 ) -> OrdemServico:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -297,14 +299,17 @@ def atualizar_ordem_servico(
 
         ordem = session.execute(
             select(OrdemServico).where(
-                OrdemServico.id == ordem_servico_id
+                OrdemServico.id
+                == ordem_servico_id
             )
         ).scalar_one_or_none()
+
 
         if ordem is None:
             raise ValueError(
                 "Ordem de serviço não encontrada."
             )
+
 
         if ordem.status in {
             "CONCLUIDA",
@@ -315,7 +320,15 @@ def atualizar_ordem_servico(
                 "ou cancelada."
             )
 
-        if tipo is not None:
+
+        # =========================
+        # TIPO
+        # =========================
+
+        if (
+            tipo is not _NAO_INFORMADO
+            and tipo is not None
+        ):
 
             tipo = tipo.upper()
 
@@ -326,18 +339,38 @@ def atualizar_ordem_servico(
 
             ordem.tipo = tipo
 
-        if prioridade is not None:
+
+        # =========================
+        # PRIORIDADE
+        # =========================
+
+        if (
+            prioridade
+            is not _NAO_INFORMADO
+            and prioridade is not None
+        ):
 
             prioridade = prioridade.upper()
 
-            if prioridade not in PRIORIDADES_OS:
+            if (
+                prioridade
+                not in PRIORIDADES_OS
+            ):
                 raise ValueError(
                     "Prioridade inválida."
                 )
 
             ordem.prioridade = prioridade
 
-        if status is not None:
+
+        # =========================
+        # STATUS
+        # =========================
+
+        if (
+            status is not _NAO_INFORMADO
+            and status is not None
+        ):
 
             status = status.upper()
 
@@ -348,53 +381,183 @@ def atualizar_ordem_servico(
 
             ordem.status = status
 
-        if maquina_id is not None:
-            if ordem.equipamento_id is not None:
-                raise ValueError(
-                    "A OS já está vinculada a um equipamento."
+
+        # =========================
+        # MÁQUINA / EQUIPAMENTO
+        # =========================
+
+        alterou_ativo = (
+            maquina_id
+            is not _NAO_INFORMADO
+            or
+            equipamento_id
+            is not _NAO_INFORMADO
+        )
+
+
+        if alterou_ativo:
+
+            maquina_final = (
+                ordem.maquina_id
+                if maquina_id
+                is _NAO_INFORMADO
+                else maquina_id
+            )
+
+            equipamento_final = (
+                ordem.equipamento_id
+                if equipamento_id
+                is _NAO_INFORMADO
+                else equipamento_id
+            )
+
+
+            _validar_relacionamentos(
+                session=session,
+                maquina_id=maquina_final,
+                equipamento_id=equipamento_final
+            )
+
+
+            if (
+                maquina_id
+                is not _NAO_INFORMADO
+            ):
+                ordem.maquina_id = (
+                    maquina_id
                 )
 
-            ordem.maquina_id = maquina_id
 
-        if equipamento_id is not None:
-            if ordem.maquina_id is not None:
-                raise ValueError(
-                    "A OS já está vinculada a uma máquina."
+            if (
+                equipamento_id
+                is not _NAO_INFORMADO
+            ):
+                ordem.equipamento_id = (
+                    equipamento_id
                 )
 
-            ordem.equipamento_id = equipamento_id
 
-        if titulo is not None:
-            ordem.titulo = titulo
+        # =========================
+        # OPERADOR
+        # =========================
 
-        if descricao is not None:
-            ordem.descricao = descricao
+        if (
+            operador_id
+            is not _NAO_INFORMADO
+        ):
 
-        if operador_id is not None:
+            if operador_id is not None:
+
+                operador = session.get(
+                    Usuario,
+                    operador_id
+                )
+
+                if operador is None:
+                    raise ValueError(
+                        "Operador não encontrado."
+                    )
+
+                if not operador.ativo:
+                    raise ValueError(
+                        "Operador está inativo."
+                    )
+
             ordem.operador_id = operador_id
 
-        if responsavel_id is not None:
-            ordem.responsavel_id = responsavel_id
 
-        if prazo is not None:
+        # =========================
+        # RESPONSÁVEL
+        # =========================
+
+        if (
+            responsavel_id
+            is not _NAO_INFORMADO
+        ):
+
+            if responsavel_id is not None:
+
+                responsavel = session.get(
+                    Usuario,
+                    responsavel_id
+                )
+
+                if responsavel is None:
+                    raise ValueError(
+                        "Responsável não encontrado."
+                    )
+
+                if not responsavel.ativo:
+                    raise ValueError(
+                        "Responsável está inativo."
+                    )
+
+            ordem.responsavel_id = (
+                responsavel_id
+            )
+
+
+        # =========================
+        # CAMPOS NORMAIS
+        # =========================
+
+        if (
+            titulo is not _NAO_INFORMADO
+            and titulo is not None
+        ):
+            ordem.titulo = titulo
+
+
+        if (
+            descricao
+            is not _NAO_INFORMADO
+        ):
+            ordem.descricao = descricao
+
+
+        if prazo is not _NAO_INFORMADO:
             ordem.prazo = prazo
 
-        if ordem.maquina_id is None and ordem.equipamento_id is None:
+
+        # =========================
+        # GARANTIA FINAL
+        # =========================
+
+        if (
+            ordem.maquina_id is None
+            and
+            ordem.equipamento_id is None
+        ):
             raise ValueError(
                 "A OS deve estar relacionada a uma máquina "
                 "ou equipamento."
             )
 
+
+        if (
+            ordem.maquina_id is not None
+            and
+            ordem.equipamento_id is not None
+        ):
+            raise ValueError(
+                "A OS não pode estar relacionada "
+                "a uma máquina e equipamento ao mesmo tempo."
+            )
+
+
         session.commit()
+
         session.refresh(ordem)
 
         return ordem
+
 
     except Exception:
 
         session.rollback()
 
         raise
+
 
     finally:
 

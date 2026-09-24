@@ -7,6 +7,12 @@ import {
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home/Home";
 import Maquinarios from "./pages/Maquinarios/Maquinarios";
+import Equipamentos from "./pages/Equipamentos/Equipamentos";
+import OrdensServico from "./pages/OrdensServico/OrdensServico";
+import NovaOrdemServico from "./pages/NovaOrdemServico/NovaOrdemServico";
+import DetalhesOrdemServico from "./pages/DetalhesOrdemServico/DetalhesOrdemServico";
+import EditarOrdemServico from "./pages/EditarOrdemServico/EditarOrdemServico";
+import Calendario from "./pages/Calendario/Calendario";
 
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -46,19 +52,14 @@ function App() {
                 <Route
                     path="/calendario"
                     element={
-                        <PagePlaceholder
-                            titulo="Calendário de serviços"
-                        />
+                        <Calendario />
                     }
                 />
-
 
                 <Route
                     path="/ordens-servico"
                     element={
-                        <PagePlaceholder
-                            titulo="Ordens de serviço"
-                        />
+                        <OrdensServico />
                     }
                 />
 
@@ -66,12 +67,23 @@ function App() {
                 <Route
                     path="/ordens-servico/nova"
                     element={
-                        <PagePlaceholder
-                            titulo="Nova ordem de serviço"
-                        />
+                        <NovaOrdemServico />
+                    }
+                />
+                
+                <Route
+                    path="/ordens-servico/:id/editar"
+                    element={
+                        <EditarOrdemServico />
                     }
                 />
 
+                <Route
+                    path="/ordens-servico/:id"
+                    element={
+                        <DetalhesOrdemServico />
+                    }
+                />
 
                 <Route
                     path="/maquinarios"
@@ -84,9 +96,7 @@ function App() {
                 <Route
                     path="/equipamentos"
                     element={
-                        <PagePlaceholder
-                            titulo="Equipamentos"
-                        />
+                        <Equipamentos />
                     }
                 />
 

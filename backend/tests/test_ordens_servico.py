@@ -870,3 +870,246 @@ def test_os_maquina_inexistente_nao_deve_gerar_500(
     }
 
     assert resposta.status_code != 500
+    
+def test_trocar_maquina_por_equipamento_na_os(
+    base_url,
+    auth_headers,
+    codigo_unico,
+    cleanup_registros_teste,
+):
+    maquina = criar_maquina_para_os(
+        base_url,
+        auth_headers,
+        f"{codigo_unico}-MAQ",
+    )
+
+    equipamento = criar_equipamento_para_os(
+        base_url,
+        auth_headers,
+        f"{codigo_unico}-EQP",
+    )
+
+    cleanup_registros_teste(
+        "maquinas",
+        maquina["id"],
+    )
+
+    cleanup_registros_teste(
+        "equipamentos",
+        equipamento["id"],
+    )
+
+
+    ordem = criar_os_maquina(
+        base_url,
+        auth_headers,
+        maquina["id"],
+        f"{codigo_unico}-OS",
+    )
+
+    cleanup_registros_teste(
+        "ordens_servico",
+        ordem["id"],
+    )
+
+
+    resposta = requests.put(
+        (
+            f"{base_url}/api/ordens-servico/"
+            f"{ordem['id']}"
+        ),
+        headers=auth_headers,
+        json={
+            "maquina_id": None,
+            "equipamento_id":
+                equipamento["id"],
+        },
+        timeout=10,
+    )
+
+
+    assert resposta.status_code == 200
+
+    atualizada = resposta.json()[
+        "ordem_servico"
+    ]
+
+
+    assert (
+        atualizada["maquina_id"]
+        is None
+    )
+
+    assert (
+        atualizada["equipamento_id"]
+        == equipamento["id"]
+    )
+
+
+def test_remover_prazo_da_os(
+    base_url,
+    auth_headers,
+    codigo_unico,
+    cleanup_registros_teste,
+):
+    maquina = criar_maquina_para_os(
+        base_url,
+        auth_headers,
+        codigo_unico,
+    )
+
+    cleanup_registros_teste(
+        "maquinas",
+        maquina["id"],
+    )
+
+
+    ordem = criar_os_maquina(
+        base_url,
+        auth_headers,
+        maquina["id"],
+        codigo_unico,
+    )
+
+    cleanup_registros_teste(
+        "ordens_servico",
+        ordem["id"],
+    )
+
+
+    assert ordem["prazo"] is not None
+
+
+    resposta = requests.put(
+        (
+            f"{base_url}/api/ordens-servico/"
+            f"{ordem['id']}"
+        ),
+        headers=auth_headers,
+        json={
+            "prazo": None,
+        },
+        timeout=10,
+    )
+
+
+    assert resposta.status_code == 200
+
+
+    atualizada = resposta.json()[
+        "ordem_servico"
+    ]
+
+
+    assert atualizada["prazo"] is None
+
+
+def test_nao_remover_unico_ativo_da_os(
+    base_url,
+    auth_headers,
+    codigo_unico,
+    cleanup_registros_teste,
+):
+    maquina = criar_maquina_para_os(
+        base_url,
+        auth_headers,
+        codigo_unico,
+    )
+
+    cleanup_registros_teste(
+        "maquinas",
+        maquina["id"],
+    )
+
+
+    ordem = criar_os_maquina(
+        base_url,
+        auth_headers,
+        maquina["id"],
+        codigo_unico,
+    )
+
+    cleanup_registros_teste(
+        "ordens_servico",
+        ordem["id"],
+    )
+
+
+    resposta = requests.put(
+        (
+            f"{base_url}/api/ordens-servico/"
+            f"{ordem['id']}"
+        ),
+        headers=auth_headers,
+        json={
+            "maquina_id": None,
+        },
+        timeout=10,
+    )
+
+
+    assert resposta.status_code == 400
+
+    dados = resposta.json()
+
+    assert dados["sucesso"] is False
+
+    assert (
+        "máquina ou equipamento"
+        in dados["erro"].lower()
+    )
+
+
+def test_limpar_descricao_da_os(
+    base_url,
+    auth_headers,
+    codigo_unico,
+    cleanup_registros_teste,
+):
+    maquina = criar_maquina_para_os(
+        base_url,
+        auth_headers,
+        codigo_unico,
+    )
+
+    cleanup_registros_teste(
+        "maquinas",
+        maquina["id"],
+    )
+
+
+    ordem = criar_os_maquina(
+        base_url,
+        auth_headers,
+        maquina["id"],
+        codigo_unico,
+    )
+
+    cleanup_registros_teste(
+        "ordens_servico",
+        ordem["id"],
+    )
+
+
+    resposta = requests.put(
+        (
+            f"{base_url}/api/ordens-servico/"
+            f"{ordem['id']}"
+        ),
+        headers=auth_headers,
+        json={
+            "descricao": None,
+        },
+        timeout=10,
+    )
+
+
+    assert resposta.status_code == 200
+
+    atualizada = resposta.json()[
+        "ordem_servico"
+    ]
+
+    assert atualizada[
+        "descricao"
+    ] is None
