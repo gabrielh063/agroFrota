@@ -6,6 +6,7 @@ import {
 
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home/Home";
+import Maquinarios from "./pages/Maquinarios/Maquinarios";
 
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -41,6 +42,7 @@ function App() {
                     }
                 />
 
+
                 <Route
                     path="/calendario"
                     element={
@@ -49,6 +51,7 @@ function App() {
                         />
                     }
                 />
+
 
                 <Route
                     path="/ordens-servico"
@@ -59,6 +62,7 @@ function App() {
                     }
                 />
 
+
                 <Route
                     path="/ordens-servico/nova"
                     element={
@@ -68,14 +72,14 @@ function App() {
                     }
                 />
 
+
                 <Route
                     path="/maquinarios"
                     element={
-                        <PagePlaceholder
-                            titulo="Maquinários"
-                        />
+                        <Maquinarios />
                     }
                 />
+
 
                 <Route
                     path="/equipamentos"

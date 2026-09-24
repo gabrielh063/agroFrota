@@ -30,9 +30,27 @@ def listar_maquinas_route(**kwargs):
 
     database_name = kwargs["database_name"]
 
+    incluir_inativas_param = request.args.get(
+        "incluir_inativas",
+        "false"
+    )
+
+    incluir_inativas = (
+        incluir_inativas_param
+        .strip()
+        .lower()
+        in {
+            "1",
+            "true",
+            "sim",
+            "yes"
+        }
+    )
+
     maquinas = listar_maquinas(
         config=Config,
-        database_name=database_name
+        database_name=database_name,
+        incluir_inativas=incluir_inativas
     )
 
     return jsonify({
@@ -46,14 +64,14 @@ def listar_maquinas_route(**kwargs):
                 "ano": maquina.ano,
                 "localizacao": maquina.localizacao,
                 "status": maquina.status,
-                "controla_telemetria": maquina.controla_telemetria,
+                "controla_telemetria":
+                    maquina.controla_telemetria,
                 "ativo": maquina.ativo
             }
             for maquina in maquinas
         ]
     })
-
-
+    
 @maquinas_bp.post("/")
 @autenticar()
 @resolver_tenant(Config)

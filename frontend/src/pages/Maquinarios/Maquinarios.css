@@ -1,0 +1,696 @@
+.maquinarios-page {
+    width: 100%;
+    max-width: 1216px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================
+   CABEÇALHO
+========================= */
+
+.maquinarios-header {
+    min-height: 62px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+}
+
+
+.maquinarios-header h1 {
+    margin: 0;
+
+    font-family:
+        var(--font-display);
+
+    color:
+        #EFEFE6;
+
+    font-size: 30px;
+    line-height: 36px;
+
+    font-weight: 600;
+}
+
+
+.maquinarios-header p {
+    margin:
+        6px 0 0;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 14px;
+}
+
+
+.maquinarios-new {
+    min-height: 32px;
+
+    padding:
+        6px 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background:
+        var(--color-primary);
+
+    color:
+        #071009;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.maquinarios-new:hover {
+    background:
+        var(--color-primary-hover);
+}
+
+
+/* =========================
+   FILTROS
+========================= */
+
+.maquinarios-filters {
+    margin-top: 24px;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(260px, 1fr)
+        190px
+        150px;
+
+    gap: 12px;
+}
+
+
+.maquinarios-search {
+    position: relative;
+}
+
+
+.maquinarios-search i {
+    position: absolute;
+
+    left: 13px;
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 14px;
+}
+
+
+.maquinarios-search input,
+.maquinarios-filters select {
+    width: 100%;
+    height: 40px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.1);
+
+    border-radius: 8px;
+
+    background:
+        #0D140E;
+
+    color:
+        #EFEFE6;
+
+    outline: none;
+
+    font-size: 13px;
+}
+
+
+.maquinarios-search input {
+    padding:
+        0 14px 0 38px;
+}
+
+
+.maquinarios-filters select {
+    padding:
+        0 12px;
+}
+
+
+.maquinarios-search input:focus,
+.maquinarios-filters select:focus {
+    border-color:
+        var(--color-primary);
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.maquinarios-card {
+    margin-top: 16px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    border-radius: 12px;
+
+    background:
+        #0D140E;
+
+    overflow: hidden;
+}
+
+
+.maquinarios-card-header {
+    min-height: 68px;
+
+    padding:
+        0 20px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+}
+
+
+.maquinarios-card-header h2 {
+    margin: 0;
+
+    font-family:
+        var(--font-display);
+
+    color:
+        #EFEFE6;
+
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+
+.maquinarios-card-header span {
+    display: block;
+
+    margin-top: 3px;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   TABELA
+========================= */
+
+.maquinarios-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+.maquinarios-table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+
+.maquinarios-table th {
+    padding:
+        11px 16px;
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 11px;
+
+    font-weight: 500;
+
+    text-align: left;
+
+    text-transform: uppercase;
+
+    letter-spacing:
+        0.04em;
+}
+
+
+.maquinarios-table td {
+    padding:
+        14px 16px;
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.05);
+
+    color:
+        #D8DBD2;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+
+.maquinarios-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+.maquinarios-table tbody tr:hover {
+    background:
+        rgba(255, 255, 255, 0.02);
+}
+
+
+/* =========================
+   IDENTIFICAÇÃO
+========================= */
+
+.maquina-identificacao {
+    min-width: 210px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+}
+
+
+.maquina-icon {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background:
+        rgba(82, 168, 91, 0.12);
+
+    color:
+        var(--color-primary);
+}
+
+
+.maquina-identificacao div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.maquina-identificacao strong {
+    color:
+        #EFEFE6;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+.maquina-identificacao span {
+    margin-top: 2px;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   BADGES
+========================= */
+
+.maquina-status,
+.situacao {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding:
+        3px 8px;
+
+    border-radius:
+        999px;
+
+    font-size: 11px;
+
+    font-weight: 500;
+}
+
+
+.maquina-status.operando {
+    background:
+        rgba(82, 168, 91, 0.12);
+
+    color:
+        #52A85B;
+}
+
+
+.maquina-status.manutencao {
+    background:
+        rgba(225, 143, 55, 0.15);
+
+    color:
+        #E18F37;
+}
+
+
+.maquina-status.indisponivel {
+    background:
+        rgba(255, 99, 103, 0.12);
+
+    color:
+        #FF6367;
+}
+
+
+.maquina-status.neutro {
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color:
+        var(--color-text-muted);
+}
+
+
+.situacao.ativo {
+    background:
+        rgba(82, 168, 91, 0.12);
+
+    color:
+        #52A85B;
+}
+
+
+.situacao.inativo {
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color:
+        var(--color-text-muted);
+}
+
+
+/* =========================
+   TELEMETRIA
+========================= */
+
+.telemetria {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    color:
+        var(--color-text-muted);
+}
+
+
+.telemetria.ativa {
+    color:
+        #25AEA7;
+}
+
+
+/* =========================
+   AÇÕES
+========================= */
+
+.maquina-actions {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+
+    border-radius: 7px;
+
+    background:
+        transparent;
+
+    color:
+        var(--color-text-muted);
+}
+
+
+.maquina-actions:hover {
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    color:
+        #EFEFE6;
+}
+
+
+/* =========================
+   ESTADOS
+========================= */
+
+.maquinarios-state {
+    min-height: 220px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color:
+        var(--color-text-muted);
+}
+
+
+.maquinarios-state i {
+    margin-bottom: 8px;
+
+    color:
+        var(--color-primary);
+
+    font-size: 27px;
+}
+
+
+.maquinarios-state strong {
+    color:
+        #EFEFE6;
+
+    font-size: 14px;
+}
+
+
+.maquinarios-state span {
+    margin-top: 4px;
+
+    font-size: 12px;
+}
+
+
+.maquinarios-error {
+    margin-top: 18px;
+
+    padding:
+        12px 14px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    border:
+        1px solid
+        rgba(255, 99, 103, 0.25);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255, 99, 103, 0.07);
+
+    color:
+        #FF8588;
+
+    font-size: 13px;
+}
+
+
+.maquinarios-error button {
+    margin-left: auto;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #FF8588;
+}
+
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (
+    max-width: 850px
+) {
+    .maquinarios-filters {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+.maquina-status.inativa {
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color:
+        var(--color-text-muted);
+}
+
+
+/* =========================
+   MENU DE AÇÕES
+========================= */
+
+.actions-cell {
+    position: relative;
+
+    width: 54px;
+}
+
+
+.maquina-action-menu {
+    position: absolute;
+
+    top: 44px;
+    right: 14px;
+
+    z-index: 20;
+
+    width: 145px;
+
+    padding: 5px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.1);
+
+    border-radius: 9px;
+
+    background:
+        #18221B;
+
+    box-shadow:
+        0 12px 30px
+        rgba(0, 0, 0, 0.4);
+}
+
+
+.maquina-action-menu button {
+    width: 100%;
+    height: 34px;
+
+    padding:
+        0 9px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    border: 0;
+
+    border-radius: 6px;
+
+    background:
+        transparent;
+
+    color:
+        #EFEFE6;
+
+    font-size: 12px;
+
+    text-align: left;
+}
+
+
+.maquina-action-menu button:hover {
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+
+.maquina-action-menu button.danger {
+    color:
+        #FF8588;
+}
+
+
+/* =========================
+   SUCESSO
+========================= */
+
+.maquinarios-success {
+    margin-top: 18px;
+
+    padding:
+        11px 14px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    border:
+        1px solid
+        rgba(82, 168, 91, 0.25);
+
+    border-radius: 9px;
+
+    background:
+        rgba(82, 168, 91, 0.08);
+
+    color:
+        #69BD72;
+
+    font-size: 13px;
+}
