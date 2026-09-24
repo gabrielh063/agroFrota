@@ -3,7 +3,6 @@ from sqlalchemy import select
 from database.session import criar_sessao_tenant
 
 from models.tenant.perfil import Perfil
-from models.tenant.permissao import Permissao
 
 
 def criar_perfil(
@@ -21,6 +20,7 @@ def criar_perfil(
     session = SessionLocal()
 
     try:
+
         perfil_existente = session.execute(
             select(Perfil).where(
                 Perfil.nome == nome
@@ -52,11 +52,40 @@ def criar_perfil(
         session.close()
 
 
-def adicionar_permissao_ao_perfil(
+def buscar_perfil(
+    config,
+    database_name: str,
+    perfil_id: int
+) -> Perfil | None:
+
+    SessionLocal, _ = criar_sessao_tenant(
+        config,
+        database_name
+    )
+
+    session = SessionLocal()
+
+    try:
+
+        perfil = session.execute(
+            select(Perfil).where(
+                Perfil.id == perfil_id
+            )
+        ).scalar_one_or_none()
+
+        return perfil
+
+    finally:
+        session.close()
+
+
+def atualizar_perfil(
     config,
     database_name: str,
     perfil_id: int,
-    permissao_id: int
+    nome: str | None = None,
+    descricao: str | None = None,
+    ativo: bool | None = None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -67,6 +96,7 @@ def adicionar_permissao_ao_perfil(
     session = SessionLocal()
 
     try:
+
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -78,19 +108,27 @@ def adicionar_permissao_ao_perfil(
                 "Perfil não encontrado."
             )
 
-        permissao = session.execute(
-            select(Permissao).where(
-                Permissao.id == permissao_id
-            )
-        ).scalar_one_or_none()
+        if nome is not None:
 
-        if permissao is None:
-            raise ValueError(
-                "Permissão não encontrada."
-            )
+            perfil_existente = session.execute(
+                select(Perfil).where(
+                    Perfil.nome == nome,
+                    Perfil.id != perfil_id
+                )
+            ).scalar_one_or_none()
 
-        if permissao not in perfil.permissoes:
-            perfil.permissoes.append(permissao)
+            if perfil_existente is not None:
+                raise ValueError(
+                    "Já existe um perfil com este nome."
+                )
+
+            perfil.nome = nome
+
+        if descricao is not None:
+            perfil.descricao = descricao
+
+        if ativo is not None:
+            perfil.ativo = ativo
 
         session.commit()
         session.refresh(perfil)
@@ -100,6 +138,40 @@ def adicionar_permissao_ao_perfil(
     except Exception:
         session.rollback()
         raise
+
+    finally:
+        session.close()
+
+
+def listar_perfis(
+    config,
+    database_name: str,
+    incluir_inativos: bool = False
+) -> list[Perfil]:
+
+    SessionLocal, _ = criar_sessao_tenant(
+        config,
+        database_name
+    )
+
+    session = SessionLocal()
+
+    try:
+
+        consulta = select(Perfil).order_by(
+            Perfil.id
+        )
+
+        if not incluir_inativos:
+            consulta = consulta.where(
+                Perfil.ativo.is_(True)
+            )
+
+        perfis = session.execute(
+            consulta
+        ).scalars().all()
+
+        return perfis
 
     finally:
         session.close()

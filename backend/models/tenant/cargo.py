@@ -29,6 +29,3 @@ class Cargo(TenantBase):
         nullable=False,
         default=True
     )
-
-    def __repr__(self) -> str:
-        return f"<Cargo {self.nome}>"

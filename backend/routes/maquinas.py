@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from middleware.auth import autenticar
 from middleware.tenant import resolver_tenant
+from middleware.permissions import exigir_permissao
 
 from config import Config
 
@@ -24,6 +25,7 @@ maquinas_bp = Blueprint(
 @maquinas_bp.get("/")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("MAQUINA_VISUALIZAR")
 def listar_maquinas_route(**kwargs):
 
     database_name = kwargs["database_name"]
@@ -55,6 +57,7 @@ def listar_maquinas_route(**kwargs):
 @maquinas_bp.post("/")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("MAQUINA_CRIAR")
 def criar_maquina_route(**kwargs):
 
     database_name = kwargs["database_name"]
@@ -121,6 +124,7 @@ def criar_maquina_route(**kwargs):
 @maquinas_bp.put("/<int:maquina_id>")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("MAQUINA_EDITAR")
 def atualizar_maquina_route(
     maquina_id,
     **kwargs
@@ -199,6 +203,7 @@ def atualizar_maquina_route(
 @maquinas_bp.patch("/<int:maquina_id>/desativar")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("MAQUINA_DESATIVAR")
 def desativar_maquina_route(
     maquina_id,
     **kwargs
@@ -242,6 +247,7 @@ def desativar_maquina_route(
 @maquinas_bp.patch("/<int:maquina_id>/ativar")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("MAQUINA_DESATIVAR")
 def ativar_maquina_route(
     maquina_id,
     **kwargs

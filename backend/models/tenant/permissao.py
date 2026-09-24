@@ -23,6 +23,3 @@ class Permissao(TenantBase):
         String(255),
         nullable=True
     )
-
-    def __repr__(self) -> str:
-        return f"<Permissao {self.codigo}>"

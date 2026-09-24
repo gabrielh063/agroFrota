@@ -16,9 +16,21 @@ from services.tenant_service import criar_tenant
 
 from routes.maquinas import maquinas_bp
 from routes.equipamentos import equipamentos_bp
+from routes.cargos import cargos_bp
+from routes.permissoes import permissoes_bp
+from routes.perfis import perfis_bp
+from routes.perfil_permissoes import perfil_permissoes_bp
+from routes.auth import auth_bp
+from routes.usuarios import usuarios_bp
+from routes.ordens_servico import ordens_servico_bp
+from routes.calendario import calendario_bp
+from routes.manutencoes import manutencoes_bp
+from routes.indisponibilidades import indisponibilidades_bp
+from routes.dashboard import dashboard_bp
 
 from middleware.auth import autenticar
 from middleware.tenant import resolver_tenant
+from middleware.permissions import exigir_permissao
 
 def create_app():
 
@@ -39,6 +51,18 @@ def create_app():
 
     app.register_blueprint(maquinas_bp)
     app.register_blueprint(equipamentos_bp)
+    app.register_blueprint(cargos_bp)
+    app.register_blueprint(permissoes_bp)
+    app.register_blueprint(perfis_bp)
+    app.register_blueprint(perfil_permissoes_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(usuarios_bp)
+    app.register_blueprint(ordens_servico_bp)
+    app.register_blueprint(calendario_bp)
+    app.register_blueprint(manutencoes_bp)
+    app.register_blueprint(indisponibilidades_bp)
+    app.register_blueprint(dashboard_bp)
+    
     # --------------------------------------------------
     # BANCO CENTRAL
     # --------------------------------------------------
@@ -77,15 +101,10 @@ def create_app():
     @app.get("/api/dev/protegida")
     @autenticar()
     @resolver_tenant(Config)
-    def rota_protegida(
-        usuario_id,
-        tenant_id,
-        perfil_id,
-        tenant,
-        database_name,
-        tenant_session
-    ):
-        
+    def rota_protegida(**kwargs):
+        tenant_session = kwargs["tenant_session"]
+        tenant = kwargs["tenant"]
+
         usuarios = tenant_session.execute(
             select(Usuario)
         ).scalars().all()
@@ -93,18 +112,28 @@ def create_app():
         return jsonify({
             "success": True,
             "message": "Acesso autorizado.",
-            "usuario_id": usuario_id,
-            "tenant_id": tenant_id,
-            "perfil_id": perfil_id,
+            "usuario_id": kwargs["usuario_autenticado_id"],
+            "tenant_id": kwargs["tenant_id"],
+            "perfil_id": kwargs["usuario_perfil_id"],
             "tenant_nome": tenant.nome,
-            "database_name": database_name,
+            "database_name": kwargs["database_name"],
             "tenant_session": "ativa",
             "quantidade_usuarios": len(usuarios)
         })
     # --------------------------------------------------
     # ROTA TEMPORÁRIA DE DESENVOLVIMENTO
     # --------------------------------------------------
-
+    
+    @app.get("/api/dev/teste-permissao")
+    @autenticar()
+    @resolver_tenant(Config)
+    @exigir_permissao("OS.CRIAR")
+    def teste_permissao(**kwargs):
+        return jsonify({
+            "success": True,
+            "message": "Permissão OS.CRIAR validada com sucesso."
+        })
+    
     @app.post("/api/dev/tenants")
     def criar_tenant_dev():
 

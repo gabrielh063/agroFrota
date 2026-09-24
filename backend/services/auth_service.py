@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -22,6 +24,7 @@ def autenticar_usuario(
     session = SessionLocal()
 
     try:
+
         usuario = session.execute(
             select(Usuario).where(
                 Usuario.username == username
@@ -46,7 +49,20 @@ def autenticar_usuario(
                 "Usuário ou senha inválidos."
             )
 
+        usuario.ultimo_login = datetime.utcnow()
+
+        session.commit()
+
+        session.refresh(usuario)
+
         return usuario
 
+    except Exception:
+
+        session.rollback()
+
+        raise
+
     finally:
+
         session.close()

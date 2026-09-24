@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from middleware.auth import autenticar
 from middleware.tenant import resolver_tenant
+from middleware.permissions import exigir_permissao
 
 from config import Config
 
@@ -27,6 +28,7 @@ equipamentos_bp = Blueprint(
 @equipamentos_bp.get("/")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("EQUIPAMENTO_VISUALIZAR")
 def listar_equipamentos_route(**kwargs):
 
     database_name = kwargs["database_name"]
@@ -59,6 +61,7 @@ def listar_equipamentos_route(**kwargs):
 @equipamentos_bp.post("/")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("EQUIPAMENTO_CRIAR")
 def criar_equipamento_route(**kwargs):
 
     database_name = kwargs["database_name"]
@@ -127,6 +130,7 @@ def criar_equipamento_route(**kwargs):
 @equipamentos_bp.put("/<int:equipamento_id>")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("EQUIPAMENTO_EDITAR")
 def atualizar_equipamento_route(
     equipamento_id,
     **kwargs
@@ -200,6 +204,94 @@ def atualizar_equipamento_route(
             "ano": equipamento.ano,
             "localizacao": equipamento.localizacao,
             "status": equipamento.status,
+            "ativo": equipamento.ativo
+        }
+    })
+    
+@equipamentos_bp.patch("/<int:equipamento_id>/desativar")
+@autenticar()
+@resolver_tenant(Config)
+@exigir_permissao("EQUIPAMENTO_DESATIVAR")
+def desativar_equipamento_route(
+    equipamento_id,
+    **kwargs
+):
+
+    database_name = kwargs["database_name"]
+
+    try:
+
+        equipamento = atualizar_equipamento(
+            config=Config,
+            database_name=database_name,
+            equipamento_id=equipamento_id,
+            ativo=False
+        )
+
+    except ValueError as erro:
+
+        if str(erro) == "Equipamento não encontrado.":
+
+            return jsonify({
+                "success": False,
+                "message": str(erro)
+            }), 404
+
+        return jsonify({
+            "success": False,
+            "message": str(erro)
+        }), 400
+
+    return jsonify({
+        "success": True,
+        "message": "Equipamento desativado com sucesso.",
+        "data": {
+            "id": equipamento.id,
+            "identificacao": equipamento.identificacao,
+            "ativo": equipamento.ativo
+        }
+    })
+    
+@equipamentos_bp.patch("/<int:equipamento_id>/ativar")
+@autenticar()
+@resolver_tenant(Config)
+@exigir_permissao("EQUIPAMENTO_DESATIVAR")
+def ativar_equipamento_route(
+    equipamento_id,
+    **kwargs
+):
+
+    database_name = kwargs["database_name"]
+
+    try:
+
+        equipamento = atualizar_equipamento(
+            config=Config,
+            database_name=database_name,
+            equipamento_id=equipamento_id,
+            ativo=True
+        )
+
+    except ValueError as erro:
+
+        if str(erro) == "Equipamento não encontrado.":
+
+            return jsonify({
+                "success": False,
+                "message": str(erro)
+            }), 404
+
+        return jsonify({
+            "success": False,
+            "message": str(erro)
+        }), 400
+
+    return jsonify({
+        "success": True,
+        "message": "Equipamento ativado com sucesso.",
+        "data": {
+            "id": equipamento.id,
+            "identificacao": equipamento.identificacao,
             "ativo": equipamento.ativo
         }
     })

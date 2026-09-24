@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -6,7 +6,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from database.base import CentralBase
 
 
+def utc_now():
+    return datetime.now(UTC).replace(tzinfo=None)
+
+
 class Tenant(CentralBase):
+
     __tablename__ = "tenants"
 
     id: Mapped[int] = mapped_column(
@@ -36,14 +41,14 @@ class Tenant(CentralBase):
     criado_em: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
-        default=datetime.utcnow
+        default=utc_now
     )
 
     atualizado_em: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
+        default=utc_now,
+        onupdate=utc_now
     )
 
     def __repr__(self) -> str:
