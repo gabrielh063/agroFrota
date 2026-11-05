@@ -28,7 +28,7 @@ def buscar_ids_gerente_operador_cargo():
             text("""
                 SELECT id
                 FROM perfis
-                WHERE nome = 'GERENTE'
+                WHERE nome = 'ADMIN_EMPRESA'
                   AND ativo = 1
                 LIMIT 1
             """)

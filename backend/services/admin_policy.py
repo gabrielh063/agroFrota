@@ -41,6 +41,10 @@ def autorizar(session, database_name, contexto, permissao):
     permissoes = codigos(ator.perfil)
     if not ADMIN_CAPABILITIES <= permissoes or permissao not in permissoes:
         raise AdministracaoNegada('Autoridade administrativa insuficiente.')
+    from services.escopo import escopo_atual
+    from services.matriz_acesso import EMPRESA
+    if escopo_atual(session, contexto, permissao) != EMPRESA:
+        raise AdministracaoNegada('Escopo administrativo insuficiente.')
     return ator, permissoes
 
 
