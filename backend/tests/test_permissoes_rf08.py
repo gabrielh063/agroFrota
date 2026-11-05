@@ -330,6 +330,15 @@ def test_operador_pode_criar_os(
         maquina["id"],
     )
 
+    me = requests.get(f"{base_url}/api/auth/me", headers=operador_headers, timeout=10)
+    assert me.status_code == 200
+    operador_id = me.json()["data"]["usuario"]["id"]
+    atribuicao = requests.post(f"{base_url}/api/ordens-servico/", headers=auth_headers,
+        json={"tipo": "SERVICO", "titulo": "Atribuição pelo gestor", "maquina_id": maquina["id"],
+              "operador_id": operador_id}, timeout=10)
+    assert atribuicao.status_code == 201
+    cleanup_registros_teste("ordens_servico", atribuicao.json()["ordem_servico"]["id"])
+
     resposta = requests.post(
         f"{base_url}/api/ordens-servico/",
         headers=operador_headers,
@@ -338,6 +347,7 @@ def test_operador_pode_criar_os(
                 "SERVICO",
             "titulo":
                 "OS criada por OPERADOR",
+            "operador_id": operador_id,
             "descricao":
                 "Teste RF08",
             "maquina_id":

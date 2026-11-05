@@ -1,5 +1,9 @@
 # Estado de prontidão
 
+Atualização da missão final: candidata composta em `codex/missao-final`, ainda
+**PARCIAL**. O registro abaixo é histórico. Evidências atuais, CI, alterações,
+avisos e gates pendentes estão em [MISSAO_FINAL.md](MISSAO_FINAL.md).
+
 **PARCIAL — não homologado nem seguro para operação privada.** Base `714a2c0f623f680207e1c03fd1a180efcd5e532e`. Detalhes e evidências em [HANDOFF_ETAPA_1.md](HANDOFF_ETAPA_1.md).
 
 - [x] Revisões iniciais central e tenant aplicadas em MariaDB vazio; comparação Alembic sem diferenças.

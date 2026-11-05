@@ -10,6 +10,7 @@ from database.session import criar_sessao_tenant
 from models.tenant.maquina import Maquina
 from models.tenant.ordem_servico import OrdemServico
 from models.tenant.operacao_lock import OperacaoLock
+from test_matriz_escopo import contexto
 from services.ordem_servico_service import criar_ordem_servico, _proximo_numero_os
 
 
@@ -21,12 +22,13 @@ def test_os_concorrentes_numeros_distintos_e_rollback():
         session.add(maquina)
         session.commit()
         maquina_id = maquina.id
+        ctx = contexto(session, DATABASE_NAME, "ADMIN_EMPRESA")
     barreira = Barrier(2, timeout=10)
 
     def criar(_):
         barreira.wait()
         return criar_ordem_servico(Config, DATABASE_NAME, 'SERVICO', 'Concorrência',
-                                  maquina_id=maquina_id)
+                                  maquina_id=maquina_id, contexto=ctx)
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         ordens = list(pool.map(criar, range(2)))
