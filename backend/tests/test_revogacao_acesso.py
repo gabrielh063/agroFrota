@@ -409,3 +409,31 @@ def test_mudanca_de_senha_revoga_token_antigo(base_url, auth_headers):
         assert requests.get(f"{base_url}/api/usuarios/", headers=nova, timeout=10).status_code == 200
     finally:
         excluir_usuario_teste(usuario['id'])
+
+
+def test_perfil_inativo_impede_login_e_rota_sem_permissao(base_url, auth_headers):
+    usuario = criar_usuario_teste(base_url, auth_headers)
+    headers = login_usuario(base_url, usuario)
+    session = abrir_sessao()
+    try:
+        # Perfil exclusivo, para não afetar os demais usuários sintéticos.
+        nome = 'INATIVO_' + uuid.uuid4().hex[:12]
+        session.execute(text('INSERT INTO perfis (nome, ativo) VALUES (:nome, 1)'), {'nome': nome})
+        perfil_id = session.execute(text('SELECT id FROM perfis WHERE nome = :nome'), {'nome': nome}).scalar_one()
+        session.execute(text('UPDATE usuarios SET perfil_id = :perfil WHERE id = :id'), {'perfil': perfil_id, 'id': usuario['id']})
+        session.commit()
+        session.execute(text('UPDATE perfis SET ativo = 0 WHERE id = :id'), {'id': perfil_id})
+        session.commit()
+        assert requests.post(f'{base_url}/api/auth/logout', headers=headers, timeout=10).status_code == 403
+        resposta = requests.post(f'{base_url}/api/auth/login', json={
+            'username': usuario['username'], 'senha': usuario['senha'], 'database_name': DATABASE_NAME,
+        }, timeout=10)
+        assert resposta.status_code == 401
+    finally:
+        session.rollback()
+        session.execute(text('UPDATE usuarios SET perfil_id = :perfil WHERE id = :id'), {'perfil': usuario['gerente_id'], 'id': usuario['id']})
+        if 'perfil_id' in locals():
+            session.execute(text('DELETE FROM perfis WHERE id = :id'), {'id': perfil_id})
+        session.commit()
+        session.close()
+        excluir_usuario_teste(usuario['id'])

@@ -2,7 +2,7 @@
 
 ## Estado atual — retomada
 
-Branch `codex/fundacao-rf08`, base de trabalho `da0c0a1`; a PR #1 permanece em rascunho. Bootstrap versionado validado com limpeza positiva; logout e troca de senha agora invalidam versões de sessão persistentes. Em MariaDB descartável, 52 testes selecionados passaram; reinício e múltiplos workers ainda precisam de prova. Os sete perfis, autorização administrativa transacional, auditoria, CLI, pools e atualização/restore seguem pendentes. As mudanças locais de calendário e frontend continuam fora da PR. Os checkpoints abaixo são históricos.
+Branch `codex/fundacao-rf08`; consulte `git rev-parse HEAD` para o SHA atual. A PR #1 permanece em rascunho. Bootstrap versionado validado com limpeza positiva; logout e troca de senha invalidam versões de sessão persistentes. Perfil inativo agora impede login e acesso autenticado mesmo em rotas sem decorador de permissão; teste específico acrescentado. Reinício e múltiplos workers ainda precisam de prova. Os sete perfis, autorização administrativa transacional, auditoria, CLI, pools e atualização/restore seguem pendentes. As mudanças locais de calendário e frontend continuam fora da PR. Os checkpoints abaixo são históricos.
 
 ## Histórico
 

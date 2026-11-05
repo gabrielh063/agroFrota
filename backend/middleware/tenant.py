@@ -10,6 +10,7 @@ from database.session import (
 )
 from models.central.tenant import Tenant
 from models.tenant.usuario import Usuario
+from models.tenant.perfil import Perfil
 
 
 def resolver_tenant(config):
@@ -186,6 +187,17 @@ def resolver_tenant(config):
                             "Perfil do usuário "
                             "não identificado.",
                     }), 403
+
+                perfil_ativo = tenant_session.execute(
+                    select(Perfil.id).where(
+                        Perfil.id == perfil_id_atual,
+                        Perfil.ativo.is_(True),
+                    )
+                ).scalar_one_or_none()
+                if perfil_ativo is None:
+                    tenant_session.close()
+                    tenant_session = None
+                    return jsonify({"success": False, "message": "Perfil não encontrado ou inativo."}), 403
 
             except Exception as erro:
 
