@@ -212,3 +212,20 @@ def logout(**kwargs):
     )
     session.commit()
     return jsonify({"success": True, "message": "Sessões revogadas."}), 200
+
+
+@auth_bp.get("/me")
+@autenticar()
+@resolver_tenant(Config)
+def usuario_atual(**kwargs):
+    usuario = kwargs["tenant_session"].get(Usuario, kwargs["usuario_autenticado_id"])
+    return jsonify({
+        "success": True,
+        "data": {
+            "usuario": {"id": usuario.id, "nome": usuario.nome,
+                        "username": usuario.username, "email": usuario.email,
+                        "perfil_id": usuario.perfil_id, "cargo_id": usuario.cargo_id},
+            "tenant": {"id": kwargs["tenant"].id, "nome": kwargs["tenant"].nome},
+            "permissoes": sorted(p.codigo for p in usuario.perfil.permissoes),
+        },
+    }), 200
