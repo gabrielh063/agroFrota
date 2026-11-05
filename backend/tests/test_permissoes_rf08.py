@@ -754,3 +754,20 @@ def test_rf08_sem_token(
     )
 
     assert resposta.status_code == 401
+
+def test_gerente_pode_listar_cargos(base_url, auth_headers):
+    resposta = requests.get(f"{base_url}/api/cargos/", headers=auth_headers, timeout=10)
+    assert resposta.status_code == 200
+
+
+@pytest.mark.parametrize("method,path", [
+    ("get", "/api/cargos/"),
+    ("post", "/api/cargos/"),
+    ("put", "/api/cargos/1"),
+    ("patch", "/api/cargos/1/desativar"),
+    ("patch", "/api/cargos/1/ativar"),
+])
+def test_operador_sem_permissao_nao_acessa_cargos(base_url, operador_headers, method, path):
+    resposta = requests.request(method, f"{base_url}{path}", headers=operador_headers,
+                                json={"nome": "Teste"}, timeout=10)
+    assert resposta.status_code == 403
