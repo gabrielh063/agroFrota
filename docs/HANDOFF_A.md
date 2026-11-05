@@ -1,11 +1,22 @@
-# Handoff A — segurança RF08 (parcial)
+# Handoff A — matriz e escopo RF08
 
-Base `codex/fundacao-rf08` em `1711156`; branch `codex/seguranca-rf08`. Os commits de implementação são `5ac36b2` (contrato e consulta atual) e `3c8c480` (revogação nas mutações administrativas). A PR é dependente da base de fundação e não deve ser integrada como entrega completa da missão.
+Branch `codex/seguranca-rf08`, PR #3, base `codex/fundacao-rf08` em `1711156`. Contrato inicial publicado em `728edd749ae81623b64ddf8871ec4d17ff528705`; implementação administrativa `f0bbef6147a91a6c33a7b04b2a06f87764148d47`; testes e matriz documentada `a6f9b15030c047af6826bbc44c506c88d3b6685e`. Consulte `git rev-parse HEAD` para o commit deste handoff e eventuais alterações posteriores.
 
-O contrato disponível para B está em [CONTRATOS_SEGURANCA.md](CONTRATOS_SEGURANCA.md). `GET /api/auth/me` retorna usuário, tenant e códigos atuais; bearer e logout continuam compatíveis. Ainda não há helper genérico de escopo nem matriz de sete perfis. Não presumir proteção de objetos operacionais.
+Os sete perfis, códigos e escopos estão na [matriz e contrato](CONTRATOS_SEGURANCA.md). O helper `services.escopo.consultar_autorizado` usa contexto resolvido pelo servidor, sessão do banco do tenant, perfil e permissões atuais; aplica filtro SQL para lista e detalhe. Ausência de política, permissão, contexto ou coluna necessária nega. Cargo não confere acesso. Serviços administrativos e troca de senha aplicam a autorização nos serviços; o bloqueio transacional e a definição de administrador efetivo permanecem. As leituras de usuário usam filtro; demais leituras administrativas exigem escopo de empresa. A troca administrativa de senha passou a exigir autoridade administrativa efetiva e senha atual, mesmo em chamadas diretas ao serviço.
 
-Os serviços administrativos incrementam a versão de sessão na mudança de perfil ou estado do usuário, estado do perfil e permissões do perfil, na transação da mudança. A política e o bloqueio de último administrador já existiam na base. A desativação/reativação do tenant central ainda não revoga persistentemente os tokens, e reinício e múltiplos workers não foram provados.
+O seed cria os sete perfis somente quando ausentes; não altera permissões ou política de perfis existentes. O provisionamento inicial novo usa `ADMIN_EMPRESA`. A migração tenant exclusiva `a71f82c9d410` sucede `9b3b4b41d220`: associa explicitamente legados `GERENTE`, `MANUTENCAO`, `OPERADOR` às suas políticas, sem criar permissões ou reatribuir usuários, e incrementa a versão das sessões afetadas. Perfis personalizados restantes não recebem escopo operacional automaticamente; devem ser tratados explicitamente na integração de instalações existentes. Como as permissões legadas são preservadas, o acesso permitido pelo helper é a interseção delas com a matriz. A migração altera a interpretação de escopo: instale e valide o código coordenadamente com a migração antes de servir tráfego.
 
-Em MariaDB descartável próprio: `test_auth.py`, `test_admin_transacional.py` e `test_revogacao_acesso.py`: 22 passaram antes da inclusão do teste adicional de perfil; após incluí-lo, `test_admin_transacional.py`: 12 passaram. Cobrem consulta atual, troca de perfil, desativação/reativação de usuário e perfil, alterações de associação e concorrência administrativa. Não cobrem integralmente os requisitos da missão.
+Validação em MariaDB e API descartáveis próprios: **78 passaram** com `test_matriz_escopo.py`, `test_auth.py`, `test_security.py`, `test_multitenant.py`, `test_permissoes_rf08.py`, `test_revogacao_acesso.py` e `test_admin_transacional.py`; duas advertências existentes de `datetime.utcnow`. Mais 15 testes unitários de configuração, schemas e segurança passaram. Os testes cobrem os sete perfis, ações permitidas/negadas, contexto de outro tenant, registro próprio e atribuição, lista e detalhe, seed repetido, migração legada e revogação, inclusive concorrência administrativa existente. O ambiente foi encerrado após uso.
 
-Pendente: matriz, seeds e migração explícita dos sete perfis legados; helper de autorização por escopo; auditoria persistente transacional e leitura restrita; revogação persistente por ciclo do tenant; provas de restart e dois workers; testes completos dos sete perfis e rollback de auditoria; revisão final e integração. Não houve migração nova nesta branch; cadeia tenant existente termina em `9b3b4b41d220`.
+Reprodução (com dependências Python e MariaDB instaladas):
+
+```sh
+cd backend
+python tools/ambiente_descartavel.py start
+python tools/ambiente_descartavel.py test DIRETORIO tests/test_matriz_escopo.py tests/test_auth.py tests/test_security.py tests/test_multitenant.py tests/test_permissoes_rf08.py tests/test_revogacao_acesso.py tests/test_admin_transacional.py
+python tools/ambiente_descartavel.py stop DIRETORIO
+```
+
+O seed de teste cria um usuário sintético para cada perfil nos bancos descartáveis; o usuário inicial representa `ADMIN_EMPRESA`. `DIRETORIO` é o caminho retornado por `start`; não executar contra instalações reais.
+
+Limites: B precisa aplicar e testar o helper em cada serviço operacional, incluindo a fonte confiável da atribuição e a autorização de criação. Escopo operacional ainda não foi validado. Auditoria persistente completa, revogação persistente em ciclo do tenant e provas de dois workers permanecem para próximo incremento. A PR continua em rascunho e depende da fundação; não houve merge ou deploy.
