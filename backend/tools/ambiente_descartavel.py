@@ -17,7 +17,7 @@ import pymysql
 import requests
 
 BACKEND = Path(__file__).resolve().parents[1]
-PREFIX = '/tmp/agrofrota-db-'
+PREFIX = 'agrofrota-db-'
 
 
 def port():
@@ -28,7 +28,7 @@ def port():
 
 def metadata(path):
     p = Path(path).resolve()
-    if not str(p).startswith(PREFIX) or p.parent != Path('/tmp') or not p.is_dir():
+    if not p.name.startswith(PREFIX) or not p.is_dir():
         raise ValueError('Diretório descartável inválido')
     st = p.stat()
     if st.st_uid != os.getuid() or st.st_mode & 0o077:
@@ -73,8 +73,12 @@ def start():
     for command in ('mariadb-install-db', 'mariadbd'):
         if not shutil.which(command):
             raise RuntimeError(f'{command} não encontrado')
-    p = Path(tempfile.mkdtemp(prefix='agrofrota-db-', dir='/tmp')).resolve()
-    state = dict(directory=str(p), marker=secrets.token_hex(32), db_port=port(), api_port=port(), db_user='af_test', db_password=secrets.token_hex(24), password_a=secrets.token_urlsafe(24), password_b=secrets.token_urlsafe(24), secret=secrets.token_urlsafe(48), jwt_secret=secrets.token_urlsafe(48))
+    db_port = port()
+    api_port = port()
+    while api_port == db_port:
+        api_port = port()
+    p = Path(tempfile.mkdtemp(prefix=PREFIX)).resolve()
+    state = dict(directory=str(p), marker=secrets.token_hex(32), db_port=db_port, api_port=api_port, db_user='af_test', db_password=secrets.token_hex(24), password_a=secrets.token_urlsafe(24), password_b=secrets.token_urlsafe(24), secret=secrets.token_urlsafe(48), jwt_secret=secrets.token_urlsafe(48))
     try:
         subprocess.run(['mariadb-install-db', '--no-defaults', f'--datadir={p / "data"}', '--auth-root-authentication-method=socket', '--skip-test-db'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         log = (p / 'mariadb.log').open('ab')
