@@ -10,3 +10,5 @@
 - [ ] Interfaces e fluxos operacionais; IA, limites e desempenho; implantação privada e homologação.
 
 O modo de produção agora valida configurações básicas e pode iniciar com valores que passam nas verificações, mas isso **não** demonstra segurança operacional. Não exponha a aplicação nem use dados reais antes de fechar os gates. Ver [plano](PRODUCTIZATION_PLAN.md).
+
+Bootstrap local versionado: [instruções](TESTES_DESCARTAVEIS.md); 50 testes selecionados passaram e cleanup foi verificado em uma nova instância descartável. Esse resultado não valida os sete perfis nem os demais requisitos pendentes.

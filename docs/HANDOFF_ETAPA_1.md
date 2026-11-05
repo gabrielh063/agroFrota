@@ -1,5 +1,11 @@
 # Handoff — etapa 1
 
+## Estado atual — retomada
+
+Branch `codex/fundacao-rf08`, base de trabalho `da0c0a1`; a PR #1 permanece em rascunho. O bootstrap versionado foi criado e validado com 50 testes HTTP em MariaDB descartável, com migrações central e tenant e limpeza positiva dos seus próprios recursos. Os sete perfis, autorização administrativa transacional, auditoria, revogação persistente, CLI, pools e atualização/restore seguem pendentes. As mudanças locais de calendário e frontend continuam fora da PR. Os checkpoints abaixo são históricos.
+
+## Histórico
+
 Branch `codex/fundacao-rf08`, HEAD `714a2c0f623f680207e1c03fd1a180efcd5e532e`. Há alterações sem commit de fundação e alterações preexistentes no calendário e frontend; não descartá-las nem incluí-las automaticamente em commits da fundação. Remoto Main confirmado no mesmo SHA; GitHub informou nenhuma PR ou execução de CI.
 
 Estado recuperado: rotas de cargos possuem verificação de permissão, seed não acrescenta permissões a perfil existente, rotas dev são opt-in, produção agora valida parâmetros básicos, mas não está homologada e testes têm proteção inicial de banco. RF08 completo, migrações, revogação persistente e produção segura ainda não foram concluídos.
