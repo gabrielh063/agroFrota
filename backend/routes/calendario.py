@@ -133,14 +133,14 @@ def atualizar(agendamento_id, **kwargs):
 
         dados = AgendamentoAtualizarSchema.model_validate(data)
 
+        dados_atualizacao = dados.model_dump(
+            exclude_unset=True
+        )
+
         agendamento = atualizar_agendamento(
             session=tenant_session,
             agendamento_id=agendamento_id,
-            inicio=dados.inicio,
-            fim=dados.fim,
-            responsavel_id=dados.responsavel_id,
-            status=dados.status,
-            observacoes=dados.observacoes,
+            **dados_atualizacao,
         )
 
         return jsonify({

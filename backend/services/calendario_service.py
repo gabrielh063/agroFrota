@@ -14,6 +14,7 @@ STATUS_AGENDAMENTO = {
     "CANCELADO",
 }
 
+_NAO_INFORMADO = object()
 
 def criar_agendamento(
     session,
@@ -97,15 +98,14 @@ def listar_agendamentos(session):
         )
     ).scalars().all()
 
-
 def atualizar_agendamento(
     session,
     agendamento_id: int,
-    inicio: datetime | None = None,
-    fim: datetime | None = None,
-    responsavel_id: int | None = None,
-    status: str | None = None,
-    observacoes: str | None = None,
+    inicio=_NAO_INFORMADO,
+    fim=_NAO_INFORMADO,
+    responsavel_id=_NAO_INFORMADO,
+    status=_NAO_INFORMADO,
+    observacoes=_NAO_INFORMADO,
 ):
     agendamento = buscar_agendamento(
         session,
@@ -116,7 +116,7 @@ def atualizar_agendamento(
         raise ValueError(
             "Agendamento não encontrado."
         )
-    
+
     if agendamento.status in {
         "CONCLUIDO",
         "CANCELADO",
@@ -126,22 +126,40 @@ def atualizar_agendamento(
             "concluído ou cancelado."
         )
 
+
+    # =========================
+    # DATAS
+    # =========================
+
     novo_inicio = (
-        inicio if inicio is not None
-        else agendamento.inicio
+        agendamento.inicio
+        if inicio is _NAO_INFORMADO
+        or inicio is None
+        else inicio
     )
 
     novo_fim = (
-        fim if fim is not None
-        else agendamento.fim
+        agendamento.fim
+        if fim is _NAO_INFORMADO
+        or fim is None
+        else fim
     )
+
 
     if novo_fim <= novo_inicio:
         raise ValueError(
             "A data/hora final deve ser posterior à inicial."
         )
 
-    if status is not None:
+
+    # =========================
+    # STATUS
+    # =========================
+
+    if (
+        status is not _NAO_INFORMADO
+        and status is not None
+    ):
         status = status.upper()
 
         if status not in STATUS_AGENDAMENTO:
@@ -149,38 +167,61 @@ def atualizar_agendamento(
                 "Status de agendamento inválido."
             )
 
+
+
+    # =========================
+    # RESPONSÁVEL
+    # =========================
+
+    if responsavel_id is not _NAO_INFORMADO:
+
+        if responsavel_id is not None:
+
+            responsavel = session.execute(
+                select(Usuario).where(
+                    Usuario.id
+                    == responsavel_id
+                )
+            ).scalar_one_or_none()
+
+            if responsavel is None:
+                raise ValueError(
+                    "Responsável não encontrado."
+                )
+
+            if not responsavel.ativo:
+                raise ValueError(
+                    "O responsável está inativo."
+                )
+
+        agendamento.responsavel_id = (
+            responsavel_id
+        )
+
+
+    # =========================
+    # OBSERVAÇÕES
+    # =========================
+
+    if observacoes is not _NAO_INFORMADO:
+        agendamento.observacoes = (
+            observacoes
+        )
+
+
+    # =========================
+    # SALVAR
+    # =========================
+
+    if status is not _NAO_INFORMADO and status is not None:
         agendamento.status = status
-
-    if responsavel_id is not None:
-        responsavel = session.execute(
-            select(Usuario).where(
-                Usuario.id == responsavel_id
-            )
-        ).scalar_one_or_none()
-
-        if responsavel is None:
-            raise ValueError(
-                "Responsável não encontrado."
-            )
-
-        if not responsavel.ativo:
-            raise ValueError(
-                "O responsável está inativo."
-            )
-
-        agendamento.responsavel_id = responsavel_id
-
     agendamento.inicio = novo_inicio
     agendamento.fim = novo_fim
-
-    if observacoes is not None:
-        agendamento.observacoes = observacoes
 
     session.commit()
     session.refresh(agendamento)
 
     return agendamento
-
 
 def cancelar_agendamento(session, agendamento_id: int):
     agendamento = buscar_agendamento(
