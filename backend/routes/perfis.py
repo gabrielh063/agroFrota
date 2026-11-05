@@ -45,7 +45,8 @@ def listar_perfis_route(**kwargs):
     perfis = listar_perfis(
         config=Config,
         database_name=database_name,
-        incluir_inativos=incluir_inativos
+        incluir_inativos=incluir_inativos,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     return jsonify({

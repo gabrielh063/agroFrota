@@ -58,7 +58,8 @@ def criar_cargo(
 def buscar_cargo(
     config,
     database_name: str,
-    cargo_id: int
+    cargo_id: int,
+    contexto=None
 ) -> Cargo | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -69,6 +70,10 @@ def buscar_cargo(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "CARGO_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         cargo = session.execute(
             select(Cargo).where(
@@ -151,7 +156,8 @@ def atualizar_cargo(
 def listar_cargos(
     config,
     database_name: str,
-    incluir_inativos: bool = False
+    incluir_inativos: bool = False,
+    contexto=None
 ) -> list[Cargo]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -162,6 +168,10 @@ def listar_cargos(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "CARGO_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         consulta = select(Cargo).order_by(
             Cargo.id

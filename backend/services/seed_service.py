@@ -9,6 +9,7 @@ from models.tenant.admin_lock import AdminLock
 from utils.security import gerar_hash_senha
 
 PERMISSOES_PADRAO = [
+    {"codigo": "USUARIO_PROPRIO_VISUALIZAR", "descricao": "Permite consultar o próprio registro."},
     {
         "codigo": "USUARIO_CRIAR",
         "descricao": "Permite criar usuários.",
@@ -143,74 +144,9 @@ PERMISSOES_PADRAO = [
     },
 ]
 
-PERFIS_PADRAO = {
-    "GERENTE": [
-        "USUARIO_CRIAR",
-        "USUARIO_VISUALIZAR",
-        "USUARIO_EDITAR",
-        "USUARIO_DESATIVAR",
-        "CARGO_CRIAR",
-        "CARGO_VISUALIZAR",
-        "CARGO_EDITAR",
-        "PERFIL_CRIAR",
-        "PERFIL_VISUALIZAR",
-        "PERFIL_EDITAR",
-        "PERFIL_PERMISSAO_GERENCIAR",
-        "MAQUINA_CRIAR",
-        "MAQUINA_VISUALIZAR",
-        "MAQUINA_EDITAR",
-        "MAQUINA_DESATIVAR",
-        "EQUIPAMENTO_CRIAR",
-        "EQUIPAMENTO_VISUALIZAR",
-        "EQUIPAMENTO_EDITAR",
-        "EQUIPAMENTO_DESATIVAR",
-        "OS.CRIAR",
-        "OS.VISUALIZAR",
-        "OS.EDITAR",
-        "OS.CANCELAR",
-        "OS.CONCLUIR",
-        "MANUTENCAO.CRIAR",
-        "MANUTENCAO.VISUALIZAR",
-        "MANUTENCAO.CANCELAR",
-        "MANUTENCAO.EDITAR",
-        "MANUTENCAO.CONCLUIR",
-        "INDISPONIBILIDADE.CRIAR",
-        "INDISPONIBILIDADE.VISUALIZAR",
-        "INDISPONIBILIDADE.EDITAR",
-        "DASHBOARD.VISUALIZAR",
-    ],
+from services.matriz_acesso import MATRIZ
 
-    "MANUTENCAO": [
-        "USUARIO_VISUALIZAR",
-        "MAQUINA_VISUALIZAR",
-        "MAQUINA_EDITAR",
-        "EQUIPAMENTO_VISUALIZAR",
-        "EQUIPAMENTO_EDITAR",
-        "OS.CRIAR",
-        "OS.VISUALIZAR",
-        "OS.EDITAR",
-        "OS.CONCLUIR",
-        "MANUTENCAO.CRIAR",
-        "MANUTENCAO.VISUALIZAR",
-        "MANUTENCAO.EDITAR",
-        "MANUTENCAO.CONCLUIR",
-        "MANUTENCAO.CANCELAR",
-        "INDISPONIBILIDADE.CRIAR",
-        "INDISPONIBILIDADE.VISUALIZAR",
-        "INDISPONIBILIDADE.EDITAR",
-        "DASHBOARD.VISUALIZAR",
-    ],
-
-    "OPERADOR": [
-        "MAQUINA_VISUALIZAR",
-        "EQUIPAMENTO_VISUALIZAR",
-        "OS.CRIAR",
-        "OS.VISUALIZAR",
-        "MANUTENCAO.VISUALIZAR",
-        "INDISPONIBILIDADE.CRIAR",
-        "INDISPONIBILIDADE.VISUALIZAR",
-    ],
-}
+PERFIS_PADRAO = {nome: list(acoes) for nome, acoes in MATRIZ.items()}
 
 
 def criar_permissoes_padrao(config, database_name):
@@ -276,7 +212,8 @@ def criar_perfis_padrao(config, database_name):
                 perfil = Perfil(
                     nome=nome_perfil,
                     descricao=f"Perfil padrão de {nome_perfil.lower()}.",
-                    ativo=True
+                    ativo=True,
+                    politica_escopo=nome_perfil
                 )
 
                 session.add(perfil)
@@ -337,13 +274,13 @@ def criar_usuario_gerente_padrao(
             raise ValueError("Provisionamento inicial exige empresa sem usuários.")
         perfil = session.execute(
             select(Perfil).where(
-                Perfil.nome == "GERENTE"
+                Perfil.nome == "ADMIN_EMPRESA"
             )
         ).scalar_one_or_none()
 
         if perfil is None:
             raise ValueError(
-                "Perfil GERENTE não encontrado."
+                "Perfil ADMIN_EMPRESA não encontrado."
             )
 
         cargo = session.execute(

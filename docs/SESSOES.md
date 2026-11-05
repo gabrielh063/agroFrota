@@ -9,3 +9,7 @@ Testes em MariaDB descartável verificaram logout, reutilização de dois tokens
 
 O login rejeita perfil inexistente ou inativo e o contexto autenticado revalida seu estado mesmo quando a rota não exige uma permissão específica. O teste `test_perfil_inativo_impede_login_e_rota_sem_permissao` cobre login e logout com um perfil sintético desativado. Isso não comprova revogação após reativação, reinício ou múltiplos workers.
 
+
+## Alterações administrativas
+
+Alterar o perfil ou o estado ativo de um usuário incrementa sua versão de sessão na mesma transação. Ativar ou desativar um perfil e adicionar ou remover suas permissões incrementa a versão de todos os usuários desse perfil, também na transação. Uma reversão desfaz tanto a mudança quanto a revogação. Alterações diretas no banco que ignorem estes serviços não recebem essa garantia. Desativação e reativação do tenant central ainda não têm mecanismo equivalente comprovado; reinício e múltiplos workers ainda precisam de testes próprios.
