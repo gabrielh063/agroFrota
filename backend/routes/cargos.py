@@ -43,7 +43,8 @@ def listar_cargos_route(**kwargs):
     cargos = listar_cargos(
         config=Config,
         database_name=database_name,
-        incluir_inativos=incluir_inativos
+        incluir_inativos=incluir_inativos,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     return jsonify({

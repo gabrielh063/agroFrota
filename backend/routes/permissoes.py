@@ -37,7 +37,8 @@ def listar_permissoes_route(**kwargs):
 
     permissoes = listar_permissoes(
         config=Config,
-        database_name=database_name
+        database_name=database_name,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     return jsonify({

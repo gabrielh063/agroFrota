@@ -1,9 +1,10 @@
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from database.session import criar_sessao_tenant
 
 from models.tenant.perfil import Perfil
+from models.tenant.usuario import Usuario
 from models.tenant.permissao import Permissao
 
 
@@ -66,6 +67,8 @@ def adicionar_permissao_perfil(
 
         perfil.permissoes.append(permissao)
 
+        session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
+                        .values(session_version=Usuario.session_version + 1))
         preservar_administrador(session)
         session.commit()
         session.refresh(perfil)
@@ -142,6 +145,8 @@ def remover_permissao_perfil(
             permissao_associada
         )
 
+        session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
+                        .values(session_version=Usuario.session_version + 1))
         preservar_administrador(session)
         session.commit()
         session.refresh(perfil)
@@ -159,7 +164,8 @@ def remover_permissao_perfil(
 def listar_permissoes_perfil(
     config,
     database_name: str,
-    perfil_id: int
+    perfil_id: int,
+    contexto=None
 ) -> list[Permissao]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -170,6 +176,10 @@ def listar_permissoes_perfil(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         perfil = session.execute(
             select(Perfil).where(

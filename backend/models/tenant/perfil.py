@@ -50,6 +50,8 @@ class Perfil(TenantBase):
         default=True
     )
 
+    politica_escopo: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
     permissoes = relationship(
         "Permissao",
         secondary=perfil_permissoes,

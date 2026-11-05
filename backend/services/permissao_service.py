@@ -57,7 +57,8 @@ def criar_permissao(
 def buscar_permissao(
     config,
     database_name: str,
-    permissao_id: int
+    permissao_id: int,
+    contexto=None
 ) -> Permissao | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -68,6 +69,10 @@ def buscar_permissao(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         permissao = session.execute(
             select(Permissao).where(
@@ -150,7 +155,8 @@ def atualizar_permissao(
 
 def listar_permissoes(
     config,
-    database_name: str
+    database_name: str,
+    contexto=None
 ) -> list[Permissao]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -161,6 +167,10 @@ def listar_permissoes(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         permissoes = session.execute(
             select(Permissao).order_by(
