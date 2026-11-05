@@ -41,3 +41,44 @@ item = session.execute(consulta.where(OrdemServico.id == ordem_id)).scalar_one_o
 A revisão tenant `a71f82c9d410` sucede `9b3b4b41d220`; identifica explicitamente os legados `GERENTE`, `MANUTENCAO` e `OPERADOR`, sem acrescentar permissões ou reatribuir usuários e revoga suas sessões. Um perfil personalizado que coincida com esses nomes recebe no máximo a interseção entre permissões atuais e matriz. Os demais perfis existentes permanecem sem política de escopo; não são concedidos privilégios ao atualizar. O seed cria somente perfis ausentes e não modifica associações de perfis existentes. Para primeiro provisionamento novo usa `ADMIN_EMPRESA`.
 
 A matriz ainda não está aplicada aos serviços operacionais: B deve integrar e testar cada rota, incluindo sua fonte de atribuição. O helper não determina se uma atribuição foi criada legitimamente, nem valida dados enviados na criação; isso pertence ao serviço operacional.
+
+### Matriz por operação
+
+Cada célula é o escopo máximo; `—` significa negado. A concessão de cada código continua sujeita às associações persistidas do perfil.
+
+| Operação / código | ADMIN_EMPRESA | DIRETORIA | GESTOR_FROTA | ADMINISTRATIVO | MANUTENCAO | OPERADOR | AUDITOR |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `CARGO_CRIAR` | empresa | — | — | — | — | — | — |
+| `CARGO_EDITAR` | empresa | — | — | — | — | — | — |
+| `CARGO_VISUALIZAR` | empresa | empresa | — | empresa | — | — | empresa |
+| `DASHBOARD.VISUALIZAR` | empresa | empresa | empresa | empresa | — | — | empresa |
+| `EQUIPAMENTO_CRIAR` | empresa | — | empresa | — | — | — | — |
+| `EQUIPAMENTO_DESATIVAR` | empresa | — | empresa | — | — | — | — |
+| `EQUIPAMENTO_EDITAR` | empresa | — | empresa | — | — | — | — |
+| `EQUIPAMENTO_VISUALIZAR` | empresa | empresa | empresa | empresa | empresa | empresa | empresa |
+| `INDISPONIBILIDADE.CRIAR` | empresa | — | empresa | — | — | atribuicao | — |
+| `INDISPONIBILIDADE.EDITAR` | empresa | — | empresa | — | — | — | — |
+| `INDISPONIBILIDADE.VISUALIZAR` | empresa | empresa | empresa | empresa | atribuicao | atribuicao | empresa |
+| `MANUTENCAO.CANCELAR` | empresa | — | empresa | — | — | — | — |
+| `MANUTENCAO.CONCLUIR` | empresa | — | empresa | — | atribuicao | — | — |
+| `MANUTENCAO.CRIAR` | empresa | — | empresa | — | atribuicao | — | — |
+| `MANUTENCAO.EDITAR` | empresa | — | empresa | — | atribuicao | — | — |
+| `MANUTENCAO.VISUALIZAR` | empresa | empresa | empresa | — | atribuicao | — | empresa |
+| `MAQUINA_CRIAR` | empresa | — | empresa | — | — | — | — |
+| `MAQUINA_DESATIVAR` | empresa | — | empresa | — | — | — | — |
+| `MAQUINA_EDITAR` | empresa | — | empresa | — | — | — | — |
+| `MAQUINA_VISUALIZAR` | empresa | empresa | empresa | empresa | empresa | empresa | empresa |
+| `OS.CANCELAR` | empresa | — | empresa | — | — | — | — |
+| `OS.CONCLUIR` | empresa | — | empresa | — | atribuicao | — | — |
+| `OS.CRIAR` | empresa | — | empresa | — | — | atribuicao | — |
+| `OS.EDITAR` | empresa | — | empresa | — | atribuicao | — | — |
+| `OS.VISUALIZAR` | empresa | empresa | empresa | empresa | atribuicao | atribuicao | empresa |
+| `PERFIL_CRIAR` | empresa | — | — | — | — | — | — |
+| `PERFIL_EDITAR` | empresa | — | — | — | — | — | — |
+| `PERFIL_PERMISSAO_GERENCIAR` | empresa | — | — | — | — | — | — |
+| `PERFIL_VISUALIZAR` | empresa | empresa | — | empresa | — | — | empresa |
+| `USUARIO_CRIAR` | empresa | — | — | — | — | — | — |
+| `USUARIO_DESATIVAR` | empresa | — | — | — | — | — | — |
+| `USUARIO_EDITAR` | empresa | — | — | — | — | — | — |
+| `USUARIO_PROPRIO_VISUALIZAR` | proprio | proprio | proprio | proprio | proprio | proprio | proprio |
+| `USUARIO_VISUALIZAR` | empresa | empresa | empresa | empresa | — | — | empresa |
