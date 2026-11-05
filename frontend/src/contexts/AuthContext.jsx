@@ -1,6 +1,7 @@
 import {
     createContext,
     useContext,
+    useEffect,
     useState,
 } from "react";
 
@@ -47,6 +48,22 @@ export function AuthProvider({
     );
 
 
+    const [sessaoExpirada, setSessaoExpirada] = useState(false);
+
+    useEffect(() => {
+        function expirarSessao() {
+            sessionStorage.removeItem("agrofrota_token");
+            sessionStorage.removeItem("agrofrota_usuario");
+            sessionStorage.removeItem("agrofrota_tenant");
+            setToken(null);
+            setUsuario(null);
+            setTenant(null);
+            setSessaoExpirada(true);
+        }
+        window.addEventListener("agrofrota:session-expired", expirarSessao);
+        return () => window.removeEventListener("agrofrota:session-expired", expirarSessao);
+    }, []);
+
     async function entrar(
         username,
         senha
@@ -86,6 +103,7 @@ export function AuthProvider({
         );
 
 
+        setSessaoExpirada(false);
         setToken(accessToken);
         setUsuario(usuarioLogado);
         setTenant(tenantLogado);
@@ -121,6 +139,7 @@ export function AuthProvider({
                 usuario,
                 tenant,
                 autenticado: Boolean(token),
+                sessaoExpirada,
                 entrar,
                 sair,
             }}
