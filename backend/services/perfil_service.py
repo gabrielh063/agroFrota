@@ -1,9 +1,10 @@
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from database.session import criar_sessao_tenant
 
 from models.tenant.perfil import Perfil
+from models.tenant.usuario import Usuario
 
 
 def criar_perfil(
@@ -135,6 +136,10 @@ def atualizar_perfil(
 
         if descricao is not None:
             perfil.descricao = descricao
+
+        if ativo is not None and ativo != perfil.ativo:
+            session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
+                            .values(session_version=Usuario.session_version + 1))
 
         if ativo is not None:
             perfil.ativo = ativo

@@ -114,7 +114,7 @@ def test_perda_de_perfil_e_token_antigo(base_url, auth_headers):
     try:
         old = login(base_url, DB, user['username'], 'Senha@12345')
         assert requests.put(f"{base_url}/api/usuarios/{user['id']}", headers=auth_headers, json={'perfil_id': operator}, timeout=10).status_code == 200
-        assert requests.post(base_url + '/api/perfis/', headers=old, json={'nome': 'TokenAntigo'}, timeout=10).status_code == 403
+        assert requests.post(base_url + '/api/perfis/', headers=old, json={'nome': 'TokenAntigo'}, timeout=10).status_code == 401
     finally:
         delete_user(session, user['id'])
         session.close()
@@ -291,4 +291,44 @@ def test_admin_gerencia_permissoes_de_outro_perfil(base_url, auth_headers):
         session.execute(text('DELETE FROM perfil_permissoes WHERE perfil_id=:id'), {'id': profile})
         session.execute(text('DELETE FROM perfis WHERE id=:id'), {'id': profile})
         session.commit()
+        session.close()
+
+
+def test_reativacao_usuario_nao_restabelece_sessao(base_url, auth_headers):
+    session = sql()
+    user = create_user(base_url, auth_headers, profile_id(session, 'OPERADOR'))
+    try:
+        old = login(base_url, DB, user['username'], 'Senha@12345')
+        for action in ('desativar', 'ativar'):
+            assert requests.patch(f"{base_url}/api/usuarios/{user['id']}/{action}", headers=auth_headers, timeout=10).status_code == 200
+        assert requests.get(base_url + '/api/auth/me', headers=old, timeout=10).status_code == 401
+        new = login(base_url, DB, user['username'], 'Senha@12345')
+        assert requests.get(base_url + '/api/auth/me', headers=new, timeout=10).status_code == 200
+    finally:
+        delete_user(session, user['id'])
+        session.close()
+
+
+def test_mudancas_perfil_revogam_sessoes(base_url, auth_headers):
+    session = sql()
+    profile = profile_id(session, 'OPERADOR')
+    user = create_user(base_url, auth_headers, profile)
+    permission = session.execute(text("SELECT id FROM permissoes WHERE codigo='DASHBOARD.VISUALIZAR'")).scalar_one()
+    try:
+        old = login(base_url, DB, user['username'], 'Senha@12345')
+        for action in ('desativar', 'ativar'):
+            assert requests.patch(f'{base_url}/api/perfis/{profile}/{action}', headers=auth_headers, timeout=10).status_code == 200
+        assert requests.get(base_url + '/api/auth/me', headers=old, timeout=10).status_code == 401
+        old = login(base_url, DB, user['username'], 'Senha@12345')
+        response = requests.post(f'{base_url}/api/perfis/{profile}/permissoes', headers=auth_headers, json={'permissao_id': permission}, timeout=10)
+        assert response.status_code == 201, response.text
+        assert requests.get(base_url + '/api/auth/me', headers=old, timeout=10).status_code == 401
+        new = login(base_url, DB, user['username'], 'Senha@12345')
+        assert 'DASHBOARD.VISUALIZAR' in requests.get(base_url + '/api/auth/me', headers=new, timeout=10).json()['data']['permissoes']
+        assert requests.delete(f'{base_url}/api/perfis/{profile}/permissoes/{permission}', headers=auth_headers, timeout=10).status_code == 200
+        assert requests.get(base_url + '/api/auth/me', headers=new, timeout=10).status_code == 401
+    finally:
+        session.rollback()
+        session.execute(text('DELETE FROM perfil_permissoes WHERE perfil_id=:p AND permissao_id=:v'), {'p': profile, 'v': permission})
+        delete_user(session, user['id'])
         session.close()

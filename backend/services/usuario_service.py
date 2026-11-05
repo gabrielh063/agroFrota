@@ -188,6 +188,10 @@ def atualizar_usuario(
         if cargo_id is not None:
             usuario.cargo_id = cargo_id
 
+        if (perfil_id is not None and perfil_id != usuario.perfil_id) or (ativo is not None and ativo != usuario.ativo):
+            session.execute(update(Usuario).where(Usuario.id == usuario.id)
+                            .values(session_version=Usuario.session_version + 1))
+
         if perfil_id is not None:
             usuario.perfil_id = perfil_id
 
