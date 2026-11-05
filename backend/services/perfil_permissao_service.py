@@ -1,3 +1,4 @@
+from services.auditoria_service import registrar_evento
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select, update
 
@@ -70,6 +71,7 @@ def adicionar_permissao_perfil(
         session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
                         .values(session_version=Usuario.session_version + 1))
         preservar_administrador(session)
+        registrar_evento(session, contexto, "adicionar_permissao_perfil")
         session.commit()
         session.refresh(perfil)
 
@@ -148,6 +150,7 @@ def remover_permissao_perfil(
         session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
                         .values(session_version=Usuario.session_version + 1))
         preservar_administrador(session)
+        registrar_evento(session, contexto, "remover_permissao_perfil")
         session.commit()
         session.refresh(perfil)
 

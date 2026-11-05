@@ -49,6 +49,7 @@ def listar_maquinas_route(**kwargs):
 
     maquinas = listar_maquinas(
         config=Config,
+        contexto=kwargs["contexto_administrativo"],
         database_name=database_name,
         incluir_inativas=incluir_inativas
     )
@@ -106,6 +107,7 @@ def criar_maquina_route(**kwargs):
 
         maquina = criar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             identificacao=dados_validos.identificacao,
             modelo=dados_validos.modelo,
@@ -176,6 +178,7 @@ def atualizar_maquina_route(
 
         maquina = atualizar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             maquina_id=maquina_id,
             identificacao=dados_validos.identificacao,
@@ -233,6 +236,7 @@ def desativar_maquina_route(
 
         maquina = atualizar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             maquina_id=maquina_id,
             ativo=False
@@ -277,6 +281,7 @@ def ativar_maquina_route(
 
         maquina = atualizar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             maquina_id=maquina_id,
             ativo=True

@@ -1,3 +1,4 @@
+from services.auditoria_service import registrar_evento
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select, update
 
@@ -43,6 +44,7 @@ def criar_perfil(
         )
 
         session.add(perfil)
+        registrar_evento(session, contexto, "criar_perfil")
         session.commit()
         session.refresh(perfil)
 
@@ -150,6 +152,7 @@ def atualizar_perfil(
             perfil.ativo = ativo
 
         preservar_administrador(session)
+        registrar_evento(session, contexto, "atualizar_perfil")
         session.commit()
         session.refresh(perfil)
 

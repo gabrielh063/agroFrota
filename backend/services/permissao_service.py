@@ -1,3 +1,4 @@
+from services.auditoria_service import registrar_evento
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
@@ -41,6 +42,7 @@ def criar_permissao(
         )
 
         session.add(permissao)
+        registrar_evento(session, contexto, "criar_permissao")
         session.commit()
         session.refresh(permissao)
 
@@ -140,6 +142,7 @@ def atualizar_permissao(
         if descricao is not None:
             permissao.descricao = descricao
 
+        registrar_evento(session, contexto, "atualizar_permissao")
         session.commit()
         session.refresh(permissao)
 

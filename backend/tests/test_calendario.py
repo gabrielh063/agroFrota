@@ -799,6 +799,12 @@ def test_nao_cancelar_agendamento_concluido(
         cleanup_registros_teste,
     )
 
+    inicio_execucao = requests.put(
+        f"{base_url}/api/calendario/{agendamento['id']}",
+        headers=auth_headers, json={"status": "EM_ANDAMENTO"}, timeout=10,
+    )
+    assert inicio_execucao.status_code == 200
+
     conclusao = requests.put(
         (
             f"{base_url}/api/calendario/"
@@ -890,6 +896,12 @@ def test_nao_editar_agendamento_concluido(
         codigo_unico,
         cleanup_registros_teste,
     )
+
+    inicio_execucao = requests.put(
+        f"{base_url}/api/calendario/{agendamento['id']}",
+        headers=auth_headers, json={"status": "EM_ANDAMENTO"}, timeout=10,
+    )
+    assert inicio_execucao.status_code == 200
 
     conclusao = requests.put(
         (

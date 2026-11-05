@@ -1,3 +1,4 @@
+from services.auditoria_service import registrar_evento
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
@@ -42,6 +43,7 @@ def criar_cargo(
         )
 
         session.add(cargo)
+        registrar_evento(session, contexto, "criar_cargo")
         session.commit()
         session.refresh(cargo)
 
@@ -140,6 +142,7 @@ def atualizar_cargo(
         if ativo is not None:
             cargo.ativo = ativo
 
+        registrar_evento(session, contexto, "atualizar_cargo")
         session.commit()
         session.refresh(cargo)
 

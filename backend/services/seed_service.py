@@ -9,6 +9,7 @@ from models.tenant.admin_lock import AdminLock
 from utils.security import gerar_hash_senha
 
 PERMISSOES_PADRAO = [
+    {"codigo": "AUDITORIA.VISUALIZAR", "descricao": "Permite consultar a trilha de auditoria."},
     {"codigo": "USUARIO_PROPRIO_VISUALIZAR", "descricao": "Permite consultar o próprio registro."},
     {
         "codigo": "USUARIO_CRIAR",

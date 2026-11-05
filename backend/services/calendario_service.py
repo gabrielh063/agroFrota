@@ -25,13 +25,17 @@ def _validar_disponibilidade(session, ordem_id, responsavel_id, inicio, fim, exc
     ordem = session.execute(
         select(OrdemServico).where(OrdemServico.id == ordem_id).with_for_update()
     ).scalar_one_or_none()
-    if ordem is None or not ordem.ativo or ordem.status in {"CONCLUIDA", "CANCELADA"}:
+    if ordem is None:
+        raise ValueError("Ordem de serviço não encontrada.")
+    if not ordem.ativo or ordem.status in {"CONCLUIDA", "CANCELADA"}:
         raise ValueError("Ordem de serviço inexistente, inativa ou encerrada.")
     if (ordem.maquina_id is None) == (ordem.equipamento_id is None):
         raise ValueError("A ordem deve ter exatamente um recurso.")
     for model, ident in ((Maquina, ordem.maquina_id), (Equipamento, ordem.equipamento_id), (Usuario, responsavel_id)):
         if ident is not None:
             recurso = session.execute(select(model).where(model.id == ident).with_for_update()).scalar_one_or_none()
+            if recurso is None and model is Usuario:
+                raise ValueError("Responsável não encontrado.")
             if recurso is None or not recurso.ativo:
                 raise ValueError("Recurso ou responsável inexistente ou inativo.")
     recurso_os = (OrdemServico.maquina_id == ordem.maquina_id if ordem.maquina_id is not None

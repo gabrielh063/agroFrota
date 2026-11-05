@@ -33,3 +33,6 @@ MATRIZ = {
 for _permissoes in MATRIZ.values():
     _permissoes['USUARIO_PROPRIO_VISUALIZAR'] = PROPRIO
 
+for _perfil in ('ADMIN_EMPRESA', 'AUDITOR'):
+    MATRIZ[_perfil]['AUDITORIA.VISUALIZAR'] = EMPRESA
+

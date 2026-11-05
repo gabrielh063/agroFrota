@@ -104,7 +104,19 @@ def test_migracao_legada_nao_acrescenta_permissoes(base_url):
     versions = dict(session.execute(text("SELECT u.id, u.session_version FROM usuarios u JOIN perfis p ON p.id=u.perfil_id WHERE p.nome IN ('OPERADOR','MANUTENCAO')")).all())
     session.close()
     def alembic(command, revision):
-        subprocess.run([sys.executable, '-m', 'alembic', '-c', 'alembic-tenant.ini', command, revision], env=env, check=True, capture_output=True)
+        # Exercise this exact migration on the verified synthetic fixture, without
+        # downgrading unrelated later revisions or altering the recorded head.
+        from importlib.util import spec_from_file_location, module_from_spec
+        from pathlib import Path
+        from alembic.migration import MigrationContext
+        from alembic.operations import Operations
+        path = Path('migrations/tenant/versions/a71f82c9d410_politica_escopo.py')
+        spec = spec_from_file_location('fixture_escopo_migration', path)
+        migration = module_from_spec(spec)
+        spec.loader.exec_module(migration)
+        with engine.begin() as connection:
+            migration.op = Operations(MigrationContext.configure(connection))
+            getattr(migration, command)()
     try:
         alembic('downgrade', '9b3b4b41d220')
         with engine.begin() as c:

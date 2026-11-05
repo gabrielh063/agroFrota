@@ -1,3 +1,4 @@
+from services.auditoria_service import registrar_evento
 from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select, update
 
@@ -65,6 +66,7 @@ def criar_usuario(
 
         session.add(usuario)
 
+        registrar_evento(session, contexto, "criar_usuario")
         session.commit()
 
         session.refresh(usuario)
@@ -197,6 +199,7 @@ def atualizar_usuario(
             usuario.ativo = ativo
 
         preservar_administrador(session)
+        registrar_evento(session, contexto, "atualizar_usuario")
         session.commit()
 
         session.refresh(usuario)
@@ -295,6 +298,7 @@ def alterar_senha_usuario(
             update(Usuario).where(Usuario.id == usuario_id)
             .values(session_version=Usuario.session_version + 1)
         )
+        registrar_evento(session, contexto, "alterar_senha_usuario")
         session.commit()
 
         session.refresh(usuario)

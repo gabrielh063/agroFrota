@@ -1,3 +1,5 @@
+from services.auditoria_service import registrar_evento
+from services.ativo_policy import autorizar_ativo
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -22,7 +24,8 @@ def criar_maquina(
     ano: int | None = None,
     localizacao: str | None = None,
     status: str = "OPERANDO",
-    controla_telemetria: bool = False
+    controla_telemetria: bool = False,
+    *, contexto=None
 ) -> Maquina:
 
     if status not in STATUS_VALIDOS:
@@ -38,6 +41,7 @@ def criar_maquina(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'MAQUINA_CRIAR', escrita=True)
 
         maquina_existente = session.execute(
             select(Maquina).where(
@@ -63,6 +67,7 @@ def criar_maquina(
 
         session.add(maquina)
 
+        registrar_evento(session, contexto, "criar_maquina")
         session.commit()
 
         session.refresh(maquina)
@@ -83,7 +88,8 @@ def criar_maquina(
 def buscar_maquina(
     config,
     database_name: str,
-    maquina_id: int
+    maquina_id: int,
+    *, contexto=None
 ) -> Maquina | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -94,6 +100,7 @@ def buscar_maquina(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'MAQUINA_VISUALIZAR', escrita=False)
 
         maquina = session.execute(
             select(Maquina).where(
@@ -118,7 +125,8 @@ def atualizar_maquina(
     localizacao: str | None = None,
     status: str | None = None,
     controla_telemetria: bool | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    *, contexto=None
 ) -> Maquina:
 
     if status is not None and status not in STATUS_VALIDOS:
@@ -134,6 +142,9 @@ def atualizar_maquina(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'MAQUINA_EDITAR', escrita=True)
+        if ativo is not None:
+            autorizar_ativo(session, contexto, 'MAQUINA_DESATIVAR')
 
         maquina = session.execute(
             select(Maquina).where(
@@ -183,6 +194,7 @@ def atualizar_maquina(
         if ativo is not None:
             maquina.ativo = ativo
 
+        registrar_evento(session, contexto, "atualizar_maquina")
         session.commit()
 
         session.refresh(maquina)
@@ -202,7 +214,8 @@ def atualizar_maquina(
 def listar_maquinas(
     config,
     database_name: str,
-    incluir_inativas: bool = False
+    incluir_inativas: bool = False,
+    *, contexto=None
 ) -> list[Maquina]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -213,6 +226,7 @@ def listar_maquinas(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'MAQUINA_VISUALIZAR', escrita=False)
 
         consulta = select(Maquina).order_by(
             Maquina.id

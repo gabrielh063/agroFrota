@@ -6,6 +6,7 @@ from models.tenant.ordem_servico import OrdemServico
 from models.tenant.usuario import Usuario
 from models.tenant.maquina import Maquina
 from models.tenant.equipamento import Equipamento
+from services.operacao_lock import bloquear_operacoes
 
 
 TIPOS_OS = {
@@ -124,14 +125,10 @@ def _validar_relacionamentos(
             )
 
 def _proximo_numero_os(session) -> int:
-    ultimo_numero = session.execute(
-        select(func.max(OrdemServico.numero))
-    ).scalar()
-
-    if ultimo_numero is None:
-        return 1
-
-    return ultimo_numero + 1
+    lock = bloquear_operacoes(session)
+    numero = lock.proximo_numero_os
+    lock.proximo_numero_os += 1
+    return numero
 
 
 def criar_ordem_servico(
@@ -157,6 +154,7 @@ def criar_ordem_servico(
 
     try:
 
+        bloquear_operacoes(session)
         tipo = tipo.upper()
         prioridade = prioridade.upper()
 
