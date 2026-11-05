@@ -23,3 +23,15 @@ api.interceptors.request.use(
         return config;
     }
 );
+
+// Ignore responses from an older session after a new login.
+api.interceptors.response.use(undefined, (error) => {
+    const authorization = error.config?.headers?.Authorization;
+    const currentToken = sessionStorage.getItem("agrofrota_token");
+    if (error.response?.status === 401 && currentToken &&
+        authorization === `Bearer ${currentToken}` &&
+        !error.config?.url?.includes("/api/auth/login")) {
+        window.dispatchEvent(new Event("agrofrota:session-expired"));
+    }
+    return Promise.reject(error);
+});
