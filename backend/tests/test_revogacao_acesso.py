@@ -381,3 +381,31 @@ def test_token_usuario_excluido_deve_ser_bloqueado(
         resposta.json()["success"]
         is False
     )
+
+def test_logout_revoga_todas_as_sessoes_e_novo_login_funciona(base_url, auth_headers):
+    usuario = criar_usuario_teste(base_url, auth_headers)
+    try:
+        primeira = login_usuario(base_url, usuario)
+        segunda = login_usuario(base_url, usuario)
+        assert requests.post(f"{base_url}/api/auth/logout", headers=primeira, timeout=10).status_code == 200
+        for headers in (primeira, segunda):
+            assert requests.get(f"{base_url}/api/usuarios/", headers=headers, timeout=10).status_code == 401
+        nova = login_usuario(base_url, usuario)
+        assert requests.get(f"{base_url}/api/usuarios/", headers=nova, timeout=10).status_code == 200
+    finally:
+        excluir_usuario_teste(usuario['id'])
+
+
+def test_mudanca_de_senha_revoga_token_antigo(base_url, auth_headers):
+    usuario = criar_usuario_teste(base_url, auth_headers)
+    try:
+        headers = login_usuario(base_url, usuario)
+        resposta = requests.put(f"{base_url}/api/usuarios/{usuario['id']}/senha", headers=headers,
+                                json={'senha_atual': usuario['senha'], 'nova_senha': 'OutraSenha@123'}, timeout=10)
+        assert resposta.status_code == 200
+        assert requests.get(f"{base_url}/api/usuarios/", headers=headers, timeout=10).status_code == 401
+        usuario['senha'] = 'OutraSenha@123'
+        nova = login_usuario(base_url, usuario)
+        assert requests.get(f"{base_url}/api/usuarios/", headers=nova, timeout=10).status_code == 200
+    finally:
+        excluir_usuario_teste(usuario['id'])

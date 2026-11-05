@@ -4,7 +4,7 @@ import {
     useState,
 } from "react";
 
-import { login as loginApi } from "../api/authService";
+import { login as loginApi, logout as logoutApi } from "../api/authService";
 
 
 const AuthContext = createContext(null);
@@ -94,7 +94,8 @@ export function AuthProvider({
     }
 
 
-    function sair() {
+    async function sair() {
+        await logoutApi();
         sessionStorage.removeItem(
             "agrofrota_token"
         );

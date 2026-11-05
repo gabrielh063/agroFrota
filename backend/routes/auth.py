@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from config import Config
 
@@ -12,6 +12,10 @@ from models.central.tenant import Tenant
 from services.auth_service import (
     autenticar_usuario,
 )
+
+from middleware.auth import autenticar
+from middleware.tenant import resolver_tenant
+from models.tenant.usuario import Usuario
 
 from services.token_service import (
     criar_token_usuario,
@@ -133,7 +137,8 @@ def login():
         token = criar_token_usuario(
             usuario_id=usuario.id,
             tenant_id=tenant.id,
-            perfil_id=usuario.perfil_id
+            perfil_id=usuario.perfil_id,
+            session_version=usuario.session_version
         )
 
         # -------------------------------------------------
@@ -195,3 +200,15 @@ def login():
                 "Erro interno ao realizar login."
             )
         }), 500
+
+@auth_bp.post("/logout")
+@autenticar()
+@resolver_tenant(Config)
+def logout(**kwargs):
+    session = kwargs["tenant_session"]
+    session.execute(
+        update(Usuario).where(Usuario.id == kwargs["usuario_autenticado_id"])
+        .values(session_version=Usuario.session_version + 1)
+    )
+    session.commit()
+    return jsonify({"success": True, "message": "Sessões revogadas."}), 200

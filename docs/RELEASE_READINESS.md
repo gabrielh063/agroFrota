@@ -6,9 +6,11 @@
 - [x] Suíte existente selecionada de autenticação, segurança, multitenant, RF08 legado e revogação: 50 passaram no ambiente descartável, incluindo seis verificações novas de cargos.
 - [ ] Atualização de instalação existente, provisionamento isolado, backup e restore.
 - [ ] Matriz RF08 proposta, escopo por objeto, proteção contra escalada e último administrador, auditoria transacional.
-- [ ] Logout e revogação persistente, pools limitados, CI e segurança restante.
+- [ ] Provar revogação após reinício e em múltiplos workers; implementar pools limitados, CI e segurança restante.
 - [ ] Interfaces e fluxos operacionais; IA, limites e desempenho; implantação privada e homologação.
 
 O modo de produção agora valida configurações básicas e pode iniciar com valores que passam nas verificações, mas isso **não** demonstra segurança operacional. Não exponha a aplicação nem use dados reais antes de fechar os gates. Ver [plano](PRODUCTIZATION_PLAN.md).
 
 Bootstrap local versionado: [instruções](TESTES_DESCARTAVEIS.md); 50 testes selecionados passaram e cleanup foi verificado em uma nova instância descartável. Esse resultado não valida os sete perfis nem os demais requisitos pendentes.
+
+Revogação por versão persistida implementada; veja [SESSOES.md](SESSOES.md) para testes e limitações.

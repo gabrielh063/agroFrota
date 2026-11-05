@@ -1,6 +1,7 @@
 from functools import wraps
 
 from flask import jsonify
+from flask_jwt_extended import get_jwt
 from sqlalchemy import select
 
 from database.session import (
@@ -150,6 +151,12 @@ def resolver_tenant(config):
                         "message":
                             "Usuário está inativo.",
                     }), 401
+
+                versao = get_jwt().get("session_version")
+                if type(versao) is not int or versao != usuario.session_version:
+                    tenant_session.close()
+                    tenant_session = None
+                    return jsonify({"success": False, "message": "Sessão revogada."}), 401
 
                 # --------------------------------------
                 # PERFIL ATUAL DO USUÁRIO

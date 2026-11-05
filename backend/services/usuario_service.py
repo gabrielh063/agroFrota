@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from database.session import criar_sessao_tenant
 from models.tenant.usuario import Usuario
@@ -273,7 +273,10 @@ def alterar_senha_usuario(
         usuario.senha_hash = gerar_hash_senha(
             nova_senha
         )
-
+        session.execute(
+            update(Usuario).where(Usuario.id == usuario_id)
+            .values(session_version=Usuario.session_version + 1)
+        )
         session.commit()
 
         session.refresh(usuario)

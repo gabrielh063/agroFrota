@@ -2,7 +2,7 @@
 
 ## Estado atual — retomada
 
-Branch `codex/fundacao-rf08`, base de trabalho `da0c0a1`; a PR #1 permanece em rascunho. O bootstrap versionado foi criado e validado com 50 testes HTTP em MariaDB descartável, com migrações central e tenant e limpeza positiva dos seus próprios recursos. Os sete perfis, autorização administrativa transacional, auditoria, revogação persistente, CLI, pools e atualização/restore seguem pendentes. As mudanças locais de calendário e frontend continuam fora da PR. Os checkpoints abaixo são históricos.
+Branch `codex/fundacao-rf08`, base de trabalho `da0c0a1`; a PR #1 permanece em rascunho. Bootstrap versionado validado com limpeza positiva; logout e troca de senha agora invalidam versões de sessão persistentes. Em MariaDB descartável, 52 testes selecionados passaram; reinício e múltiplos workers ainda precisam de prova. Os sete perfis, autorização administrativa transacional, auditoria, CLI, pools e atualização/restore seguem pendentes. As mudanças locais de calendário e frontend continuam fora da PR. Os checkpoints abaixo são históricos.
 
 ## Histórico
 
@@ -35,3 +35,5 @@ Próxima ação executável: implementar e testar a política de autorização a
 Marco de autorização de cargos: adicionados seis casos positivos e negativos; a suíte selecionada foi repetida na API atual e terminou com **50 aprovados** em MariaDB descartável. Commit `ac85e79`; HEAD nesse checkpoint. A suíte não demonstra proteção contra escalada ou último administrador.
 
 Marco de publicação: branch publicada em `origin/codex/fundacao-rf08`; [PR #1 em rascunho](https://github.com/gabrielh063/agroFrota/pull/1), base `Main`, explicitamente não pronta para merge ou deploy. HEAD antes deste registro: `a22b85f`. Os cinco caminhos do calendário e frontend permanecem fora dos commits. Duas APIs exclusivas de teste (39091 e 39092) e o MariaDB descartável continuam ativos; não encerrar sem verificar o processo e o uso por outras sessões.
+
+Marco de sessão: revisão tenant `58a724c498ce`, versionamento persistente e contrato de logout; 52 testes HTTP selecionados passaram e build frontend passou. Detalhes em [SESSOES.md](SESSOES.md). Ambiente `/tmp/agrofrota-db-b_7bqlyg` é próprio do bootstrap e continua ativo para outras provas.
