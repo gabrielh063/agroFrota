@@ -37,3 +37,5 @@ Thumbs.db
 # Banco local
 *.sqlite
 *.sqlite3
+# Backups locais (o dump já versionado requer avaliação separada)
+backend/backups/

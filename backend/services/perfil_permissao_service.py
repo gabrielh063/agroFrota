@@ -1,3 +1,4 @@
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -10,7 +11,8 @@ def adicionar_permissao_perfil(
     config,
     database_name: str,
     perfil_id: int,
-    permissao_id: int
+    permissao_id: int,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -22,6 +24,7 @@ def adicionar_permissao_perfil(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -33,6 +36,10 @@ def adicionar_permissao_perfil(
                 "Perfil não encontrado."
             )
 
+        perfil_delegavel(session, perfil_id, permissoes, ativo=False)
+        if perfil_id == ator.perfil_id:
+            raise AdministracaoNegada("Não é permitido modificar permissões do próprio perfil.")
+
         permissao = session.execute(
             select(Permissao).where(
                 Permissao.id == permissao_id
@@ -43,6 +50,9 @@ def adicionar_permissao_perfil(
             raise ValueError(
                 "Permissão não encontrada."
             )
+
+        if permissao.codigo not in permissoes:
+            raise AdministracaoNegada("Permissão excede a autoridade delegável.")
 
         permissao_ids = {
             permissao_existente.id
@@ -56,6 +66,7 @@ def adicionar_permissao_perfil(
 
         perfil.permissoes.append(permissao)
 
+        preservar_administrador(session)
         session.commit()
         session.refresh(perfil)
 
@@ -73,7 +84,8 @@ def remover_permissao_perfil(
     config,
     database_name: str,
     perfil_id: int,
-    permissao_id: int
+    permissao_id: int,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -85,6 +97,7 @@ def remover_permissao_perfil(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -95,6 +108,10 @@ def remover_permissao_perfil(
             raise ValueError(
                 "Perfil não encontrado."
             )
+
+        perfil_delegavel(session, perfil_id, permissoes, ativo=False)
+        if perfil_id == ator.perfil_id:
+            raise AdministracaoNegada("Não é permitido modificar permissões do próprio perfil.")
 
         permissao = session.execute(
             select(Permissao).where(
@@ -125,6 +142,7 @@ def remover_permissao_perfil(
             permissao_associada
         )
 
+        preservar_administrador(session)
         session.commit()
         session.refresh(perfil)
 

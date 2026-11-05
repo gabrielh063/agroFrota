@@ -1,3 +1,4 @@
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -9,7 +10,8 @@ def criar_perfil(
     config,
     database_name: str,
     nome: str,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -21,6 +23,7 @@ def criar_perfil(
 
     try:
 
+        autorizar(session, database_name, contexto, "PERFIL_CRIAR")
         perfil_existente = session.execute(
             select(Perfil).where(
                 Perfil.nome == nome
@@ -85,7 +88,8 @@ def atualizar_perfil(
     perfil_id: int,
     nome: str | None = None,
     descricao: str | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -97,6 +101,7 @@ def atualizar_perfil(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_EDITAR")
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -107,6 +112,10 @@ def atualizar_perfil(
             raise ValueError(
                 "Perfil não encontrado."
             )
+
+        perfil_delegavel(session, perfil_id, permissoes, ativo=False)
+        if perfil.id == ator.perfil_id:
+            raise AdministracaoNegada("Não é permitido alterar o próprio perfil.")
 
         if nome is not None:
 
@@ -130,6 +139,7 @@ def atualizar_perfil(
         if ativo is not None:
             perfil.ativo = ativo
 
+        preservar_administrador(session)
         session.commit()
         session.refresh(perfil)
 

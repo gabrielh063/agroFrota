@@ -78,12 +78,13 @@ def criar_perfil_route(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
 
         perfil = criar_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             nome=dados.nome,
@@ -128,12 +129,13 @@ def atualizar_perfil_route(
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
 
         perfil = atualizar_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,
@@ -168,7 +170,7 @@ def atualizar_perfil_route(
 @perfis_bp.patch("/<int:perfil_id>/desativar")
 @autenticar()
 @resolver_tenant(Config)
-@exigir_permissao("PERFIL_DESATIVAR")
+@exigir_permissao("PERFIL_EDITAR")
 def desativar_perfil_route(
     perfil_id,
     **kwargs
@@ -179,6 +181,7 @@ def desativar_perfil_route(
     try:
 
         perfil = atualizar_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,
@@ -204,7 +207,7 @@ def desativar_perfil_route(
 @perfis_bp.patch("/<int:perfil_id>/ativar")
 @autenticar()
 @resolver_tenant(Config)
-@exigir_permissao("PERFIL_ATIVAR")
+@exigir_permissao("PERFIL_EDITAR")
 def ativar_perfil_route(
     perfil_id,
     **kwargs
@@ -215,6 +218,7 @@ def ativar_perfil_route(
     try:
 
         perfil = atualizar_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,

@@ -1,3 +1,4 @@
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -9,7 +10,8 @@ def criar_permissao(
     config,
     database_name: str,
     codigo: str,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Permissao:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -21,6 +23,7 @@ def criar_permissao(
 
     try:
 
+        autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         permissao_existente = session.execute(
             select(Permissao).where(
                 Permissao.codigo == codigo
@@ -83,7 +86,8 @@ def atualizar_permissao(
     database_name: str,
     permissao_id: int,
     codigo: str | None = None,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Permissao:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -95,6 +99,7 @@ def atualizar_permissao(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         permissao = session.execute(
             select(Permissao).where(
                 Permissao.id == permissao_id
@@ -105,6 +110,11 @@ def atualizar_permissao(
             raise ValueError(
                 "Permissão não encontrada."
             )
+
+        if permissao.codigo not in permissoes:
+            raise AdministracaoNegada("Permissão excede a autoridade delegável.")
+        if codigo is not None and codigo != permissao.codigo:
+            raise AdministracaoNegada("Códigos de permissão são imutáveis.")
 
         if codigo is not None:
 

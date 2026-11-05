@@ -1,6 +1,8 @@
 from database.base import TenantBase
+from sqlalchemy import text
 from database.tenant import criar_engine_tenant
 
+from models.tenant.admin_lock import AdminLock
 from models.tenant.usuario import Usuario
 from models.tenant.cargo import Cargo
 from models.tenant.perfil import Perfil
@@ -21,5 +23,7 @@ def criar_schema_tenant(config, database_name):
 
     try:
         TenantBase.metadata.create_all(engine)
+        with engine.begin() as connection:
+            connection.execute(text("INSERT IGNORE INTO administracao_lock (id) VALUES (1)"))
     finally:
         engine.dispose()

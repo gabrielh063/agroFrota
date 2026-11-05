@@ -1,4 +1,5 @@
-from sqlalchemy import select
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
+from sqlalchemy import select, update
 
 from database.session import criar_sessao_tenant
 from models.tenant.usuario import Usuario
@@ -13,7 +14,8 @@ def criar_usuario(
     senha: str,
     perfil_id: int,
     cargo_id: int | None = None,
-    email: str | None = None
+    email: str | None = None,
+    contexto=None
 ) -> Usuario:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -25,6 +27,8 @@ def criar_usuario(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "USUARIO_CRIAR")
+        perfil_delegavel(session, perfil_id, permissoes)
         usuario_existente = session.execute(
             select(Usuario).where(
                 Usuario.username == username
@@ -115,7 +119,8 @@ def atualizar_usuario(
     email: str | None = None,
     cargo_id: int | None = None,
     perfil_id: int | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    contexto=None
 ) -> Usuario:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -127,6 +132,7 @@ def atualizar_usuario(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "USUARIO_DESATIVAR" if ativo is not None else "USUARIO_EDITAR")
         usuario = session.execute(
             select(Usuario).where(
                 Usuario.id == usuario_id
@@ -137,6 +143,12 @@ def atualizar_usuario(
             raise ValueError(
                 "Usuário não encontrado."
             )
+
+        perfil_delegavel(session, usuario.perfil_id, permissoes, ativo=False)
+        if perfil_id is not None:
+            if usuario.id == ator.id and perfil_id != usuario.perfil_id:
+                raise AdministracaoNegada("Não é permitido alterar o próprio perfil.")
+            perfil_delegavel(session, perfil_id, permissoes)
 
         if username is not None:
 
@@ -182,6 +194,7 @@ def atualizar_usuario(
         if ativo is not None:
             usuario.ativo = ativo
 
+        preservar_administrador(session)
         session.commit()
 
         session.refresh(usuario)
@@ -273,7 +286,10 @@ def alterar_senha_usuario(
         usuario.senha_hash = gerar_hash_senha(
             nova_senha
         )
-
+        session.execute(
+            update(Usuario).where(Usuario.id == usuario_id)
+            .values(session_version=Usuario.session_version + 1)
+        )
         session.commit()
 
         session.refresh(usuario)

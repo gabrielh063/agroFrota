@@ -1,6 +1,7 @@
 from functools import wraps
 
 from flask import jsonify
+from flask_jwt_extended import get_jwt
 from sqlalchemy import select
 
 from database.session import (
@@ -9,6 +10,8 @@ from database.session import (
 )
 from models.central.tenant import Tenant
 from models.tenant.usuario import Usuario
+from models.tenant.perfil import Perfil
+from services.admin_policy import ContextoAdministrativo
 
 
 def resolver_tenant(config):
@@ -151,6 +154,12 @@ def resolver_tenant(config):
                             "Usuário está inativo.",
                     }), 401
 
+                versao = get_jwt().get("session_version")
+                if type(versao) is not int or versao != usuario.session_version:
+                    tenant_session.close()
+                    tenant_session = None
+                    return jsonify({"success": False, "message": "Sessão revogada."}), 401
+
                 # --------------------------------------
                 # PERFIL ATUAL DO USUÁRIO
                 # --------------------------------------
@@ -180,6 +189,17 @@ def resolver_tenant(config):
                             "não identificado.",
                     }), 403
 
+                perfil_ativo = tenant_session.execute(
+                    select(Perfil.id).where(
+                        Perfil.id == perfil_id_atual,
+                        Perfil.ativo.is_(True),
+                    )
+                ).scalar_one_or_none()
+                if perfil_ativo is None:
+                    tenant_session.close()
+                    tenant_session = None
+                    return jsonify({"success": False, "message": "Perfil não encontrado ou inativo."}), 403
+
             except Exception as erro:
 
                 if tenant_session is not None:
@@ -189,10 +209,7 @@ def resolver_tenant(config):
 
                     tenant_session = None
 
-                print(
-                    "ERRO AO RESOLVER TENANT:",
-                    repr(erro),
-                )
+                # Do not expose connection details in logs.
 
                 return jsonify({
                     "success": False,
@@ -205,6 +222,9 @@ def resolver_tenant(config):
             # CONTEXTO DA REQUISIÇÃO
             # ------------------------------------------
 
+            kwargs["contexto_administrativo"] = ContextoAdministrativo(
+                tenant.database_name, usuario_id, versao
+            )
             kwargs["tenant"] = tenant
 
             kwargs["database_name"] = (

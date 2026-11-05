@@ -19,8 +19,13 @@ function Sidebar() {
     } = useAuth();
 
 
-    function handleLogout() {
-        sair();
+    async function handleLogout() {
+        try {
+            await sair();
+        } catch {
+            window.alert("Não foi possível encerrar a sessão no servidor. Tente novamente.");
+            return;
+        }
 
         navigate(
             "/login",
