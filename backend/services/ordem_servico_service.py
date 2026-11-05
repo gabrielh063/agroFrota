@@ -307,6 +307,8 @@ def atualizar_ordem_servico(
 
     try:
         iniciar_escrita(session)
+        if isinstance(status, str):
+            status = status.upper()
         acao = "OS.CONCLUIR" if status == "CONCLUIDA" else "OS.CANCELAR" if status == "CANCELADA" else "OS.EDITAR"
         if escopo_atual(session, contexto, acao) != "empresa":
             if any(x is not _NAO_INFORMADO for x in (maquina_id, equipamento_id, operador_id, responsavel_id)):
