@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, jsonify, request
 
 from config import Config
@@ -80,9 +82,16 @@ def criar(**kwargs):
 def listar(**kwargs):
     tenant_session = kwargs["tenant_session"]
 
-    agendamentos = listar_agendamentos(
-        tenant_session
-    )
+    try:
+        inicio = datetime.fromisoformat(request.args["inicio"]) if request.args.get("inicio") else None
+        fim = datetime.fromisoformat(request.args["fim"]) if request.args.get("fim") else None
+        limite = int(request.args.get("limite", 100))
+        offset = int(request.args.get("offset", 0))
+        if not 1 <= limite <= 200 or offset < 0 or (inicio and fim and inicio >= fim):
+            raise ValueError()
+        agendamentos = listar_agendamentos(tenant_session, inicio, fim, limite, offset)
+    except (ValueError, TypeError):
+        return jsonify({"success": False, "message": "Filtros de agenda inválidos."}), 400
 
     return jsonify({
         "success": True,

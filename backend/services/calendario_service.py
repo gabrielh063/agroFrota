@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from models.tenant.agendamento import Agendamento
 from models.tenant.ordem_servico import OrdemServico
 from models.tenant.usuario import Usuario
+from models.tenant.maquina import Maquina
+from models.tenant.equipamento import Equipamento
+from models.tenant.indisponibilidade import Indisponibilidade
 
 
 STATUS_AGENDAMENTO = {
@@ -15,6 +18,43 @@ STATUS_AGENDAMENTO = {
 }
 
 _NAO_INFORMADO = object()
+
+# Locking reads use the current committed state under MariaDB REPEATABLE READ.
+# Resources are always locked in machine, equipment, responsible order.
+def _validar_disponibilidade(session, ordem_id, responsavel_id, inicio, fim, excluir_id=None):
+    ordem = session.execute(
+        select(OrdemServico).where(OrdemServico.id == ordem_id).with_for_update()
+    ).scalar_one_or_none()
+    if ordem is None or not ordem.ativo or ordem.status in {"CONCLUIDA", "CANCELADA"}:
+        raise ValueError("Ordem de serviço inexistente, inativa ou encerrada.")
+    if (ordem.maquina_id is None) == (ordem.equipamento_id is None):
+        raise ValueError("A ordem deve ter exatamente um recurso.")
+    for model, ident in ((Maquina, ordem.maquina_id), (Equipamento, ordem.equipamento_id), (Usuario, responsavel_id)):
+        if ident is not None:
+            recurso = session.execute(select(model).where(model.id == ident).with_for_update()).scalar_one_or_none()
+            if recurso is None or not recurso.ativo:
+                raise ValueError("Recurso ou responsável inexistente ou inativo.")
+    recurso_os = (OrdemServico.maquina_id == ordem.maquina_id if ordem.maquina_id is not None
+                  else OrdemServico.equipamento_id == ordem.equipamento_id)
+    condicoes = [recurso_os]
+    if responsavel_id is not None:
+        condicoes.append(Agendamento.responsavel_id == responsavel_id)
+    consulta = (select(Agendamento.id).join(OrdemServico, Agendamento.ordem_servico_id == OrdemServico.id)
+                .where(Agendamento.status != "CANCELADO", Agendamento.inicio < fim,
+                       Agendamento.fim > inicio, or_(*condicoes)))
+    if excluir_id is not None:
+        consulta = consulta.where(Agendamento.id != excluir_id)
+    if session.execute(consulta.with_for_update()).first() is not None:
+        raise ValueError("Conflito com outro agendamento.")
+    recurso_indisponivel = (Indisponibilidade.maquina_id == ordem.maquina_id if ordem.maquina_id is not None
+                           else Indisponibilidade.equipamento_id == ordem.equipamento_id)
+    if session.execute(select(Indisponibilidade.id).where(
+        recurso_indisponivel, Indisponibilidade.status != "CANCELADA",
+        Indisponibilidade.inicio < fim,
+        or_(Indisponibilidade.fim.is_(None), Indisponibilidade.fim > inicio),
+    ).with_for_update()).first() is not None:
+        raise ValueError("Recurso indisponível no período.")
+
 
 def criar_agendamento(
     session,
@@ -29,43 +69,7 @@ def criar_agendamento(
             "A data/hora final deve ser posterior à inicial."
         )
 
-    ordem_servico = session.execute(
-        select(OrdemServico).where(
-            OrdemServico.id == ordem_servico_id
-        )
-    ).scalar_one_or_none()
-
-    if ordem_servico is None:
-        raise ValueError(
-            "Ordem de serviço não encontrada."
-        )
-
-    if not ordem_servico.ativo:
-        raise ValueError(
-            "A ordem de serviço está inativa."
-        )
-
-    if ordem_servico.status in {"CONCLUIDA", "CANCELADA"}:
-        raise ValueError(
-            "Não é possível agendar uma ordem de serviço concluída ou cancelada."
-        )
-
-    if responsavel_id is not None:
-        responsavel = session.execute(
-            select(Usuario).where(
-                Usuario.id == responsavel_id
-            )
-        ).scalar_one_or_none()
-
-        if responsavel is None:
-            raise ValueError(
-                "Responsável não encontrado."
-            )
-
-        if not responsavel.ativo:
-            raise ValueError(
-                "O responsável está inativo."
-            )
+    _validar_disponibilidade(session, ordem_servico_id, responsavel_id, inicio, fim)
 
     agendamento = Agendamento(
         ordem_servico_id=ordem_servico_id,
@@ -91,12 +95,14 @@ def buscar_agendamento(session, agendamento_id: int):
     ).scalar_one_or_none()
 
 
-def listar_agendamentos(session):
-    return session.execute(
-        select(Agendamento).order_by(
-            Agendamento.inicio.asc()
-        )
-    ).scalars().all()
+def listar_agendamentos(session, inicio=None, fim=None, limite=100, offset=0):
+    consulta = select(Agendamento)
+    if inicio is not None:
+        consulta = consulta.where(Agendamento.fim > inicio)
+    if fim is not None:
+        consulta = consulta.where(Agendamento.inicio < fim)
+    return session.execute(consulta.order_by(Agendamento.inicio.asc(), Agendamento.id.asc())
+                           .limit(limite).offset(offset)).scalars().all()
 
 def atualizar_agendamento(
     session,
@@ -168,6 +174,16 @@ def atualizar_agendamento(
             )
 
 
+
+    transicoes = {"AGENDADO": {"AGENDADO", "EM_ANDAMENTO", "CANCELADO"},
+                  "EM_ANDAMENTO": {"EM_ANDAMENTO", "CONCLUIDO", "CANCELADO"}}
+    novo_status = agendamento.status if status is _NAO_INFORMADO or status is None else status
+    if novo_status not in transicoes[agendamento.status]:
+        raise ValueError("Transição de status inválida.")
+    novo_responsavel = agendamento.responsavel_id if responsavel_id is _NAO_INFORMADO else responsavel_id
+    if novo_status != "CANCELADO":
+        _validar_disponibilidade(session, agendamento.ordem_servico_id, novo_responsavel,
+                                novo_inicio, novo_fim, agendamento.id)
 
     # =========================
     # RESPONSÁVEL
