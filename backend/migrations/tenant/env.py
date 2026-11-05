@@ -44,6 +44,9 @@ from database.base import TenantBase
 # todas as tabelas no TenantBase.metadata.
 #
 
+from models.tenant.admin_lock import AdminLock
+from models.tenant.operacao_lock import OperacaoLock
+from models.tenant.auditoria import EventoAuditoria
 from models.tenant.usuario import Usuario
 from models.tenant.cargo import Cargo
 from models.tenant.perfil import Perfil

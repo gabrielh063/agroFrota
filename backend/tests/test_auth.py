@@ -1,3 +1,4 @@
+import os
 import requests
 
 
@@ -8,10 +9,10 @@ def test_login_valido(
     resposta = requests.post(
         f"{base_url}/api/auth/login",
         json={
-            "username": "admin",
-            "senha": "Admin@123",
+            "username": os.environ["AGROFROTA_TEST_USERNAME"],
+            "senha": os.environ["AGROFROTA_TEST_PASSWORD"],
             "database_name":
-                "tenant_000004",
+                os.environ["AGROFROTA_TEST_DATABASE"],
         },
         timeout=10,
     )
@@ -35,10 +36,10 @@ def test_login_senha_incorreta(
     resposta = requests.post(
         f"{base_url}/api/auth/login",
         json={
-            "username": "admin",
+            "username": os.environ["AGROFROTA_TEST_USERNAME"],
             "senha": "SENHA-INCORRETA",
             "database_name":
-                "tenant_000004",
+                os.environ["AGROFROTA_TEST_DATABASE"],
         },
         timeout=10,
     )
@@ -67,3 +68,12 @@ def test_rota_protegida_sem_token(
     )
 
     assert resposta.status_code == 401
+
+def test_usuario_atual(base_url, auth_headers):
+    resposta = requests.get(f"{base_url}/api/auth/me", headers=auth_headers, timeout=10)
+    assert resposta.status_code == 200
+    dados = resposta.json()["data"]
+    assert dados["usuario"]["username"] == os.environ["AGROFROTA_TEST_USERNAME"]
+    assert "USUARIO_CRIAR" in dados["permissoes"]
+    assert dados["permissoes"] == sorted(set(dados["permissoes"]))
+    assert requests.get(f"{base_url}/api/auth/me", timeout=10).status_code == 401

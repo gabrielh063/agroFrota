@@ -2,13 +2,18 @@ import { api } from "./api";
 
 
 export async function listarAgendamentos() {
-    const resposta = await api.get(
-        "/api/calendario/"
-    );
-
-    return resposta.data;
+    const limite = 200;
+    let offset = 0;
+    const agendamentos = [];
+    while (true) {
+        const resposta = await api.get("/api/calendario/", { params: { limite, offset } });
+        const pagina = resposta.data.agendamentos;
+        agendamentos.push(...pagina);
+        if (pagina.length < limite) break;
+        offset += pagina.length;
+    }
+    return { agendamentos };
 }
-
 
 export async function buscarAgendamento(
     agendamentoId

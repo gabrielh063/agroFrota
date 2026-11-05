@@ -1,5 +1,9 @@
 # AgroFrota
 
+**Estado atual: PARCIAL, sem homologação privada.** A candidata de integração,
+evidências e pendências estão em [docs/MISSAO_FINAL.md](docs/MISSAO_FINAL.md).
+O checklist abaixo é histórico e não comprova os fluxos completos.
+
 Sistema SaaS de gestão para propriedades rurais, com foco no controle de máquinas, equipamentos, manutenção, ordens de serviço, indisponibilidade e gestão operacional.
 
 O projeto está sendo desenvolvido de forma modular, priorizando primeiro a estrutura do backend e a validação das regras de negócio antes da construção do frontend.

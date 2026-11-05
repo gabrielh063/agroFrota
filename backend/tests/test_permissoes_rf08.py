@@ -1,3 +1,4 @@
+import os
 import uuid
 
 import pytest
@@ -8,7 +9,7 @@ from config import Config
 from database.session import criar_sessao_tenant
 
 
-DATABASE_NAME = "tenant_000004"
+DATABASE_NAME = os.environ.get("AGROFROTA_TEST_DATABASE", "")
 
 
 def abrir_sessao():
@@ -329,6 +330,15 @@ def test_operador_pode_criar_os(
         maquina["id"],
     )
 
+    me = requests.get(f"{base_url}/api/auth/me", headers=operador_headers, timeout=10)
+    assert me.status_code == 200
+    operador_id = me.json()["data"]["usuario"]["id"]
+    atribuicao = requests.post(f"{base_url}/api/ordens-servico/", headers=auth_headers,
+        json={"tipo": "SERVICO", "titulo": "Atribuição pelo gestor", "maquina_id": maquina["id"],
+              "operador_id": operador_id}, timeout=10)
+    assert atribuicao.status_code == 201
+    cleanup_registros_teste("ordens_servico", atribuicao.json()["ordem_servico"]["id"])
+
     resposta = requests.post(
         f"{base_url}/api/ordens-servico/",
         headers=operador_headers,
@@ -337,6 +347,7 @@ def test_operador_pode_criar_os(
                 "SERVICO",
             "titulo":
                 "OS criada por OPERADOR",
+            "operador_id": operador_id,
             "descricao":
                 "Teste RF08",
             "maquina_id":
@@ -753,3 +764,20 @@ def test_rf08_sem_token(
     )
 
     assert resposta.status_code == 401
+
+def test_gerente_pode_listar_cargos(base_url, auth_headers):
+    resposta = requests.get(f"{base_url}/api/cargos/", headers=auth_headers, timeout=10)
+    assert resposta.status_code == 200
+
+
+@pytest.mark.parametrize("method,path", [
+    ("get", "/api/cargos/"),
+    ("post", "/api/cargos/"),
+    ("put", "/api/cargos/1"),
+    ("patch", "/api/cargos/1/desativar"),
+    ("patch", "/api/cargos/1/ativar"),
+])
+def test_operador_sem_permissao_nao_acessa_cargos(base_url, operador_headers, method, path):
+    resposta = requests.request(method, f"{base_url}{path}", headers=operador_headers,
+                                json={"nome": "Teste"}, timeout=10)
+    assert resposta.status_code == 403

@@ -1,15 +1,19 @@
-from sqlalchemy import select
+from services.auditoria_service import registrar_evento
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
+from sqlalchemy import select, update
 
 from database.session import criar_sessao_tenant
 
 from models.tenant.perfil import Perfil
+from models.tenant.usuario import Usuario
 
 
 def criar_perfil(
     config,
     database_name: str,
     nome: str,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -21,6 +25,7 @@ def criar_perfil(
 
     try:
 
+        autorizar(session, database_name, contexto, "PERFIL_CRIAR")
         perfil_existente = session.execute(
             select(Perfil).where(
                 Perfil.nome == nome
@@ -39,6 +44,7 @@ def criar_perfil(
         )
 
         session.add(perfil)
+        registrar_evento(session, contexto, "criar_perfil")
         session.commit()
         session.refresh(perfil)
 
@@ -55,7 +61,8 @@ def criar_perfil(
 def buscar_perfil(
     config,
     database_name: str,
-    perfil_id: int
+    perfil_id: int,
+    contexto=None
 ) -> Perfil | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -66,6 +73,10 @@ def buscar_perfil(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         perfil = session.execute(
             select(Perfil).where(
@@ -85,7 +96,8 @@ def atualizar_perfil(
     perfil_id: int,
     nome: str | None = None,
     descricao: str | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -97,6 +109,7 @@ def atualizar_perfil(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_EDITAR")
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -107,6 +120,10 @@ def atualizar_perfil(
             raise ValueError(
                 "Perfil não encontrado."
             )
+
+        perfil_delegavel(session, perfil_id, permissoes, ativo=False)
+        if perfil.id == ator.perfil_id:
+            raise AdministracaoNegada("Não é permitido alterar o próprio perfil.")
 
         if nome is not None:
 
@@ -127,9 +144,15 @@ def atualizar_perfil(
         if descricao is not None:
             perfil.descricao = descricao
 
+        if ativo is not None and ativo != perfil.ativo:
+            session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
+                            .values(session_version=Usuario.session_version + 1))
+
         if ativo is not None:
             perfil.ativo = ativo
 
+        preservar_administrador(session)
+        registrar_evento(session, contexto, "atualizar_perfil")
         session.commit()
         session.refresh(perfil)
 
@@ -146,7 +169,8 @@ def atualizar_perfil(
 def listar_perfis(
     config,
     database_name: str,
-    incluir_inativos: bool = False
+    incluir_inativos: bool = False,
+    contexto=None
 ) -> list[Perfil]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -157,6 +181,10 @@ def listar_perfis(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         consulta = select(Perfil).order_by(
             Perfil.id

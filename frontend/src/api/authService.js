@@ -19,3 +19,7 @@ export async function login({
 
     return resposta.data;
 }
+
+export async function logout() {
+    await api.post("/api/auth/logout");
+}

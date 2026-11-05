@@ -1,3 +1,5 @@
+from services.auditoria_service import registrar_evento
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -9,7 +11,8 @@ def criar_permissao(
     config,
     database_name: str,
     codigo: str,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Permissao:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -21,6 +24,7 @@ def criar_permissao(
 
     try:
 
+        autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         permissao_existente = session.execute(
             select(Permissao).where(
                 Permissao.codigo == codigo
@@ -38,6 +42,7 @@ def criar_permissao(
         )
 
         session.add(permissao)
+        registrar_evento(session, contexto, "criar_permissao")
         session.commit()
         session.refresh(permissao)
 
@@ -54,7 +59,8 @@ def criar_permissao(
 def buscar_permissao(
     config,
     database_name: str,
-    permissao_id: int
+    permissao_id: int,
+    contexto=None
 ) -> Permissao | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -65,6 +71,10 @@ def buscar_permissao(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         permissao = session.execute(
             select(Permissao).where(
@@ -83,7 +93,8 @@ def atualizar_permissao(
     database_name: str,
     permissao_id: int,
     codigo: str | None = None,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Permissao:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -95,6 +106,7 @@ def atualizar_permissao(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         permissao = session.execute(
             select(Permissao).where(
                 Permissao.id == permissao_id
@@ -105,6 +117,11 @@ def atualizar_permissao(
             raise ValueError(
                 "Permissão não encontrada."
             )
+
+        if permissao.codigo not in permissoes:
+            raise AdministracaoNegada("Permissão excede a autoridade delegável.")
+        if codigo is not None and codigo != permissao.codigo:
+            raise AdministracaoNegada("Códigos de permissão são imutáveis.")
 
         if codigo is not None:
 
@@ -125,6 +142,7 @@ def atualizar_permissao(
         if descricao is not None:
             permissao.descricao = descricao
 
+        registrar_evento(session, contexto, "atualizar_permissao")
         session.commit()
         session.refresh(permissao)
 
@@ -140,7 +158,8 @@ def atualizar_permissao(
 
 def listar_permissoes(
     config,
-    database_name: str
+    database_name: str,
+    contexto=None
 ) -> list[Permissao]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -151,6 +170,10 @@ def listar_permissoes(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         permissoes = session.execute(
             select(Permissao).order_by(

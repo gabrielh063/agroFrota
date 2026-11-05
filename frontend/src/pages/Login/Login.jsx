@@ -18,6 +18,7 @@ function Login() {
 
     const {
         entrar,
+        sessaoExpirada,
     } = useAuth();
 
     const [username, setUsername] =
@@ -194,7 +195,7 @@ function Login() {
                         </div>
 
 
-                        {erro && (
+                        {(erro || sessaoExpirada) && (
                             <div
                                 className="login-error"
                                 role="alert"
@@ -202,7 +203,7 @@ function Login() {
                                 <i className="bi bi-exclamation-circle" />
 
                                 <span>
-                                    {erro}
+                                    {erro || "Sua sessão expirou ou foi revogada. Entre novamente."}
                                 </span>
                             </div>
                         )}

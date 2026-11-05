@@ -1,8 +1,11 @@
-from sqlalchemy import select
+from services.auditoria_service import registrar_evento
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
+from sqlalchemy import select, update
 
 from database.session import criar_sessao_tenant
 
 from models.tenant.perfil import Perfil
+from models.tenant.usuario import Usuario
 from models.tenant.permissao import Permissao
 
 
@@ -10,7 +13,8 @@ def adicionar_permissao_perfil(
     config,
     database_name: str,
     perfil_id: int,
-    permissao_id: int
+    permissao_id: int,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -22,6 +26,7 @@ def adicionar_permissao_perfil(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -33,6 +38,10 @@ def adicionar_permissao_perfil(
                 "Perfil não encontrado."
             )
 
+        perfil_delegavel(session, perfil_id, permissoes, ativo=False)
+        if perfil_id == ator.perfil_id:
+            raise AdministracaoNegada("Não é permitido modificar permissões do próprio perfil.")
+
         permissao = session.execute(
             select(Permissao).where(
                 Permissao.id == permissao_id
@@ -43,6 +52,9 @@ def adicionar_permissao_perfil(
             raise ValueError(
                 "Permissão não encontrada."
             )
+
+        if permissao.codigo not in permissoes:
+            raise AdministracaoNegada("Permissão excede a autoridade delegável.")
 
         permissao_ids = {
             permissao_existente.id
@@ -56,6 +68,10 @@ def adicionar_permissao_perfil(
 
         perfil.permissoes.append(permissao)
 
+        session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
+                        .values(session_version=Usuario.session_version + 1))
+        preservar_administrador(session)
+        registrar_evento(session, contexto, "adicionar_permissao_perfil")
         session.commit()
         session.refresh(perfil)
 
@@ -73,7 +89,8 @@ def remover_permissao_perfil(
     config,
     database_name: str,
     perfil_id: int,
-    permissao_id: int
+    permissao_id: int,
+    contexto=None
 ) -> Perfil:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -85,6 +102,7 @@ def remover_permissao_perfil(
 
     try:
 
+        ator, permissoes = autorizar(session, database_name, contexto, "PERFIL_PERMISSAO_GERENCIAR")
         perfil = session.execute(
             select(Perfil).where(
                 Perfil.id == perfil_id
@@ -95,6 +113,10 @@ def remover_permissao_perfil(
             raise ValueError(
                 "Perfil não encontrado."
             )
+
+        perfil_delegavel(session, perfil_id, permissoes, ativo=False)
+        if perfil_id == ator.perfil_id:
+            raise AdministracaoNegada("Não é permitido modificar permissões do próprio perfil.")
 
         permissao = session.execute(
             select(Permissao).where(
@@ -125,6 +147,10 @@ def remover_permissao_perfil(
             permissao_associada
         )
 
+        session.execute(update(Usuario).where(Usuario.perfil_id == perfil.id)
+                        .values(session_version=Usuario.session_version + 1))
+        preservar_administrador(session)
+        registrar_evento(session, contexto, "remover_permissao_perfil")
         session.commit()
         session.refresh(perfil)
 
@@ -141,7 +167,8 @@ def remover_permissao_perfil(
 def listar_permissoes_perfil(
     config,
     database_name: str,
-    perfil_id: int
+    perfil_id: int,
+    contexto=None
 ) -> list[Permissao]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -152,6 +179,10 @@ def listar_permissoes_perfil(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         perfil = session.execute(
             select(Perfil).where(

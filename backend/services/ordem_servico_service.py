@@ -1,3 +1,7 @@
+from services.os_policy import iniciar_escrita, consulta_os, autorizar_criacao
+from services.escopo import escopo_atual
+from services.admin_policy import AdministracaoNegada
+from services.auditoria_service import registrar_evento
 from sqlalchemy import func, select
 
 from database.session import criar_sessao_tenant
@@ -6,6 +10,7 @@ from models.tenant.ordem_servico import OrdemServico
 from models.tenant.usuario import Usuario
 from models.tenant.maquina import Maquina
 from models.tenant.equipamento import Equipamento
+from services.operacao_lock import bloquear_operacoes
 
 
 TIPOS_OS = {
@@ -124,14 +129,10 @@ def _validar_relacionamentos(
             )
 
 def _proximo_numero_os(session) -> int:
-    ultimo_numero = session.execute(
-        select(func.max(OrdemServico.numero))
-    ).scalar()
-
-    if ultimo_numero is None:
-        return 1
-
-    return ultimo_numero + 1
+    lock = bloquear_operacoes(session)
+    numero = lock.proximo_numero_os
+    lock.proximo_numero_os += 1
+    return numero
 
 
 def criar_ordem_servico(
@@ -145,7 +146,8 @@ def criar_ordem_servico(
     operador_id: int | None = None,
     responsavel_id: int | None = None,
     prioridade: str = "MEDIA",
-    prazo=None
+    prazo=None,
+    *, contexto=None
 ) -> OrdemServico:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -157,6 +159,8 @@ def criar_ordem_servico(
 
     try:
 
+        iniciar_escrita(session)
+        autorizar_criacao(session, contexto, maquina_id, equipamento_id, operador_id, responsavel_id)
         tipo = tipo.upper()
         prioridade = prioridade.upper()
 
@@ -191,6 +195,7 @@ def criar_ordem_servico(
         )
 
         session.add(ordem)
+        registrar_evento(session, contexto, "criar_ordem_servico")
         session.commit()
         session.refresh(ordem)
 
@@ -210,7 +215,8 @@ def criar_ordem_servico(
 def buscar_ordem_servico(
     config,
     database_name: str,
-    ordem_servico_id: int
+    ordem_servico_id: int,
+    *, contexto=None
 ) -> OrdemServico | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -223,7 +229,7 @@ def buscar_ordem_servico(
     try:
 
         ordem = session.execute(
-            select(OrdemServico).where(
+            consulta_os(session, contexto, "OS.VISUALIZAR", select(OrdemServico)).where(
                 OrdemServico.id == ordem_servico_id
             )
         ).scalar_one_or_none()
@@ -238,7 +244,8 @@ def buscar_ordem_servico(
 def listar_ordens_servico(
     config,
     database_name: str,
-    apenas_ativas: bool = False
+    apenas_ativas: bool = False,
+    *, contexto=None
 ) -> list[OrdemServico]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -255,6 +262,8 @@ def listar_ordens_servico(
         ).order_by(
             OrdemServico.numero.desc()
         )
+
+        consulta = consulta_os(session, contexto, "OS.VISUALIZAR", consulta)
 
         if apenas_ativas:
             consulta = consulta.where(
@@ -285,7 +294,8 @@ def atualizar_ordem_servico(
     responsavel_id=_NAO_INFORMADO,
     prioridade=_NAO_INFORMADO,
     status=_NAO_INFORMADO,
-    prazo=_NAO_INFORMADO
+    prazo=_NAO_INFORMADO,
+    *, contexto=None
 ) -> OrdemServico:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -296,9 +306,16 @@ def atualizar_ordem_servico(
     session = SessionLocal()
 
     try:
+        iniciar_escrita(session)
+        if isinstance(status, str):
+            status = status.upper()
+        acao = "OS.CONCLUIR" if status == "CONCLUIDA" else "OS.CANCELAR" if status == "CANCELADA" else "OS.EDITAR"
+        if escopo_atual(session, contexto, acao) != "empresa":
+            if any(x is not _NAO_INFORMADO for x in (maquina_id, equipamento_id, operador_id, responsavel_id)):
+                raise AdministracaoNegada("Somente gestão pode alterar a atribuição da OS.")
 
         ordem = session.execute(
-            select(OrdemServico).where(
+            consulta_os(session, contexto, acao, select(OrdemServico)).where(
                 OrdemServico.id
                 == ordem_servico_id
             )
@@ -545,6 +562,7 @@ def atualizar_ordem_servico(
             )
 
 
+        registrar_evento(session, contexto, acao)
         session.commit()
 
         session.refresh(ordem)
@@ -567,13 +585,15 @@ def atualizar_ordem_servico(
 def concluir_ordem_servico(
     config,
     database_name: str,
-    ordem_servico_id: int
+    ordem_servico_id: int,
+    *, contexto=None
 ) -> OrdemServico:
 
     return atualizar_ordem_servico(
         config=config,
         database_name=database_name,
         ordem_servico_id=ordem_servico_id,
+        contexto=contexto,
         status="CONCLUIDA"
     )
 
@@ -581,12 +601,14 @@ def concluir_ordem_servico(
 def cancelar_ordem_servico(
     config,
     database_name: str,
-    ordem_servico_id: int
+    ordem_servico_id: int,
+    *, contexto=None
 ) -> OrdemServico:
 
     return atualizar_ordem_servico(
         config=config,
         database_name=database_name,
         ordem_servico_id=ordem_servico_id,
+        contexto=contexto,
         status="CANCELADA"
     )

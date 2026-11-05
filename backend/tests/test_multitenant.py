@@ -13,26 +13,26 @@ from database.session import (
 from models.central.tenant import Tenant
 
 
-TENANT_A_ID = 4
+TENANT_A_ID = int(os.getenv("AGROFROTA_TEST_TENANT_A_ID", "4"))
 TENANT_A_DB = os.getenv(
     "AGROFROTA_TEST_DATABASE",
-    "tenant_000004",
+    "",
 )
 
-TENANT_B_ID = 5
+TENANT_B_ID = int(os.getenv("AGROFROTA_TEST_TENANT_B_ID", "5"))
 TENANT_B_DB = os.getenv(
     "AGROFROTA_TEST_DATABASE_B",
-    "tenant_000005",
+    "",
 )
 
 TENANT_B_USERNAME = os.getenv(
     "AGROFROTA_TEST_USERNAME_B",
-    "admin_isolamento",
+    "",
 )
 
 TENANT_B_PASSWORD = os.getenv(
     "AGROFROTA_TEST_PASSWORD_B",
-    "AdminIso@123",
+    "",
 )
 
 
