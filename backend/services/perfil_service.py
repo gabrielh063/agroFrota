@@ -59,7 +59,8 @@ def criar_perfil(
 def buscar_perfil(
     config,
     database_name: str,
-    perfil_id: int
+    perfil_id: int,
+    contexto=None
 ) -> Perfil | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -70,6 +71,10 @@ def buscar_perfil(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         perfil = session.execute(
             select(Perfil).where(
@@ -161,7 +166,8 @@ def atualizar_perfil(
 def listar_perfis(
     config,
     database_name: str,
-    incluir_inativos: bool = False
+    incluir_inativos: bool = False,
+    contexto=None
 ) -> list[Perfil]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -172,6 +178,10 @@ def listar_perfis(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         consulta = select(Perfil).order_by(
             Perfil.id

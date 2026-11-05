@@ -45,7 +45,8 @@ def listar(**kwargs):
     usuarios = listar_usuarios(
         config=Config,
         database_name=database_name,
-        apenas_ativos=apenas_ativos
+        apenas_ativos=apenas_ativos,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     data = [
@@ -124,7 +125,8 @@ def buscar(usuario_id, **kwargs):
     usuario = buscar_usuario(
         config=Config,
         database_name=database_name,
-        usuario_id=usuario_id
+        usuario_id=usuario_id,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     if usuario is None:
@@ -300,7 +302,8 @@ def alterar_senha(usuario_id, **kwargs):
             database_name=database_name,
             usuario_id=usuario_id,
             senha_atual=dados_validos.senha_atual,
-            nova_senha=dados_validos.nova_senha
+            nova_senha=dados_validos.nova_senha,
+            contexto=kwargs["contexto_administrativo"]
         )
 
         data = UsuarioRespostaSchema.model_validate(

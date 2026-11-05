@@ -164,7 +164,8 @@ def remover_permissao_perfil(
 def listar_permissoes_perfil(
     config,
     database_name: str,
-    perfil_id: int
+    perfil_id: int,
+    contexto=None
 ) -> list[Permissao]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -175,6 +176,10 @@ def listar_permissoes_perfil(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "PERFIL_PERMISSAO_GERENCIAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         perfil = session.execute(
             select(Perfil).where(

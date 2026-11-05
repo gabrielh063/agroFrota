@@ -85,7 +85,8 @@ def criar_usuario(
 def buscar_usuario(
     config,
     database_name: str,
-    usuario_id: int
+    usuario_id: int,
+    contexto=None
 ) -> Usuario | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -97,13 +98,10 @@ def buscar_usuario(
 
     try:
 
-        usuario = session.execute(
-            select(Usuario).where(
-                Usuario.id == usuario_id
-            )
-        ).scalar_one_or_none()
-
-        return usuario
+        from services.escopo import consultar_autorizado
+        consulta = consultar_autorizado(session, contexto, "USUARIO_VISUALIZAR",
+                                        select(Usuario).where(Usuario.id == usuario_id), proprio=Usuario.id)
+        return session.execute(consulta).scalar_one_or_none()
 
     finally:
 
@@ -219,7 +217,8 @@ def atualizar_usuario(
 def listar_usuarios(
     config,
     database_name: str,
-    apenas_ativos: bool = False
+    apenas_ativos: bool = False,
+    contexto=None
 ) -> list[Usuario]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -231,9 +230,9 @@ def listar_usuarios(
 
     try:
 
-        consulta = select(Usuario).order_by(
-            Usuario.id
-        )
+        from services.escopo import consultar_autorizado
+        consulta = consultar_autorizado(session, contexto, "USUARIO_VISUALIZAR",
+                                        select(Usuario).order_by(Usuario.id), proprio=Usuario.id)
 
         if apenas_ativos:
 
@@ -256,7 +255,8 @@ def alterar_senha_usuario(
     database_name: str,
     usuario_id: int,
     senha_atual: str,
-    nova_senha: str
+    nova_senha: str,
+    contexto=None
 ) -> Usuario:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -267,6 +267,7 @@ def alterar_senha_usuario(
     session = SessionLocal()
 
     try:
+        autorizar(session, database_name, contexto, "USUARIO_EDITAR")
 
         usuario = session.execute(
             select(Usuario).where(

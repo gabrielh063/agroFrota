@@ -47,7 +47,8 @@ def listar_permissoes_perfil_route(
         permissoes = listar_permissoes_perfil(
             config=Config,
             database_name=database_name,
-            perfil_id=perfil_id
+            perfil_id=perfil_id,
+            contexto=kwargs["contexto_administrativo"]
         )
 
     except ValueError as erro:
