@@ -77,7 +77,7 @@ def _exigir_ambiente_descartavel():
 
 @pytest.fixture(autouse=True)
 def _validar_segundo_tenant(request):
-    if request.node.path.name in {"test_multitenant.py", "test_permissoes_rf08.py", "test_revogacao_acesso.py"}:
+    if request.node.path.name in {"test_multitenant.py", "test_permissoes_rf08.py", "test_revogacao_acesso.py", "test_admin_transacional.py"}:
         _exigir_ambiente_descartavel()
     if request.node.path.name == "test_multitenant.py":
         other = os.getenv("AGROFROTA_TEST_DATABASE_B", "")

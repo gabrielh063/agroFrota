@@ -98,6 +98,7 @@ def adicionar_permissao_perfil_route(
     try:
 
         perfil = adicionar_permissao_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,
@@ -155,6 +156,7 @@ def remover_permissao_perfil_route(
     try:
 
         perfil = remover_permissao_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,

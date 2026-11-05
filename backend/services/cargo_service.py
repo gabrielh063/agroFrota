@@ -1,3 +1,4 @@
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -9,7 +10,8 @@ def criar_cargo(
     config,
     database_name: str,
     nome: str,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Cargo:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -21,6 +23,7 @@ def criar_cargo(
 
     try:
 
+        autorizar(session, database_name, contexto, "CARGO_CRIAR")
         cargo_existente = session.execute(
             select(Cargo).where(
                 Cargo.nome == nome
@@ -85,7 +88,8 @@ def atualizar_cargo(
     cargo_id: int,
     nome: str | None = None,
     descricao: str | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    contexto=None
 ) -> Cargo:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -97,6 +101,7 @@ def atualizar_cargo(
 
     try:
 
+        autorizar(session, database_name, contexto, "CARGO_EDITAR")
         cargo = session.execute(
             select(Cargo).where(
                 Cargo.id == cargo_id

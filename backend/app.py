@@ -15,6 +15,7 @@ from models.central.tenant import Tenant
 from models.tenant.usuario import Usuario
 
 from services.tenant_service import criar_tenant
+from services.admin_policy import AdministracaoNegada
 
 from routes.maquinas import maquinas_bp
 from routes.equipamentos import equipamentos_bp
@@ -37,6 +38,10 @@ from middleware.permissions import exigir_permissao
 def create_app():
 
     app = Flask(__name__)
+
+    @app.errorhandler(AdministracaoNegada)
+    def administracao_negada(_erro):
+        return jsonify({"success": False, "message": str(_erro)}), 403
     app.config.from_object(Config)
     app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024
 

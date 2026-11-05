@@ -85,6 +85,7 @@ def criar(**kwargs):
 
     try:
         usuario = criar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             nome=dados_validos.nome,
@@ -168,6 +169,7 @@ def atualizar(usuario_id, **kwargs):
 
     try:
         usuario = atualizar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             usuario_id=usuario_id,
@@ -205,6 +207,7 @@ def desativar(usuario_id, **kwargs):
 
     try:
         usuario = atualizar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             usuario_id=usuario_id,
@@ -237,6 +240,7 @@ def ativar(usuario_id, **kwargs):
 
     try:
         usuario = atualizar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             usuario_id=usuario_id,

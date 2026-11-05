@@ -76,6 +76,7 @@ def criar_permissao_route(**kwargs):
     try:
 
         permissao = criar_permissao(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             codigo=dados.codigo,
@@ -126,6 +127,7 @@ def atualizar_permissao_route(
     try:
 
         permissao = atualizar_permissao(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             permissao_id=permissao_id,

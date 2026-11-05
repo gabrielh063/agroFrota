@@ -82,6 +82,7 @@ def criar_cargo_route(**kwargs):
     try:
 
         cargo = criar_cargo(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             nome=dados.nome,
@@ -132,6 +133,7 @@ def atualizar_cargo_route(
     try:
 
         cargo = atualizar_cargo(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             cargo_id=cargo_id,
@@ -177,6 +179,7 @@ def desativar_cargo_route(
     try:
 
         cargo = atualizar_cargo(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             cargo_id=cargo_id,
@@ -222,6 +225,7 @@ def ativar_cargo_route(
     try:
 
         cargo = atualizar_cargo(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             cargo_id=cargo_id,

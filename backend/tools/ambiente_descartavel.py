@@ -151,7 +151,7 @@ def main():
         parser.error('informe o diretório retornado por start')
     p, state = verify(args.directory)
     if args.command == 'test':
-        tests = args.tests or ['tests/test_auth.py', 'tests/test_security.py', 'tests/test_multitenant.py', 'tests/test_permissoes_rf08.py', 'tests/test_revogacao_acesso.py']
+        tests = args.tests or ['tests/test_auth.py', 'tests/test_security.py', 'tests/test_multitenant.py', 'tests/test_permissoes_rf08.py', 'tests/test_revogacao_acesso.py', 'tests/test_admin_transacional.py']
         raise SystemExit(subprocess.call([sys.executable, '-m', 'pytest', '-q', *tests], cwd=BACKEND, env=env_for(p, state)))
     if args.tests:
         parser.error('stop não aceita testes')

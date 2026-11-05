@@ -5,7 +5,8 @@
 - [x] Revisões iniciais central e tenant aplicadas em MariaDB vazio; comparação Alembic sem diferenças.
 - [x] Suíte existente selecionada de autenticação, segurança, multitenant, RF08 legado e revogação: 50 passaram no ambiente descartável, incluindo seis verificações novas de cargos.
 - [ ] Atualização de instalação existente, provisionamento isolado, backup e restore.
-- [ ] Matriz RF08 proposta, escopo por objeto, proteção contra escalada e último administrador, auditoria transacional.
+- [x] Autorização administrativa transacional, delegação limitada e proteção do último administrador; detalhes em [política administrativa](POLITICA_ADMINISTRATIVA.md).
+- [ ] Matriz RF08 proposta, escopo por objeto e auditoria persistente.
 - [ ] Provar revogação após reinício e em múltiplos workers; implementar pools limitados, CI e segurança restante.
 - [ ] Interfaces e fluxos operacionais; IA, limites e desempenho; implantação privada e homologação.
 

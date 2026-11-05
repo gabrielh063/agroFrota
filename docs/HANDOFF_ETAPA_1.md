@@ -2,7 +2,9 @@
 
 ## Estado atual — retomada
 
-Branch `codex/fundacao-rf08`; consulte `git rev-parse HEAD` para o SHA atual. A PR #1 permanece em rascunho. Bootstrap versionado validado com limpeza positiva; logout e troca de senha invalidam versões de sessão persistentes. Perfil inativo agora impede login e acesso autenticado mesmo em rotas sem decorador de permissão; teste específico acrescentado. Reinício e múltiplos workers ainda precisam de prova. Os sete perfis, autorização administrativa transacional, auditoria, CLI, pools e atualização/restore seguem pendentes. As mudanças locais de calendário e frontend continuam fora da PR. Os checkpoints abaixo são históricos.
+Branch `codex/fundacao-rf08`; consulte `git rev-parse HEAD` para o SHA atual. A PR #1 permanece em rascunho. A etapa 1A implementa autorização administrativa nos serviços, delegação limitada pelas permissões atuais e proteção do último administrador em transação serializada por tenant; veja [política](POLITICA_ADMINISTRATIVA.md). A suíte selecionada em MariaDB descartável inclui os testes específicos de administração. Os checkpoints abaixo são históricos. As alterações locais anteriores de calendário e frontend permanecem fora da PR.
+
+Checklist 1A: política e serviços implementados; migração do bloqueio aplicada em bancos sintéticos; operação legítima, negação, escalada, isolamento, rollback e concorrência cobertos. A etapa 1 inteira segue parcial: sete perfis e escopo por objeto, auditoria persistente, provas adicionais de revogação, CLI e credenciais separadas, pools e atualização/restore ainda estão pendentes.
 
 ## Histórico
 

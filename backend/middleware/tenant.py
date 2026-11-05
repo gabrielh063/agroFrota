@@ -11,6 +11,7 @@ from database.session import (
 from models.central.tenant import Tenant
 from models.tenant.usuario import Usuario
 from models.tenant.perfil import Perfil
+from services.admin_policy import ContextoAdministrativo
 
 
 def resolver_tenant(config):
@@ -221,6 +222,9 @@ def resolver_tenant(config):
             # CONTEXTO DA REQUISIÇÃO
             # ------------------------------------------
 
+            kwargs["contexto_administrativo"] = ContextoAdministrativo(
+                tenant.database_name, usuario_id, versao
+            )
             kwargs["tenant"] = tenant
 
             kwargs["database_name"] = (
