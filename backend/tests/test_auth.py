@@ -1,3 +1,4 @@
+import os
 import requests
 
 
@@ -8,10 +9,10 @@ def test_login_valido(
     resposta = requests.post(
         f"{base_url}/api/auth/login",
         json={
-            "username": "admin",
-            "senha": "Admin@123",
+            "username": os.environ["AGROFROTA_TEST_USERNAME"],
+            "senha": os.environ["AGROFROTA_TEST_PASSWORD"],
             "database_name":
-                "tenant_000004",
+                os.environ["AGROFROTA_TEST_DATABASE"],
         },
         timeout=10,
     )
@@ -35,10 +36,10 @@ def test_login_senha_incorreta(
     resposta = requests.post(
         f"{base_url}/api/auth/login",
         json={
-            "username": "admin",
+            "username": os.environ["AGROFROTA_TEST_USERNAME"],
             "senha": "SENHA-INCORRETA",
             "database_name":
-                "tenant_000004",
+                os.environ["AGROFROTA_TEST_DATABASE"],
         },
         timeout=10,
     )

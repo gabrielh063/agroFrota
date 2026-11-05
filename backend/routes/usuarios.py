@@ -80,7 +80,7 @@ def criar(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -163,7 +163,7 @@ def atualizar(usuario_id, **kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -286,7 +286,7 @@ def alterar_senha(usuario_id, **kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:

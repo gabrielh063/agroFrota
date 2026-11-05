@@ -70,7 +70,7 @@ def criar_permissao_route(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -120,7 +120,7 @@ def atualizar_permissao_route(
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:

@@ -283,6 +283,10 @@ def criar_perfis_padrao(config, database_name):
 
                 perfis_criados.append(perfil)
 
+            else:
+                # Existing profiles are tenant-owned; never silently grant permissions.
+                continue
+
             codigos_existentes = {
                 permissao.codigo
                 for permissao in perfil.permissoes

@@ -78,7 +78,7 @@ def criar_perfil_route(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -128,7 +128,7 @@ def atualizar_perfil_route(
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:

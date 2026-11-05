@@ -189,10 +189,7 @@ def resolver_tenant(config):
 
                     tenant_session = None
 
-                print(
-                    "ERRO AO RESOLVER TENANT:",
-                    repr(erro),
-                )
+                # Do not expose connection details in logs.
 
                 return jsonify({
                     "success": False,

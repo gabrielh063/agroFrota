@@ -187,10 +187,7 @@ def login():
 
     except Exception as erro:
 
-        print(
-            "ERRO NO LOGIN:",
-            repr(erro)
-        )
+        # Avoid logging connection details or credentials from exceptions.
 
         return jsonify({
             "success": False,

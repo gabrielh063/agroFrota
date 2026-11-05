@@ -5,6 +5,7 @@ from config import Config
 
 from middleware.auth import autenticar
 from middleware.tenant import resolver_tenant
+from middleware.permissions import exigir_permissao
 
 from schemas.cargo import (
     CargoCriarSchema,
@@ -29,6 +30,7 @@ cargos_bp = Blueprint(
 @cargos_bp.get("/")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("CARGO_VISUALIZAR")
 def listar_cargos_route(**kwargs):
 
     database_name = kwargs["database_name"]
@@ -58,6 +60,7 @@ def listar_cargos_route(**kwargs):
 @cargos_bp.post("/")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("CARGO_CRIAR")
 def criar_cargo_route(**kwargs):
 
     database_name = kwargs["database_name"]
@@ -73,7 +76,7 @@ def criar_cargo_route(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -104,6 +107,7 @@ def criar_cargo_route(**kwargs):
 @cargos_bp.put("/<int:cargo_id>")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("CARGO_EDITAR")
 def atualizar_cargo_route(
     cargo_id,
     **kwargs
@@ -122,7 +126,7 @@ def atualizar_cargo_route(
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -162,6 +166,7 @@ def atualizar_cargo_route(
 @cargos_bp.patch("/<int:cargo_id>/desativar")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("CARGO_EDITAR")
 def desativar_cargo_route(
     cargo_id,
     **kwargs
@@ -206,6 +211,7 @@ def desativar_cargo_route(
 @cargos_bp.patch("/<int:cargo_id>/ativar")
 @autenticar()
 @resolver_tenant(Config)
+@exigir_permissao("CARGO_EDITAR")
 def ativar_cargo_route(
     cargo_id,
     **kwargs

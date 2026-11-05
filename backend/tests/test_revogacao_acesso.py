@@ -1,3 +1,4 @@
+import os
 import uuid
 
 import requests
@@ -7,7 +8,7 @@ from config import Config
 from database.session import criar_sessao_tenant
 
 
-DATABASE_NAME = "tenant_000004"
+DATABASE_NAME = os.environ.get("AGROFROTA_TEST_DATABASE", "")
 
 
 def abrir_sessao():
