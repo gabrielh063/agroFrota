@@ -71,11 +71,8 @@ function Login() {
             );
 
         } catch (error) {
-            const mensagem =
-                error.response?.data?.message
-                || "Não foi possível realizar o login.";
-
-            setErro(mensagem);
+            console.error("Falha ao autenticar usuário:", error);
+            setErro("Não foi possível entrar. Confira seus dados e tente novamente.");
 
         } finally {
             setCarregando(false);

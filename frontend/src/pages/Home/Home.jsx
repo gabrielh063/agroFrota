@@ -95,10 +95,9 @@ export default function Home() {
     const dataHoje = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
     return <div className="home-page">
-        <div className="home-topline"><span>Operação <i>/</i> <b>Visão geral</b></span><div><time>{dataHoje}</time>{demo && <span className="demo-badge"><i /> DADOS FICTÍCIOS · DEMONSTRAÇÃO</span>}<button className="notification-button" aria-label="Notificações"><i className="bi bi-bell" /></button></div></div>
+        <div className="home-topline"><span>Operações <i>/</i> <b>Visão geral</b></span><div><time>{dataHoje}</time>{demo && <span className="demo-badge"><i /> DADOS FICTÍCIOS · DEMONSTRAÇÃO</span>}</div></div>
         <header className="home-header"><div><span className="eyebrow">GESTÃO OPERACIONAL</span><h1>Painel de controle</h1><p>Visão geral da frota, manutenções e ordens de serviço.</p></div><button className="home-new-os" onClick={() => navigate("/ordens-servico/nova")}><i className="bi bi-plus-lg" /> Nova ordem de serviço</button></header>
-        {erro && <div className="home-error" role="alert"><i className="bi bi-exclamation-circle" />{erro}<button onClick={carregarDashboard}>Tentar novamente</button></div>}
-        {carregando ? <section className="dashboard-loading"><span className="spinner-border spinner-border-sm" />Carregando indicadores...</section> : <>
+        {carregando ? <section className="dashboard-loading"><span className="spinner-border spinner-border-sm" />Carregando indicadores...</section> : erro ? <section className="home-error" role="alert"><i className="bi bi-exclamation-circle" />{erro}<button onClick={carregarDashboard}>Tentar novamente</button></section> : <>
             <section className="dashboard-cards">
                 <DashboardCard titulo="Ativos cadastrados" valor={total} descricao={ativosLabel} icone="bi-truck" />
                 <DashboardCard titulo="Frota em operação" valor={capacidade?.operando ?? 0} descricao={!total ? "Sem ativos cadastrados" : baseOperacional ? `${pct(capacidade?.operando || 0)}% da base operacional` : "Sem ativos operacionais"} icone="bi-activity" variante="operando" />

@@ -11,6 +11,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./styles/global.css";
 
 import App from "./App";
+import "./styles/product-polish.css";
 
 import {
     AuthProvider,

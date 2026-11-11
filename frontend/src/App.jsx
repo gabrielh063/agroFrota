@@ -18,10 +18,6 @@ import AssistenteIA from "./pages/AssistenteIA/AssistenteIA";
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
-import PagePlaceholder
-    from "./components/PagePlaceholder/PagePlaceholder";
-
-
 function App() {
     return (
         <Routes>

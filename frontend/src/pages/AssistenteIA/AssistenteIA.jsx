@@ -4,13 +4,23 @@ import { api } from '../../api/api';
 import './AssistenteIA.css';
 
 const EXEMPLOS = [
-  'Quais máquinas estão paradas e quais OS estão abertas?',
-  'Quais serviços estão com prioridade urgente?',
-  'O que devo verificar antes de operar um trator?',
-  'Quero agendar uma colheita de silagem amanhã usando um trator disponível.',
-  'Crie uma OS para revisar o trator disponível.',
+  { label: 'Consultar disponibilidade da frota', prompt: 'Quais máquinas estão disponíveis para operação?' },
+  { label: 'Ver ordens de serviço urgentes', prompt: 'Quais serviços estão com prioridade urgente?' },
+  { label: 'Consultar recomendações técnicas', prompt: 'O que devo verificar antes de operar um trator?' },
+  { label: 'Planejar um serviço', prompt: 'Quero agendar uma colheita de silagem amanhã usando um trator disponível.' },
+  { label: 'Criar ordem de serviço', prompt: 'Crie uma OS para revisar o trator disponível.' },
 ];
-const BOAS_VINDAS = [{ origem: 'ia', texto: 'Olá! Posso consultar sua frota, explicar procedimentos do Vault e ajudar a preparar uma OS ou agendamento. As gravações só acontecem depois da sua confirmação.' }];
+const BOAS_VINDAS = [{ origem: 'ia', texto: 'Olá! Posso ajudar você a consultar sua frota, organizar serviços, criar ordens de serviço e planejar agendamentos. Por onde deseja começar?' }];
+
+function textoOperacional(value = '') {
+  return (typeof value === 'string' ? value : '')
+    .replace(/assistente\s+ia/gi, 'Central de Operações')
+    .replace(/inteligência artificial/gi, 'processamento automatizado')
+    .replace(/powered\s+by\s+ai/gi, 'AgroFrota')
+    .replace(/\b(ollama|llama|gpt|llm|rag|fts5)\b/gi, 'serviço operacional')
+    .replace(/\bvault\b/gi, 'base documental')
+    .replace(/\bia\b/gi, 'processamento automatizado');
+}
 
 function dataBonita(value) {
   if (!value) return 'Sem agendamento';
@@ -44,7 +54,8 @@ export default function AssistenteIA() {
         setProposta(data.proposta_pendente || null);
       }
     } catch (requestError) {
-      setErro(requestError.response?.data?.message || 'Não foi possível abrir o histórico da conversa.');
+      console.error('Falha ao abrir histórico operacional:', requestError);
+      setErro('Não foi possível carregar o histórico. Verifique sua conexão e tente novamente.');
     } finally {
       setCarregando(false);
     }
@@ -61,7 +72,8 @@ export default function AssistenteIA() {
       setHistorico(BOAS_VINDAS);
       setErro('');
     } catch (requestError) {
-      setErro(requestError.response?.data?.message || 'Não foi possível iniciar uma conversa.');
+      console.error('Falha ao iniciar conversa operacional:', requestError);
+      setErro('Não foi possível iniciar uma nova conversa. Verifique sua conexão e tente novamente.');
     } finally {
       setCarregando(false);
     }
@@ -85,7 +97,8 @@ export default function AssistenteIA() {
       if (data.historico) setHistorico(data.historico);
       setProposta(data.proposta || null);
     } catch (requestError) {
-      setErro(requestError.response?.data?.message || 'A assistente não respondeu. Confira o backend e o Ollama.');
+      console.error('Falha ao processar solicitação operacional:', requestError);
+      setErro('Não foi possível processar a solicitação. Verifique sua conexão e tente novamente.');
     } finally {
       setCarregando(false);
     }
@@ -103,7 +116,8 @@ export default function AssistenteIA() {
       else setHistorico((items) => [...items, { origem: 'ia', texto: data.message || 'Operação confirmada.', resultado: data.resultado }]);
       setProposta(null);
     } catch (requestError) {
-      setErro(requestError.response?.data?.message || 'Não foi possível confirmar. Confira a proposta e o calendário.');
+      console.error('Falha ao confirmar operação:', requestError);
+      setErro('Não foi possível confirmar a operação. Confira as informações e tente novamente.');
     } finally {
       setCarregando(false);
     }
@@ -120,29 +134,29 @@ export default function AssistenteIA() {
   return (
     <section className="agro-ai-page">
       <header className="agro-ai-header">
-        <div><h1><i className="bi bi-robot" /> Assistente AgroFrota</h1>
-          <p>Converse sobre a frota, prepare ordens e planeje serviços.</p></div>
-        <div className="agro-ai-header-actions"><span className="agro-ai-tag">IA local · operações confirmadas pelo usuário</span>
+        <div><span className="agro-ai-eyebrow">OPERAÇÕES</span><h1><i className="bi bi-chat-square-text" /> Central de Operações</h1>
+          <p>Consulte informações da frota, planeje serviços e acompanhe ordens de serviço em um só lugar.</p></div>
+        <div className="agro-ai-header-actions">
           <button type="button" className="agro-ai-new" onClick={novaConversa} disabled={carregando}><i className="bi bi-plus-lg" /> Nova conversa</button></div>
       </header>
 
       <div className="agro-ai-layout">
-        <section className="agro-ai-chat" aria-label="Conversa com o assistente">
-          <div className="agro-ai-messages" aria-live="polite">
+        <section className="agro-ai-chat" aria-label="Central de Operações">
+          <div className="agro-ai-messages" aria-live="polite" aria-busy={carregando}>
             {historico.map((item, index) => (
               <div key={`${index}-${item.origem}`} className={`agro-ai-bubble agro-ai-${item.origem}`}>
-                {item.texto}
-                {item.fontes?.length > 0 && <small className="agro-ai-sources">Fontes: {item.fontes.map((f) => f.secao ? `${f.arquivo} · ${f.secao}` : f.arquivo).join('; ')}</small>}
+                {textoOperacional(item.texto)}
+                {item.fontes?.length > 0 && <small className="agro-ai-sources">Referências: {item.fontes.map((f) => f.secao ? `${textoOperacional(f.arquivo)} · ${textoOperacional(f.secao)}` : textoOperacional(f.arquivo)).join('; ')}</small>}
                 {item.opcoes_recurso?.length > 0 && <div className="agro-ai-options">{item.opcoes_recurso.map((option, i) => <button key={option.id} type="button" onClick={() => enviar(`Quero o ${i === 0 ? 'primeiro' : i === 1 ? 'segundo' : `${i + 1}º`} recurso`)}>{option.identificacao} · {option.modelo}</button>)}</div>}
                 {item.resultado?.os_id && <Link className="agro-ai-result-link" to={`/ordens-servico/${item.resultado.os_id}`}>Abrir OS #{item.resultado.os_numero}</Link>}
                 {item.resultado?.agendamento_id && <Link className="agro-ai-result-link" to="/calendario">Ver calendário</Link>}
               </div>
             ))}
-            {carregando && <p className="agro-ai-loading">Consultando registros e contexto...</p>}
+            {carregando && <p className="agro-ai-loading"><span className="spinner-border spinner-border-sm" aria-hidden="true" /> Processando solicitação…</p>}
           </div>
           {proposta && (
             <div className="agro-ai-proposal">
-              <strong><i className="bi bi-clipboard-check" /> {agendaExistente ? 'Proposta de agendamento' : 'Nova ordem de serviço'}</strong>
+              <strong><i className={`bi ${agendaExistente ? 'bi-calendar-check' : 'bi-clipboard-check'}`} /> {agendaExistente ? 'Proposta de agendamento' : 'Proposta de ordem de serviço'}</strong>
               {agendaExistente ? <p><b>OS #{dadosProposta.os_numero}</b> · {dadosProposta.os_titulo}</p> : <>
                 <p><b>Título:</b> {dadosProposta.titulo}</p>
                 <p><b>Tipo:</b> {dadosProposta.tipo} · <b>Prioridade:</b> {dadosProposta.prioridade}</p>
@@ -151,25 +165,25 @@ export default function AssistenteIA() {
                 <p><b>Status inicial:</b> ABERTA</p>
               </>}
               {(proposta.inicio || dadosProposta.inicio) && <p><b>Período:</b> {dataBonita(proposta.inicio || dadosProposta.inicio)} – {dataBonita(proposta.fim || dadosProposta.fim)}</p>}
-              <small>Proposta válida por até cinco minutos. A confirmação revalida permissões e conflitos. Nada foi gravado ainda.</small>
+              <small>Esta proposta ainda não foi gravada. Ao confirmar, as permissões e a disponibilidade serão verificadas novamente.</small>
               <div className="agro-ai-actions">
                 <button type="button" onClick={confirmar} disabled={carregando}>Confirmar operação</button>
-                <button type="button" className="agro-ai-secondary" onClick={cancelarProposta} disabled={carregando}>Cancelar proposta</button>
+                <button type="button" className="agro-ai-secondary" onClick={cancelarProposta} disabled={carregando}>Cancelar</button>
               </div>
             </div>
           )}
           {erro && <div className="agro-ai-inline-error" role="alert">{erro}</div>}
           <form onSubmit={(event) => { event.preventDefault(); enviar(); }} className="agro-ai-form">
-            <input aria-label="Mensagem para o assistente" value={mensagem} onChange={(event) => setMensagem(event.target.value)} maxLength={800}
-              placeholder="Ex.: Preciso revisar um trator amanhã..." disabled={carregando} />
+            <input aria-label="Descreva o que precisa consultar ou planejar" value={mensagem} onChange={(event) => setMensagem(event.target.value)} maxLength={800}
+              placeholder="Ex.: Preciso revisar um trator amanhã…" disabled={carregando} />
             <button type="submit" disabled={!mensagem.trim() || carregando}><i className="bi bi-send" /> Enviar</button>
           </form>
         </section>
 
         <aside className="agro-ai-help">
-          <h2>Experimente perguntar</h2>
-          {EXEMPLOS.map((text) => <button type="button" key={text} onClick={() => enviar(text)} disabled={carregando}>{text}</button>)}
-          <p>O assistente consulta dados do seu tenant. Ordens e agendamentos só são persistidos depois da confirmação.</p>
+          <h2>Ações rápidas</h2>
+          {EXEMPLOS.map(({ label, prompt }) => <button type="button" key={label} onClick={() => enviar(prompt)} disabled={carregando}><i className="bi bi-arrow-up-right" />{label}</button>)}
+          <p>As ordens e os agendamentos só são registrados após sua confirmação.</p>
           <p>Confira <Link to="/ordens-servico">Ordens de serviço</Link> e <Link to="/calendario">Calendário</Link>.</p>
           <p className="agro-ai-disclaimer">Orientações técnicas são apoio à consulta. Siga o manual do fabricante e a inspeção de profissionais capacitados.</p>
         </aside>

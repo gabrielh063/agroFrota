@@ -2,6 +2,7 @@ import {
     NavLink,
     useNavigate,
 } from "react-router-dom";
+import { useState } from "react";
 
 import {
     useAuth,
@@ -12,6 +13,7 @@ import "./Sidebar.css";
 
 function Sidebar() {
     const navigate = useNavigate();
+    const [menuAberto, setMenuAberto] = useState(false);
 
     const {
         usuario,
@@ -33,6 +35,7 @@ function Sidebar() {
                 replace: true,
             }
         );
+        setMenuAberto(false);
     }
 
 
@@ -45,7 +48,7 @@ function Sidebar() {
 
     const operacional = [
         ["/", "bi-house-door", "Visão geral", true],
-        ["/assistente", "bi-robot", "Assistente IA", true],
+        ["/assistente", "bi-chat-square-text", "Central de Operações", true],
         ["/calendario", "bi-calendar3", "Calendário de serviços", true],
         ["/ordens-servico", "bi-clipboard-check", "Ordens de serviço", true],
         ["/maquinarios", "bi-truck-front", "Maquinários", true],
@@ -55,6 +58,16 @@ function Sidebar() {
 
     return (
         <aside className="sidebar">
+
+            <div className="sidebar-mobile-bar">
+                <div className="sidebar-mobile-brand">
+                    <span className="sidebar-brand-icon"><i className="bi bi-truck" /></span>
+                    <strong>AgroFrota</strong>
+                </div>
+                <button className="sidebar-menu-toggle" type="button" aria-expanded={menuAberto} aria-controls="sidebar-navigation" aria-label={menuAberto ? "Fechar menu" : "Abrir menu"} onClick={() => setMenuAberto((aberto) => !aberto)}>
+                    <i className={`bi ${menuAberto ? "bi-x-lg" : "bi-list"}`} />
+                </button>
+            </div>
 
             <div className="sidebar-brand">
 
@@ -75,10 +88,10 @@ function Sidebar() {
             </div>
 
 
-            <nav className="sidebar-nav">
+            <nav id="sidebar-navigation" className={`sidebar-nav ${menuAberto ? "sidebar-nav-open" : ""}`}>
                 <div className="sidebar-group">
-                    <span className="sidebar-section-label">OPERACIONAL</span>
-                    {operacional.map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}
+                    <span className="sidebar-section-label">OPERAÇÕES</span>
+                    {operacional.map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"} onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}
                 </div>
                 <div className="sidebar-group sidebar-management">
                     <span className="sidebar-section-label">GESTÃO</span>
@@ -90,6 +103,8 @@ function Sidebar() {
 
 
             <div className="sidebar-footer">
+
+                <span className="sidebar-section-label sidebar-account-label">CONTA</span>
 
                 <div className="sidebar-user">
 
@@ -116,11 +131,12 @@ function Sidebar() {
                 <button
                     className="sidebar-logout"
                     onClick={handleLogout}
+                    type="button"
                 >
                     <i className="bi bi-box-arrow-left" />
 
                     <span>
-                        Sair da demonstração
+                        Sair
                     </span>
                 </button>
 
