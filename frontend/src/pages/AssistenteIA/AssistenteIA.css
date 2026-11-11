@@ -1,0 +1,51 @@
+.agro-ai-page{max-width:1320px;margin:0 auto;padding:24px;color:#243247}
+.agro-ai-header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+.agro-ai-header h1{font-size:1.7rem;font-weight:700;margin:0 0 8px}
+.agro-ai-header p{margin:0;color:#6a788b}
+.agro-ai-tag{font-size:.8rem;color:#15603c;border:1px solid #b8dfcb;background:#e9f8f0;border-radius:99px;padding:8px 12px}
+.agro-ai-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:18px}
+.agro-ai-chat,.agro-ai-help{background:white;border:1px solid #e4eaf0;border-radius:14px;box-shadow:0 3px 16px rgba(0,0,0,.035)}
+.agro-ai-chat{display:flex;flex-direction:column;min-height:520px;overflow:hidden}
+.agro-ai-messages{flex:1;padding:24px;overflow:auto;max-height:480px;display:flex;flex-direction:column;gap:12px;background:#fbfcfd}
+.agro-ai-bubble{padding:13px 16px;max-width:86%;border-radius:14px;white-space:pre-wrap;line-height:1.5;font-size:.95rem}
+.agro-ai-ia{background:#e9f5ef;color:#16452f;align-self:flex-start}
+.agro-ai-usuario{background:#e8effa;color:#183d6c;align-self:flex-end}
+.agro-ai-erro{background:#fff0f0;color:#9c2323;align-self:flex-start}
+.agro-ai-loading{color:#66758a;font-size:.9rem;margin:0}
+.agro-ai-form{display:flex;gap:10px;padding:14px;border-top:1px solid #e4eaf0}
+.agro-ai-form input{flex:1;min-width:0;border:1px solid #d4dce6;border-radius:9px;padding:13px;color:#223047;background:white}
+.agro-ai-form button,.agro-ai-actions button{border:none;border-radius:9px;background:#217651;color:white;padding:12px 17px;font-weight:600;cursor:pointer}
+.agro-ai-form button:disabled,.agro-ai-help button:disabled,.agro-ai-actions button:disabled{opacity:.5;cursor:default}
+.agro-ai-proposal{padding:16px 20px;border-top:1px solid #d6ebdf;background:#f3fcf7}
+.agro-ai-proposal p{margin:8px 0}
+.agro-ai-proposal small{display:block;color:#64748b;margin:4px 0}
+.agro-ai-actions{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+.agro-ai-actions .agro-ai-secondary{background:#e2e8f0;color:#334155}
+.agro-ai-help{padding:22px;display:flex;flex-direction:column;gap:10px;align-self:start}
+.agro-ai-help h2{font-size:1.08rem;margin:0 0 8px}
+.agro-ai-help button{text-align:left;border:1px solid #e2e8f0;background:#f8fafc;padding:10px 12px;border-radius:8px;color:#334155;cursor:pointer}
+.agro-ai-help button:hover{background:#edf7f0}
+.agro-ai-help p{font-size:.88rem;color:#607085;line-height:1.5;margin:8px 0 0}
+.agro-ai-help .agro-ai-disclaimer{border-top:1px solid #e4eaf0;padding-top:12px;font-size:.8rem}
+@media(max-width:960px){.agro-ai-layout{grid-template-columns:1fr}.agro-ai-chat{min-height:440px}.agro-ai-help{order:-1}.agro-ai-header{align-items:flex-start}}
+.agro-ai-page{max-width:1480px;padding:0;color:var(--color-text)}
+.agro-ai-header h1,.agro-ai-help h2{color:#e8ede5;font-family:var(--font-display)}
+.agro-ai-header p,.agro-ai-help p{color:var(--color-text-muted)}
+.agro-ai-tag{color:#a6cea9;border-color:#29402d;background:#122117}
+.agro-ai-chat,.agro-ai-help{border-color:#222d24;background:#0c140e;box-shadow:none}
+.agro-ai-messages{background:#0a110c}
+.agro-ai-bubble{font-size:.9rem}
+.agro-ai-ia{background:#15271a;color:#d9eadb}
+.agro-ai-usuario{background:#1c2c27;color:#d2e5df}
+.agro-ai-erro{background:#321b1c;color:#ffb4b4}
+.agro-ai-loading{color:#98a397}
+.agro-ai-form{border-color:#222d24}
+.agro-ai-form input{border-color:#303a31;color:#e3e6db;background:#111a13}
+.agro-ai-proposal{border-color:#31513a;background:#122117;color:#d7e5d7}
+.agro-ai-proposal small{color:#9cab9d}
+.agro-ai-actions .agro-ai-secondary{background:#25312a;color:#d6ded5}
+.agro-ai-help button{border-color:#29352b;background:#111a13;color:#d2dbd0}
+.agro-ai-help button:hover{background:#17251a}
+.agro-ai-help .agro-ai-disclaimer{border-color:#29352b}
+.agro-ai-sources{display:block;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,.09);color:#8caa8e;font-size:.73rem}
+@media(max-width:600px){.agro-ai-page{padding:0}.agro-ai-messages{padding:14px}.agro-ai-bubble{max-width:94%}.agro-ai-form{padding:9px}.agro-ai-form button{padding:10px 12px}}

@@ -169,6 +169,7 @@ def cleanup_registros_teste():
         "agendamentos",
         "manutencoes",
         "indisponibilidades",
+        "propostas_agendamento_ia",
     }
 
     if not registros:

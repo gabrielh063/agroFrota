@@ -4,6 +4,10 @@
 evidências e pendências estão em [docs/MISSAO_FINAL.md](docs/MISSAO_FINAL.md).
 O checklist abaixo é histórico e não comprova os fluxos completos.
 
+A entrega acadêmica do Vault, Assistente IA e Dashboard está descrita em
+[docs/AGRO_IA_DASH.md](docs/AGRO_IA_DASH.md). A captura do dashboard ficará
+em `docs/evidence/dashboard-demo-1600x900.png` se o navegador local puder ser validado.
+
 Sistema SaaS de gestão para propriedades rurais, com foco no controle de máquinas, equipamentos, manutenção, ordens de serviço, indisponibilidade e gestão operacional.
 
 O projeto está sendo desenvolvido de forma modular, priorizando primeiro a estrutura do backend e a validação das regras de negócio antes da construção do frontend.

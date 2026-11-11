@@ -1,6 +1,6 @@
 # Contrato de produto e IA — requisitos pendentes
 
-Nenhum assistente foi implementado ou validado nesta branch. Este documento registra o alvo, não uma interface disponível.
+O assistente acadêmico local e seu Vault foram implementados nesta branch. A interface e as rotas de demonstração estão disponíveis; inferência por Ollama e operação de agenda foram verificadas em testes locais. Isso não constitui homologação de produção.
 
 O servidor deve determinar usuário e tenant da sessão autenticada, aplicar as permissões e o escopo fornecidos por A em cada leitura e mutação e registrar auditoria por sua interface. Ferramentas devem ser estritamente tipadas e limitadas à documentação interna e aos serviços operacionais autorizados, sem SQL livre, shell, web ou acesso a arquivos do host. Conteúdo de documentos e observações é dado não confiável, nunca autoridade.
 

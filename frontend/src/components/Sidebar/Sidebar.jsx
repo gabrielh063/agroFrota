@@ -43,6 +43,15 @@ function Sidebar() {
             ?.toUpperCase()
         || "U";
 
+    const operacional = [
+        ["/", "bi-house-door", "Visão geral", true],
+        ["/assistente", "bi-robot", "Assistente IA", true],
+        ["/calendario", "bi-calendar3", "Calendário de serviços", true],
+        ["/ordens-servico", "bi-clipboard-check", "Ordens de serviço", true],
+        ["/maquinarios", "bi-truck-front", "Maquinários", true],
+        ["/equipamentos", "bi-tools", "Equipamentos", true],
+    ];
+
 
     return (
         <aside className="sidebar">
@@ -67,97 +76,16 @@ function Sidebar() {
 
 
             <nav className="sidebar-nav">
-
-                <NavLink
-                    to="/"
-                    end
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-house-door" />
-
-                    <span>
-                        Home
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/calendario"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-calendar3" />
-
-                    <span>
-                        Calendário de serviços
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/ordens-servico"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-clipboard-check" />
-
-                    <span>
-                        Ordens de serviço
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/maquinarios"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-truck-front" />
-
-                    <span>
-                        Maquinários
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/equipamentos"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-tools" />
-
-                    <span>
-                        Equipamentos
-                    </span>
-                </NavLink>
-
+                <div className="sidebar-group">
+                    <span className="sidebar-section-label">OPERACIONAL</span>
+                    {operacional.map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}
+                </div>
+                <div className="sidebar-group sidebar-management">
+                    <span className="sidebar-section-label">GESTÃO</span>
+                    <span className="sidebar-link sidebar-disabled" aria-disabled="true" title="Disponível em uma versão futura"><i className="bi bi-bar-chart-line" /><span>Relatórios e indicadores</span><small>Em breve</small></span>
+                    <span className="sidebar-link sidebar-disabled" aria-disabled="true" title="Disponível em uma versão futura"><i className="bi bi-people" /><span>Equipe e recursos</span><small>Em breve</small></span>
+                </div>
+                {import.meta.env.VITE_AGROFROTA_DEMO === "true" && <div className="sidebar-demo"><strong><i /> Ambiente demonstrativo</strong><span>Informações fictícias para apresentação do AgroFrota.</span></div>}
             </nav>
 
 
@@ -177,8 +105,7 @@ function Sidebar() {
                         </strong>
 
                         <span>
-                            {usuario?.username
-                                || ""}
+                            {usuario?.tenant_nome || usuario?.username || "Sessão autenticada"}
                         </span>
 
                     </div>
@@ -193,7 +120,7 @@ function Sidebar() {
                     <i className="bi bi-box-arrow-left" />
 
                     <span>
-                        Sair
+                        Sair da demonstração
                     </span>
                 </button>
 

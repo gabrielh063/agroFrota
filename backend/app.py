@@ -31,6 +31,7 @@ from routes.manutencoes import manutencoes_bp
 from routes.indisponibilidades import indisponibilidades_bp
 from routes.dashboard import dashboard_bp
 from routes.auditoria import auditoria_bp
+from routes.assistente_ia import assistente_ia_bp
 
 from middleware.auth import autenticar
 from middleware.tenant import resolver_tenant
@@ -76,6 +77,7 @@ def create_app():
     app.register_blueprint(indisponibilidades_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auditoria_bp)
+    app.register_blueprint(assistente_ia_bp)
 
     # --------------------------------------------------
     # BANCO CENTRAL

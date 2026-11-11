@@ -57,6 +57,7 @@ from models.tenant.ordem_servico import OrdemServico
 from models.tenant.agendamento import Agendamento
 from models.tenant.manutencao import Manutencao
 from models.tenant.indisponibilidade import Indisponibilidade
+from models.tenant.proposta_agendamento import PropostaAgendamento
 
 
 # --------------------------------------------------

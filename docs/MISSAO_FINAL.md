@@ -109,3 +109,14 @@ Use o diretório retornado pelo próprio `start`. `test` e `stop` verificam
 marcador, datadir e processos. Esses comandos não são instalação de produção.
 As duas novas migrações recusam downgrade destrutivo; isso não substitui
 o plano de restauração, ainda pendente de implementação e validação.
+
+## Extensão acadêmica em `feat/agro-ia-vault-dashboard`
+
+Esta branch estende a candidata acima com Vault SQLite FTS5, consultas
+determinísticas de status operacional, propostas de agenda persistidas pela
+migração `e1f74b2a9031` e dashboard com histórico mensal de OS. A suíte
+descartável passou com 237 testes e o build React passou. O lint mantém avisos.
+O modelo `llama3.2:3b` está instalado e respondeu uma consulta técnica com
+fontes do Vault, embora uma inferência anterior tenha retornado JSON malformado
+e sido rejeitada. A validação visual em navegador autenticado e a homologação
+privada continuam pendentes. Veja [AGRO_IA_DASH.md](AGRO_IA_DASH.md).

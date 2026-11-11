@@ -118,7 +118,7 @@ def start():
         seed = BACKEND / 'tools' / 'seed_descartavel.py'
         subprocess.run([sys.executable, str(seed)], cwd=BACKEND, env=env, check=True)
         apilog = (p / 'api.log').open('ab')
-        api = subprocess.Popen([sys.executable, '-m', 'flask', '--app', 'app', 'run', '--host', '127.0.0.1', '--port', str(state['api_port'])], cwd=BACKEND, env=env, stdout=apilog, stderr=apilog, start_new_session=True)
+        api = subprocess.Popen([sys.executable, '-m', 'flask', '--app', 'app', 'run', '--host', '127.0.0.1', '--port', str(state['api_port']), '--without-threads'], cwd=BACKEND, env=env, stdout=apilog, stderr=apilog, start_new_session=True)
         state['api_pid'] = api.pid
         (p / 'state.json').write_text(json.dumps(state))
         os.chmod(p / 'state.json', 0o600)

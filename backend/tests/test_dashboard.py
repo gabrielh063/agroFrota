@@ -41,6 +41,7 @@ def test_capacidade_patio(
         capacidade["operando"]
         + capacidade["manutencao"]
         + capacidade["indisponivel"]
+        + capacidade["inativo"]
         ==
         capacidade["total_ativos"]
     )
@@ -64,9 +65,7 @@ def test_percentuais_capacidade(
         "capacidade"
     ]
 
-    if capacidade[
-        "total_ativos"
-    ] > 0:
+    if capacidade["base_operacional"] > 0:
 
         total_percentual = (
             capacidade[
@@ -85,6 +84,19 @@ def test_percentuais_capacidade(
         assert abs(
             total_percentual - 100
         ) <= 0.02
+
+
+def test_atividade_de_servicos_retorna_12_meses_autorizados(base_url, auth_headers):
+    resposta = requests.get(
+        f"{base_url}/api/dashboard/atividade?meses=12",
+        headers=auth_headers,
+        timeout=10,
+    )
+    assert resposta.status_code == 200
+    atividade = resposta.json()["atividade"]
+    assert len(atividade) == 12
+    assert all(item["quantidade"] >= 0 for item in atividade)
+    assert all("ano" in item and "mes" in item for item in atividade)
 
 
 def test_dashboard_indisponibilidade(

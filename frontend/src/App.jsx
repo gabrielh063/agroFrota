@@ -13,6 +13,7 @@ import NovaOrdemServico from "./pages/NovaOrdemServico/NovaOrdemServico";
 import DetalhesOrdemServico from "./pages/DetalhesOrdemServico/DetalhesOrdemServico";
 import EditarOrdemServico from "./pages/EditarOrdemServico/EditarOrdemServico";
 import Calendario from "./pages/Calendario/Calendario";
+import AssistenteIA from "./pages/AssistenteIA/AssistenteIA";
 
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -54,6 +55,11 @@ function App() {
                     element={
                         <Calendario />
                     }
+                />
+
+                <Route
+                    path="/assistente"
+                    element={<AssistenteIA />}
                 />
 
                 <Route

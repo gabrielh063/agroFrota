@@ -5,7 +5,7 @@
     left: 0;
     bottom: 0;
 
-    width: 256px;
+    width: 220px;
 
     display: flex;
     flex-direction: column;
@@ -114,9 +114,18 @@
 
     display: flex;
     flex-direction: column;
-
-    gap: 4px;
+    gap: 22px;
+    overflow-y: auto;
 }
+
+.sidebar-group { display:flex; flex-direction:column; gap:4px; }
+.sidebar-section-label { padding:0 8px 5px; color:#738074; font-size:9px; font-weight:700; letter-spacing:1.2px; }
+.sidebar-link small { margin-left:auto; color:#718071; font-size:8px; white-space:nowrap; }
+.sidebar-demo { margin:0 0 2px; padding:12px; display:flex; flex-direction:column; gap:6px; border:1px solid #29402d; border-radius:10px; background:linear-gradient(135deg,#122417,#101b13); }
+.sidebar-demo strong { color:#a5cba8; font-size:11px; }
+.sidebar-demo strong i { display:inline-block; width:7px; height:7px; margin-right:6px; border-radius:50%; background:#69bd72; }
+.sidebar-demo span { color:#879487; font-size:9px; line-height:1.5; }
+.sidebar-disabled { cursor:not-allowed; opacity:.62; }
 
 
 .sidebar-link {
@@ -317,6 +326,23 @@
     transition:
         background 0.15s,
         color 0.15s;
+}
+
+@media(max-width:900px) {
+    .sidebar { position:sticky; top:0; left:auto; bottom:auto; width:100%; height:auto; border-right:0; border-bottom:1px solid rgba(255,255,255,.08); }
+    .sidebar-brand { height:54px; padding:0 18px; }
+    .sidebar-brand-icon { width:30px; height:30px; font-size:17px; }
+    .sidebar-brand-text strong { font-size:15px; }
+    .sidebar-brand-text span { font-size:10px; }
+    .sidebar-nav { padding:7px 10px; display:block; overflow-x:auto; overflow-y:hidden; white-space:nowrap; }
+    .sidebar-group { display:flex; flex-direction:row; align-items:center; gap:4px; width:max-content; }
+    .sidebar-management,.sidebar-demo,.sidebar-section-label { display:none; }
+    .sidebar-link { width:auto; height:36px; padding:0 10px; gap:7px; font-size:11px; }
+    .sidebar-link i { font-size:14px; }
+    .sidebar-footer { position:absolute; top:7px; right:9px; padding:0; border:0; }
+    .sidebar-user { display:none; }
+    .sidebar-logout { width:auto; height:32px; margin:0; padding:0 9px; gap:6px; font-size:10px; }
+    .sidebar-logout span { max-width:105px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
 
 
