@@ -158,44 +158,12 @@ def criar_ordem_servico(
     session = SessionLocal()
 
     try:
-
-        iniciar_escrita(session)
-        autorizar_criacao(session, contexto, maquina_id, equipamento_id, operador_id, responsavel_id)
-        tipo = tipo.upper()
-        prioridade = prioridade.upper()
-
-        if tipo not in TIPOS_OS:
-            raise ValueError(
-                "Tipo de OS inválido."
-            )
-
-        _validar_relacionamentos(
-            session=session,
-            maquina_id=maquina_id,
-            equipamento_id=equipamento_id,
-            operador_id=operador_id,
-            responsavel_id=responsavel_id,
+        ordem = criar_ordem_servico_na_sessao(
+            session, tipo=tipo, titulo=titulo, descricao=descricao,
+            maquina_id=maquina_id, equipamento_id=equipamento_id,
+            operador_id=operador_id, responsavel_id=responsavel_id,
+            prioridade=prioridade, prazo=prazo, contexto=contexto,
         )
-
-        numero = _proximo_numero_os(session)
-
-        ordem = OrdemServico(
-            numero=numero,
-            tipo=tipo,
-            titulo=titulo,
-            descricao=descricao,
-            maquina_id=maquina_id,
-            equipamento_id=equipamento_id,
-            operador_id=operador_id,
-            responsavel_id=responsavel_id,
-            prioridade=prioridade,
-            status="ABERTA",
-            prazo=prazo,
-            ativo=True
-        )
-
-        session.add(ordem)
-        registrar_evento(session, contexto, "criar_ordem_servico")
         session.commit()
         session.refresh(ordem)
 
@@ -210,6 +178,43 @@ def criar_ordem_servico(
     finally:
 
         session.close()
+
+
+def criar_ordem_servico_na_sessao(
+    session, *, tipo, titulo, descricao=None, maquina_id=None,
+    equipamento_id=None, operador_id=None, responsavel_id=None,
+    prioridade="MEDIA", prazo=None, contexto=None,
+) -> OrdemServico:
+    """Cria e audita uma OS sem commit, para orquestração atômica.
+
+    A sessão e a transação pertencem ao chamador. Rotas manuais continuam
+    usando `criar_ordem_servico`, que confirma a própria transação.
+    """
+    iniciar_escrita(session)
+    autorizar_criacao(session, contexto, maquina_id, equipamento_id, operador_id, responsavel_id)
+    tipo = tipo.upper()
+    prioridade = prioridade.upper()
+    if tipo not in TIPOS_OS:
+        raise ValueError("Tipo de OS inválido.")
+    if prioridade not in PRIORIDADES_OS:
+        raise ValueError("Prioridade inválida.")
+    if not titulo or len(titulo.strip()) > 150:
+        raise ValueError("Título inválido.")
+
+    _validar_relacionamentos(
+        session=session, maquina_id=maquina_id, equipamento_id=equipamento_id,
+        operador_id=operador_id, responsavel_id=responsavel_id,
+    )
+    ordem = OrdemServico(
+        numero=_proximo_numero_os(session), tipo=tipo, titulo=titulo.strip(),
+        descricao=descricao, maquina_id=maquina_id, equipamento_id=equipamento_id,
+        operador_id=operador_id, responsavel_id=responsavel_id,
+        prioridade=prioridade, status="ABERTA", prazo=prazo, ativo=True,
+    )
+    session.add(ordem)
+    session.flush()
+    registrar_evento(session, contexto, "criar_ordem_servico_assistente")
+    return ordem
 
 
 def buscar_ordem_servico(

@@ -8,6 +8,7 @@ from models.tenant.usuario import Usuario
 from models.tenant.maquina import Maquina
 from models.tenant.equipamento import Equipamento
 from models.tenant.indisponibilidade import Indisponibilidade
+from services.os_policy import iniciar_escrita
 
 
 STATUS_AGENDAMENTO = {
@@ -67,7 +68,12 @@ def criar_agendamento(
     fim: datetime,
     responsavel_id: int | None = None,
     observacoes: str | None = None,
+    *,
+    commit: bool = True,
 ):
+    # Share the operational serialization lock with OS creation so a combined
+    # create+schedule operation and a manual schedule cannot race each other.
+    iniciar_escrita(session)
     if fim <= inicio:
         raise ValueError(
             "A data/hora final deve ser posterior à inicial."
@@ -85,8 +91,10 @@ def criar_agendamento(
     )
 
     session.add(agendamento)
-    session.commit()
+    session.flush()
     session.refresh(agendamento)
+    if commit:
+        session.commit()
 
     return agendamento
 

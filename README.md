@@ -5,8 +5,10 @@ evidências e pendências estão em [docs/MISSAO_FINAL.md](docs/MISSAO_FINAL.md)
 O checklist abaixo é histórico e não comprova os fluxos completos.
 
 A entrega acadêmica do Vault, Assistente IA e Dashboard está descrita em
-[docs/AGRO_IA_DASH.md](docs/AGRO_IA_DASH.md). A captura do dashboard ficará
-em `docs/evidence/dashboard-demo-1600x900.png` se o navegador local puder ser validado.
+[docs/AGRO_IA_DASH.md](docs/AGRO_IA_DASH.md). A captura de referência do dashboard
+está em `docs/evidence/dashboard-demo-1600x900.png`.
+O fluxo conversacional de criação de OS e agendamento está em
+[docs/AGRO_IA_02.md](docs/AGRO_IA_02.md).
 
 Sistema SaaS de gestão para propriedades rurais, com foco no controle de máquinas, equipamentos, manutenção, ordens de serviço, indisponibilidade e gestão operacional.
 

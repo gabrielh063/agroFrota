@@ -170,6 +170,7 @@ def cleanup_registros_teste():
         "manutencoes",
         "indisponibilidades",
         "propostas_agendamento_ia",
+        "conversas_assistente_ia",
     }
 
     if not registros:
@@ -184,9 +185,13 @@ def cleanup_registros_teste():
 
     try:
 
-        for tabela, registro_id in reversed(
-            registros
-        ):
+        # Proposal rows reference both the created OS and calendar entry.
+        # Remove those first regardless of test registration order.
+        ordem_exclusao = {"propostas_agendamento_ia": 0, "conversas_assistente_ia": 1,
+                          "agendamentos": 2, "indisponibilidades": 3,
+                          "manutencoes": 4, "ordens_servico": 5,
+                          "equipamentos": 6, "maquinas": 7}
+        for tabela, registro_id in sorted(registros, key=lambda item: ordem_exclusao.get(item[0], 99)):
 
             if tabela not in tabelas_permitidas:
                 continue

@@ -10,6 +10,7 @@ const FORM_INICIAL = {
     identificacao: "",
     fabricante: "",
     modelo: "",
+    categoria: "",
     ano: "",
     localizacao: "",
     status: "OPERANDO",
@@ -50,6 +51,10 @@ function MaquinaFormModal({
 
                 modelo:
                     maquina.modelo
+                    || "",
+
+                categoria:
+                    maquina.categoria
                     || "",
 
                 ano:
@@ -110,6 +115,9 @@ function MaquinaFormModal({
 
             modelo:
                 form.modelo.trim(),
+
+            categoria:
+                form.categoria.trim() || null,
 
             ano:
                 form.ano === ""
@@ -270,6 +278,21 @@ function MaquinaFormModal({
                                 placeholder="Ex.: 6110J"
                                 disabled={salvando}
                             />
+                        </div>
+
+                        <div className="maquina-form-field full">
+                            <label htmlFor="categoria">Categoria operacional</label>
+                            <select id="categoria" value={form.categoria}
+                                onChange={(event) => atualizarCampo("categoria", event.target.value)}
+                                disabled={salvando}>
+                                <option value="">Não classificada</option>
+                                <option value="TRATOR">Trator</option>
+                                <option value="COLHEITADEIRA">Colheitadeira</option>
+                                <option value="PULVERIZADOR">Pulverizador</option>
+                                <option value="CAMINHAO">Caminhão</option>
+                                <option value="OUTRA">Outra máquina</option>
+                            </select>
+                            <small>Usada para filtrar recursos; cadastros antigos podem ser classificados ao editar.</small>
                         </div>
 
 

@@ -32,6 +32,8 @@ class Maquina(TenantBase):
         nullable=False
     )
 
+    categoria: Mapped[str | None] = mapped_column(String(60), nullable=True)
+
     ano: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True

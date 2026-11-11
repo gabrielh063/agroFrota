@@ -71,7 +71,8 @@ def test_agendamento_assistente_persistido_confirmado_e_uso_unico(
         f"{base_url}/api/assistente/confirmar", headers=auth_headers,
         json={"codigo": proposta["codigo"]}, timeout=10,
     )
-    assert repetido.status_code == 409
+    assert repetido.status_code == 200
+    assert repetido.json()["agendamento"]["id"] == agendamento["id"]
 
 
 def test_agendamento_assistente_proposta_expirada_e_rejeitada(
@@ -98,7 +99,33 @@ def test_agendamento_assistente_proposta_expirada_e_rejeitada(
     assert resposta.status_code == 409
 
 
-def test_agendamento_assistente_rejeita_conflito_de_calendario(
+def test_conversa_mantem_contexto_e_altera_horario_da_os_existente(
+    base_url, auth_headers, codigo_unico, cleanup_registros_teste,
+):
+    ordem = _criar_ordem(base_url, auth_headers, codigo_unico, cleanup_registros_teste)
+    first = _pedido(base_url, auth_headers, ordem["numero"])
+    original = first["proposta"]
+    original_id = _proposta_id(original["codigo"])
+    cleanup_registros_teste("propostas_agendamento_ia", original_id)
+
+    changed = requests.post(f"{base_url}/api/assistente/mensagem", headers=auth_headers,
+        json={"conversation_id": first["conversation_id"], "mensagem": "Troca para as 9h"}, timeout=10)
+    assert changed.status_code == 200, changed.text
+    replacement = changed.json()["proposta"]
+    assert replacement["dados"]["ordem_id"] == ordem["id"]
+    assert replacement["inicio"].endswith("T09:00")
+    cleanup_registros_teste("propostas_agendamento_ia", replacement["id"])
+
+    old_confirm = requests.post(f"{base_url}/api/assistente/confirmar", headers=auth_headers,
+        json={"proposta_id": original_id}, timeout=10)
+    assert old_confirm.status_code == 409
+    confirmed = requests.post(f"{base_url}/api/assistente/confirmar", headers=auth_headers,
+        json={"proposta_id": replacement["id"], "conversation_id": first["conversation_id"]}, timeout=10)
+    assert confirmed.status_code == 200, confirmed.text
+    cleanup_registros_teste("agendamentos", confirmed.json()["agendamento"]["id"])
+
+
+def test_agendamento_assistente_nao_propõe_os_com_conflito_existente(
     base_url, auth_headers, codigo_unico, cleanup_registros_teste,
 ):
     ordem = _criar_ordem(base_url, auth_headers, codigo_unico, cleanup_registros_teste)
@@ -112,11 +139,6 @@ def test_agendamento_assistente_rejeita_conflito_de_calendario(
     assert resposta.status_code == 201, resposta.text
     cleanup_registros_teste("agendamentos", resposta.json()["agendamento"]["id"])
 
-    proposta = _pedido(base_url, auth_headers, ordem["numero"])["proposta"]
-    cleanup_registros_teste("propostas_agendamento_ia", _proposta_id(proposta["codigo"]))
-    confirmado = requests.post(
-        f"{base_url}/api/assistente/confirmar", headers=auth_headers,
-        json={"codigo": proposta["codigo"]}, timeout=10,
-    )
-    assert confirmado.status_code == 409
-    assert "Conflito" in confirmado.json()["message"]
+    resposta = _pedido(base_url, auth_headers, ordem["numero"])
+    assert resposta["proposta"] is None
+    assert "Conflito" in resposta["resposta"]

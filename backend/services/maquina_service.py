@@ -25,6 +25,7 @@ def criar_maquina(
     localizacao: str | None = None,
     status: str = "OPERANDO",
     controla_telemetria: bool = False,
+    categoria: str | None = None,
     *, contexto=None
 ) -> Maquina:
 
@@ -58,6 +59,7 @@ def criar_maquina(
             identificacao=identificacao,
             modelo=modelo,
             fabricante=fabricante,
+            categoria=categoria,
             ano=ano,
             localizacao=localizacao,
             status=status,
@@ -126,6 +128,7 @@ def atualizar_maquina(
     status: str | None = None,
     controla_telemetria: bool | None = None,
     ativo: bool | None = None,
+    categoria: str | None = None,
     *, contexto=None
 ) -> Maquina:
 
@@ -178,6 +181,9 @@ def atualizar_maquina(
 
         if fabricante is not None:
             maquina.fabricante = fabricante
+
+        if categoria is not None:
+            maquina.categoria = categoria.strip() or None
 
         if ano is not None:
             maquina.ano = ano
