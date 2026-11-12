@@ -94,7 +94,7 @@ python3 deploy/persistent/agrofrota.py up
 
 Os logs são emitidos pelo Compose; tokens, senhas e corpo de autenticação não devem ser registrados. A API mantém mensagens genéricas de erro. Verifique `GET /api/health`, `docker compose ps`, DNS MagicDNS, certificado e ACL da tailnet.
 
-O modo de inicialização após reboot depende da decisão do operador sobre acesso do serviço ao Docker. A unidade existente usa `NoNewPrivileges=true` e chama `docker` sem sudo; com o socket inacessível ao usuário, habilitá-la nesse estado falha. Não foi adicionada conta ao grupo `docker`, não foi alterada a política sudo e a unidade ainda não foi ativada. A alternativa escolhida deve ser aplicada antes de habilitar o serviço.
+O serviço de sistema exclusivo do AgroFrota foi instalado e habilitado em 12/11/2026 após autorização do operador. Nenhum grupo, regra sudo, daemon global, firewall, endpoint Tailscale ou serviço de outro projeto foi alterado.
 
 ### Inicialização automática restrita
 
@@ -102,7 +102,15 @@ AGRO-INFRA-03 preparou uma unidade systemd de sistema que controla apenas os con
 
 A unidade executa como root e usa o socket Docker, que equivale a privilégio administrativo. Seu escopo é limitado a `docker inspect`, `docker start` e `docker stop` nos três nomes fixos; ela não executa arquivos do checkout, Compose, builds ou comandos de shell fornecidos pelo usuário. Os scripts e unit precisam ser copiados para caminhos root-owned antes da ativação.
 
-Depois de revisar o HEAD desta PR e confirmar que esses três nomes correspondem aos containers existentes, a instalação proposta é:
+O serviço instalado controla somente os containers existentes com labels do projeto `agrofrota-infra-01`. Os arquivos em `/usr/local/libexec` são cópias root-owned dos scripts versionados; o unit file também é root-owned. A rotina inicializa primeiro MariaDB, espera seu healthcheck e então inicia backend/frontend. Stop para frontend, backend e MariaDB em ordem inversa. O teste de 12/11 executou `systemctl stop` e `systemctl start`, manteve o volume e as contagens de 7 usuários, 2 máquinas e 3 OS, e restaurou healthchecks locais/HTTPS.
+
+### Type=oneshot e supervisão
+
+O status esperado é `active (exited)`: `Type=oneshot` executa a rotina até ela retornar, e `RemainAfterExit=yes` mantém a unidade marcada ativa. Isso permite controlar a aplicação com `systemctl start|stop|restart`, mas não significa que systemd monitore continuamente os containers. `Restart=on-failure` só tenta novamente se a rotina de início falhar. Os três containers têm `restart: unless-stopped`, que trata saídas de processo conforme a política Docker, mas não é reinício baseado apenas em healthcheck. O reboot real do host não foi testado.
+
+### Instalação (já concluída)
+
+O procedimento original, para auditoria, foi:
 
 ```bash
 sudo install -D -o root -g root -m 0755 deploy/persistent/agrofrota-infra-01-start /usr/local/libexec/agrofrota-infra-01-start
@@ -114,10 +122,22 @@ systemctl status agrofrota-infra-01.service --no-pager
 curl --fail http://127.0.0.1:18088/api/health
 ```
 
-Esses comandos ainda não foram executados. Antes, verifique que os três destinos não contêm arquivos de outro serviço. Para rollback, use `sudo systemctl disable --now agrofrota-infra-01.service`; depois de confirmar que a unidade contém o template AgroFrota e que os três auxiliares são os arquivos instalados por este procedimento, remova somente esses quatro caminhos exatos e rode `sudo systemctl daemon-reload`. A desativação para os containers de forma limpa e preserva o volume MariaDB, os secrets, os backups e o Serve. Não use `docker compose down` ou `down -v`.
+Para rollback, desabilite e pare exclusivamente a unidade:
+
+```bash
+sudo systemctl disable --now agrofrota-infra-01.service
+sudo systemctl is-enabled agrofrota-infra-01.service
+sudo cmp /etc/systemd/system/agrofrota-infra-01.service deploy/persistent/agrofrota-infra-01.service
+sudo cmp /usr/local/libexec/agrofrota-infra-01-start deploy/persistent/agrofrota-infra-01-start
+sudo cmp /usr/local/libexec/agrofrota-infra-01-stop deploy/persistent/agrofrota-infra-01-stop
+sudo rm -- /etc/systemd/system/agrofrota-infra-01.service /usr/local/libexec/agrofrota-infra-01-start /usr/local/libexec/agrofrota-infra-01-stop
+sudo systemctl daemon-reload
+```
+
+Só remova os arquivos se `cmp` confirmar que ainda são os artefatos AgroFrota instalados por este procedimento. Isso não apaga o volume MariaDB, os secrets, os backups ou a configuração Serve. O stop é limpo; não use `docker compose down` ou `down -v`.
 
 ## Atualização e rollback
 
 Revise o diff e a CI antes de atualizar o checkout. Execute `up` para rebuild/recreate da aplicação; o volume permanece fora do ciclo de vida de containers. Migrações Alembic são aplicadas antes do backend. Faça backup antes de qualquer atualização que inclua migração. Em caso de regressão, volte o checkout à revisão anterior validada e rode `up`; restaure backup apenas em uma instância isolada, nunca sobre a base ativa durante o ensaio.
 
-O ensaio real de `stop`/`up`, leitura de registros persistentes e backup/restore isolado passou. Em 12/11/2026, o Docker system service foi observado como habilitado/ativo e o healthcheck do AgroFrota retornou 200 no loopback e no HTTPS MagicDNS. O reboot do sistema operacional e a ativação da unidade root-owned não foram executados. Ver `docs/REMOTE_ACCESS_VALIDATION.md` para os limites remotos e de inicialização automática.
+O ensaio real de `stop`/`up`, leitura de registros persistentes e backup/restore isolado passou. Em 12/11/2026, o healthcheck do AgroFrota retornou 200 no loopback e no HTTPS MagicDNS, inclusive depois do ciclo systemd. O reboot do sistema operacional não foi executado. Ver `docs/REMOTE_ACCESS_VALIDATION.md` para os limites remotos e de inicialização automática.

@@ -73,3 +73,27 @@ O peer iOS aparece online na tailnet, mas não foi possível automatizar Safari 
 **`AGRO_INFRA_03_PARTIAL`**. HTTPS Serve privado, aplicação no estado atual e infraestrutura persistente anteriormente homologada têm evidência. Permanecem pendentes a autorização/ativação da unidade systemd root-owned, prova de inicialização após reboot e homologação real de navegador no segundo dispositivo. A classificação do MVP continua independente; nenhuma evidência nova encerra acessibilidade ou segurança histórica da PR #9.
 
 CI remota no HEAD `cbb80cda9a247c62694c8c0dbc8a349aadb2e97a`: `backend-mariadb` e `frontend` passaram no run [43303527278](https://github.com/gabrielh063/agroFrota/actions/runs/43303527278).
+
+## Ativação AGRO-INFRA-04 — 12/11/2026
+
+Autorização específica do operador recebida para instalar somente a unidade AgroFrota e seus dois auxiliares. HEAD permaneceu `4d31cb1140e5fca5a940380cb94ba6c4be4ec83a`, PR #10 aberta, árvore limpa antes da instalação e CI verde. `AGENTS.md` não existe na raiz do checkout.
+
+| Verificação | Resultado | Evidência |
+|---|---|---|
+| Containers | PASS | database/backend/frontend tinham labels do projeto `agrofrota-infra-01`, estavam `running` e `healthy`; todos usavam `unless-stopped`. |
+| Volume | PASS | `agrofrota-infra-01-mariadb`, label de projeto correta, montado em `/var/lib/mysql` no container MariaDB. |
+| Destinos | PASS | Auxiliares, unidade, diretório de drop-in e link de enable estavam ausentes; `/usr/local` e `/etc/systemd/system` eram `root:root`; nenhum alvo era symlink. |
+| Instalação | PASS | Scripts `root:root 0755`; unit `root:root 0644`; `systemd-analyze verify` passou (com avisos preexistentes de `/var/run` em unidades TeamViewer/AnyDesk). Habilitada somente `agrofrota-infra-01.service`. |
+| Ciclo systemd | PASS | `systemctl stop` deixou somente os três containers AgroFrota `exited`; `systemctl start` reativou a unidade como `active (exited)` e os três containers ficaram `running/healthy`. |
+| Persistência | PASS | Antes/depois do ciclo: 7 usuários, 2 máquinas, 3 OS e 0 agendamentos; volume presente. |
+| Healthcheck e HTTPS | PASS | Depois do ciclo, API local e MagicDNS HTTPS retornaram 200; Serve continuou `tailnet only` para `127.0.0.1:18088`. |
+| Isolamento | PASS | Inventários de containers não AgroFrota e de volumes comparados antes/depois sem diferenças. Não foi executado comando sobre outros serviços. |
+| Reboot | PENDING | A unidade está enabled em `multi-user.target`, com `Requires/After=docker.service`; reboot do host não foi autorizado e não ocorreu. |
+
+O status `active (exited)` é o comportamento correto de `Type=oneshot` + `RemainAfterExit=yes`. Systemd controla start/stop e tenta reiniciar a rotina somente se ela falhar na inicialização; não supervisiona containers continuamente. Os containers têm política Docker `unless-stopped`; ela cobre saídas de processo, não um healthcheck que permaneça unhealthy. A configuração torna o início no boot esperado por análise estática, não comprovado por reboot real.
+
+### Reversão
+
+Desabilitar/parar com `sudo systemctl disable --now agrofrota-infra-01.service`; comparar a unidade e scripts instalados com as cópias do HEAD; se coincidirem, remover somente `/etc/systemd/system/agrofrota-infra-01.service`, `/usr/local/libexec/agrofrota-infra-01-start` e `/usr/local/libexec/agrofrota-infra-01-stop`; executar `sudo systemctl daemon-reload`. Não remover o volume, secrets, backups, containers, redes ou Serve.
+
+**Classificação da ativação:** PASS para controle via systemd e recuperação stop/start; **reboot real permanece PENDING**. A classificação global da infraestrutura continua parcial até prova de reboot e homologação de navegador no segundo dispositivo. A PR #9 permanece independente.
