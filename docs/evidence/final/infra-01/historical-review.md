@@ -1,0 +1,8 @@
+# Revisão histórica sanitizada
+
+- A declaração do responsável, recebida na missão AGRO-FINAL-06, afirma que os registros do dump foram gerados exclusivamente como dados fictícios para popular o MVP em desenvolvimento/demonstração. Isso é uma declaração do responsável, não prova técnica independente de titularidade.
+- O dump está removido da árvore corrente, mas o blob segue alcançável no histórico Git público. A análise processou o conteúdo em memória sem imprimir, copiar ou registrar endereços, hashes ou linhas SQL.
+- O dump contém estruturas de autenticação e hashes scrypt, segundo o inventário prévio. A checagem sanitizada atual não encontrou os nomes dos sete usuários demonstrativos atuais; os domínios de contato não são domínios reservados de exemplo/teste e os endereços literais não aparecem no inicializador demonstrativo consultado. Assim, não foi possível provar compatibilidade direta com esse seed.
+- Não foi consultado um banco atual de origem, nem os titulares. Por isso não se pode afirmar que as credenciais correspondentes continuam válidas ou foram reutilizadas. Não há evidência técnica de credencial ativa nesta instalação, mas ela também não permite provar revogação no sistema original.
+- A varredura de segredos relatada anteriormente não encontrou padrões conhecidos de chaves privadas ou tokens; isso não elimina a sensibilidade dos hashes de senha.
+- A classificação permanece risco histórico PARTIAL para decisão do responsável. Não executar rotação indiscriminada, publicar dados ou reescrever o histórico remoto. Se o responsável reconhecer uma conta real, invalidar a credencial no sistema de origem e avaliar reutilização por canal privado, sem enviar senhas ao repositório.

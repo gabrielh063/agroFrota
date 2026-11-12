@@ -1,6 +1,6 @@
 # Prontidão da release candidate do AgroFrota
 
-Data de registro: 12/11/2026. Classificação após AGRO-FINAL-03: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário e rede/idempotência passaram em navegador contra MariaDB descartável; backend (249), build/lint locais e CI remota passaram. Permanecem bloqueios concretos: segurança de hashes no histórico público sem decisão/mitigação do responsável e acessibilidade PARTIAL: axe-core reportou zero violações confirmadas em 27 estados, mas leitor de tela, anúncios dinâmicos da Central e contraste manual completo seguem pendentes. Não foi feito merge nem deploy.
+Data de atualização: 12/11/2026. Classificação do MVP: **`AGRO_MVP_FINAL_PARTIAL`**. Os fluxos funcionais e os sete perfis foram aprovados nas missões anteriores. A acessibilidade continua PARTIAL (contraste manual residual, estados dinâmicos da Central e leitor de tela sem conclusão). A missão de infraestrutura AGRO-FINAL-06 preparou uma stack isolada, mas não a implantou: filesystem com cerca de 1,3 GB livres e socket Docker inacessível para o usuário. Não houve Serve, HTTPS remoto, persistência/restore ou login remoto comprovado. A revisão histórica registra a declaração do responsável de que o dump era fictício; a inspeção técnica independente não conseguiu corroborar cada registro nem validar se alguma credencial ainda está ativa. Portanto, o risco histórico permanece aberto como PARTIAL. Sem merge nem deploy.
 
 ## Branch e histórico
 
@@ -26,7 +26,7 @@ Data de registro: 12/11/2026. Classificação após AGRO-FINAL-03: **`AGRO_MVP_F
 | Rede/idempotência | **Passou**: offline antes do envio recuperou a proposta; resposta POST 200 foi retida após o commit; timeout real de 30 s; reload/replay e clique duplo sem duplicar IDs. | `docs/evidence/final/AGRO-FINAL-02-results.md`, screenshots `gate-confirmation-*`; MariaDB descartável |
 | Frontend build/lint | **Passou**: build concluído; lint exit 0, avisos preexistentes de hooks/efeitos ainda presentes. | Execução local após correções |
 | Checks remotos | **Passou** no head `5c042c2`: `backend-mariadb` e `frontend` verdes. | PR #9 / [GitHub Actions](https://github.com/gabrielh063/agroFrota/actions/runs/43243144116) |
-| Segurança histórica | **Bloqueio**: 6 endereços e 7 hashes scrypt estão no dump removido da árvore atual, alcançável no histórico local do repositório público. Nenhum padrão de chave privada/token conhecido ou alerta GitHub foi encontrado; sinteticidade e uso das contas não podem ser comprovados. | `docs/evidence/final/AGRO-FINAL-02-results.md`; conteúdo não reproduzido |
+| Segurança histórica | **PARTIAL**: o responsável declarou que os registros eram fictícios. A revisão local confirmou hashes de autenticação e dados não correspondentes aos identificadores do seed demonstrativo atual; os domínios não são reservados para exemplos/testes. Não é possível confirmar titularidade, reutilização ou atividade sem os titulares/ambiente original. Valores não reproduzidos. | `docs/evidence/final/infra-01/historical-review.md`; declaração do responsável registrada nesta atualização |
 
 ## Fluxos homologados
 
@@ -56,13 +56,13 @@ Capturas e inventário foram feitos em 375×812 e 1600×900; a largura também f
 
 ## Pendências para classificação READY
 
-1. O responsável deve classificar os dados do dump público, identificar contas potencialmente reais e forçar redefinição/rotação quando aplicável; avaliar reutilização com os titulares sem usar os hashes como prova de inexistência de reutilização. Não reescrever histórico remoto automaticamente.
+1. A declaração de que o dump era fictício foi registrada como informação do responsável. A comparação estática não a corroborou de forma conclusiva e não identifica se credenciais foram reutilizadas ou continuam válidas; o responsável deve conservar a avaliação de risco e consultar titulares por canal seguro se reconhecer contas reais. Não fazer rotação indiscriminada nem reescrever histórico automaticamente.
 2. Concluir manualmente os casos de contraste marcados incompletos pelo axe; validar carregamento/erro dinâmicos da Central e repetir teste com leitor de tela em sessão isolada funcional.
-3. Publicar esta atualização e aguardar CI remota verde no novo head da PR #9.
+3. A stack de infraestrutura precisa ser iniciada em host com armazenamento e permissão Docker adequados; em seguida executar Serve, perfis remotos, reinício, backup/restore isolado e CI remota da PR empilhada.
 
 ## Estado do gate e classificação
 
-Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. A acessibilidade está PARTIAL conforme evidência AGRO-FINAL-03. A segurança histórica permanece bloqueada porque há hashes de senha potencialmente reais em histórico de repositório público sem classificação/mitigação do responsável. A PR #9 não deve ser aprovada para merge até a decisão/mitigação histórica e a cobertura residual de acessibilidade. Ver atualização AGRO-FINAL-03 abaixo.
+Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. A acessibilidade segue PARTIAL. A declaração do responsável sobre a natureza fictícia do dump está registrada, mas a verificação independente não é suficiente para encerrar o risco histórico. A PR #9 não deve ser aprovada para merge até resolver os gates obrigatórios conforme evidência. Ver complementos AGRO-FINAL-03/04/06.
 
 ## Inicialização e encerramento
 
@@ -93,3 +93,16 @@ O gate de apresentação de perfis foi concluído no incremento desta branch. Co
 - A PR #9 segue aberta no head `2d3c2896d4290eaebca6854134001ceab680d012`; `backend-mariadb` e `frontend` passaram no run [43252716698](https://github.com/gabrielh063/agroFrota/actions/runs/43252716698).
 - O gate de segurança histórica continua independente e bloqueante para classificar o MVP como READY; os dados não foram reproduzidos nem o histórico remoto reescrito.
 - Relatório reproduzível e capturas: [`evidence/final/accessibility/AGRO-FINAL-03-results.md`](evidence/final/accessibility/AGRO-FINAL-03-results.md), screenshots `a11y-*` e [`axe-results.json`](evidence/final/accessibility/axe-results.json).
+
+## Atualização AGRO-FINAL-06 — infraestrutura privada e persistência
+
+Foi criada a branch empilhada `feat/agro-infra-01-tailscale-private`, baseada no HEAD da PR #9 então confirmado (`95cef28cf91e509b8adb1fdf6150db380ea73ef0`). Estado remoto e checks dessa publicação serão anexados depois do push. A stack independente está em `deploy/persistent/`; `iniciar_agrofrota.py` e seu comportamento descartável não foram alterados.
+
+- Testes locais finais: `python3 backend/tools/ci.py` — **263 passed, 74 avisos de depreciação**; build Vite concluído; lint exit 0 com avisos existentes. `docker compose config` e asserções estáticas confirmaram Nginx somente em loopback `127.0.0.1:18088`, sem porta publicada para MariaDB/Gunicorn, e volume exclusivo.
+- A implementação usa Gunicorn, assets compilados, API mesma origem `/api`, schemas central/tenant dedicados, credenciais SQL restritas, secrets `0600`, migrações e seed fail-closed das sete contas/perfis. Uma flag explícita ativa a Central existente em produção sem abrir rotas dev; consultas dependentes do Ollama falham com mensagem 503 testada.
+- O host está identificado e Tailscale conectado, mas o socket Docker negou acesso ao usuário e havia cerca de 1,3 GB no filesystem raiz. Não iniciou containers, tocou no MariaDB local, instalou unidade, ativou Serve nem publicou URL HTTPS. Não houve teste externo por iPhone.
+- Persistência real, migrations no volume dedicado, logins dos sete perfis nessa instalação, reinício, backup e restore isolado não foram executados. A infraestrutura permanece **`AGRO_INFRA_01_PARTIAL`**; os passos para retomar estão em `docs/PERSISTENT_ENVIRONMENT.md` e `docs/TAILSCALE_DEPLOYMENT.md`.
+- O responsável declarou que o dump histórico contém somente dados fictícios. A inspeção independente, sem exibir valores, não encontrou correspondência do dump com os identificadores do seed demonstrativo consultado; os domínios não são reservados para dados de exemplo. Sem banco original ou titulares, validade/reutilização não pode ser comprovada nem descartada. Risco histórico permanece PARTIAL, sem rotação indiscriminada e sem reescrita Git.
+- Acessibilidade segue AGRO-FINAL-03: contraste manual incompleto, anúncios dinâmicos da Central e leitor de tela não concluídos. Não há declaração de certificação WCAG 2.2 AA.
+
+Evidências sanitizadas: `docs/evidence/final/infra-01/`. O MVP continua **`AGRO_MVP_FINAL_PARTIAL`**, independentemente da prontidão da infraestrutura. Não houve merge.
