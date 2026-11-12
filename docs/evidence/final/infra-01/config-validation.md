@@ -9,6 +9,7 @@ Executada em worktree isolada da branch `feat/agro-infra-01-tailscale-private`.
 - `cd frontend && npm run build`: exit 0 (Vite 8.3.1); `npm run lint`: exit 0, avisos preexistentes de hooks/efeitos/Fast Refresh.
 - Testes novos: secrets `*_FILE`, diretório/permissões do estado local, geração de sete credenciais únicas sem sobrescrita e ativação explícita da Central em produção sem rotas dev; falha do Ollama é erro explícito.
 - `git diff --check`: exit 0.
+- PR empilhada #10 em `release/agrofrota-mvp-final`, HEAD `6003c40aadf20d81f58b56040a51f489f9c9104d`; run remoto [43273961926](https://github.com/gabrielh063/agroFrota/actions/runs/43273961926): `backend-mariadb` PASS, `frontend` PASS. A PR #9 permaneceu aberta e inalterada no HEAD `95cef28cf91e509b8adb1fdf6150db380ea73ef0`.
 - Nenhuma imagem foi baixada, container criado, migration aplicada, serviço ativado ou banco do operador acessado.
 
 Essas validações comprovam código, CI e parsing/configuração, não o runtime Docker.

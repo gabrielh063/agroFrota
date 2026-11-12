@@ -23,7 +23,7 @@ Data da inspeção do host: 2026-11-12.
 | CP5 sete perfis remoto | PARTIAL | reutiliza `MATRIZ`, seed fail-closed, sete logins anteriores na PR #9 | Nenhum login por esta stack ou por Tailscale |
 | CP6 restart/backup/restore | PARTIAL | scripts de stop/restart/backup/restore isolado | execução em MariaDB não feita |
 | CP7 acessibilidade/segurança histórica | PARTIAL | prontidão MVP existente e limites mantidos | sem nova prova de leitor de tela; ver readiness |
-| CP8 CI/PR | PENDENTE | validação local e CI remota exigidas após implementação | esta branch ainda precisa ser publicada |
+| CP8 CI/PR | PASS (código) | PR #10 `6003c40`; jobs `backend-mariadb` e `frontend` verdes no run [43273961926](https://github.com/gabrielh063/agroFrota/actions/runs/43273961926) | atualização documental final requer novo check |
 
 ## Acesso remoto
 
