@@ -1,6 +1,7 @@
 name: AgroFrota CI
 on:
   pull_request:
+  workflow_dispatch:
   push:
     branches: [Main, 'codex/**']
 permissions:
