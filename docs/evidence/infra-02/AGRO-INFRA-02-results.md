@@ -41,7 +41,7 @@ O primeiro boot requereu correção no Compose: rede `internal: true` não ativo
 - `cd frontend && npm run build`: aprovado, Vite 8.3.1.
 - `cd frontend && npm run lint`: exit 0, avisos Oxlint existentes.
 - `docker compose config`: aprovado após `setup`.
-- CI remota da PR #10 no commit `84baa6cb2d6a21427ee538279c3377d98b0c9b96`: `backend-mariadb` e `frontend` passaram no run [43299031912](https://github.com/gabrielh063/agroFrota/actions/runs/43299031912).
+- CI remota da PR #10 no head atual `948f46682d566bcf0a6e98fe45434b41bc40d0fb`: `backend-mariadb` e `frontend` passaram no run [43299467303](https://github.com/gabrielh063/agroFrota/actions/runs/43299467303).
 
 ## Limites e rollback
 

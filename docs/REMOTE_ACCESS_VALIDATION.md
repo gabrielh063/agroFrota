@@ -15,7 +15,7 @@ Homologação local/Tailscale: 12/11/2026. Host: Linux Mint 22.1 `gabriel-Nitro-
 | Tailscale HTTPS | PASS | Serve ativo em `https://gabriel-nitro-anv15-51.tailac6509.ts.net/`; certificado aceito no Chrome; `tailscale0:443` e status indicam “tailnet only”. Serve encaminha para `127.0.0.1:18088`. | O acesso por segundo dispositivo da tailnet ainda precisa de prova. Nenhum Funnel foi usado. |
 | Acesso remoto | PARTIAL | Chrome isolado abriu login, dashboard, Equipe, Maquinários, OS, Calendário e Central; 7/7 perfis autenticaram; health 200, preflight CORS correto, logout revogou sessão, Auditor foi negado, erro de rede na Central apareceu com alerta e loading encerrado. Nenhuma chamada do browser a `localhost:5001`, `127.0.0.1:5001` ou Vite dev server. | Chrome foi executado no próprio host. Não declarar validação em iPhone/outra rede. |
 | Reinício automático | PARTIAL | `systemd_user.py` e unidade existentes foram inspecionados. | Unidade não ativada: requer estratégia autorizada de acesso Docker para o serviço. Restart manual de stack foi aprovado; reboot do host não foi feito. |
-| CI | PASS | PR #10 no head `84baa6c`; jobs `backend-mariadb` e `frontend` passaram no run [43299031912](https://github.com/gabrielh063/agroFrota/actions/runs/43299031912). | Nenhuma pendência de CI neste head. |
+| CI | PASS | PR #10 no head `948f466`; jobs `backend-mariadb` e `frontend` passaram no run [43299467303](https://github.com/gabrielh063/agroFrota/actions/runs/43299467303). |
 
 ## Configuração Tailscale
 
