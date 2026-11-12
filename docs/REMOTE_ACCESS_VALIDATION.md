@@ -1,32 +1,48 @@
 # Validação de acesso privado remoto
 
-Data da inspeção do host: 2026-11-12.
-
-## Evidência observada
-
-- Host: Linux Mint 22.1, kernel 6.8, x86_64; Tailscale CLI 1.104.5.
-- Daemon Tailscale ativo e host conectado; MagicDNS presente. Valores de IP/identidade completos foram omitidos deste relatório.
-- `tailscale serve status` vazio e `tailscale serve get-config --all` sem endpoint Serve configurado.
-- MariaDB local já estava ativo em `127.0.0.1:3306`; PostgreSQL/Ollama também possuíam listeners locais. Nenhum foi reutilizado ou alterado.
-- Docker e Compose instalados e daemon ativo, mas leituras de `docker info`, containers e imagens falharam por permissão negada em `/var/run/docker.sock`.
-- Raiz com aproximadamente 1,3 GB livres. Não foi seguro baixar/buildar imagens ou iniciar a dupla de banco ativo e banco de restauração.
-- Sem Docker acessível, não havia endpoint local do AgroFrota para validar, portanto Tailscale Serve não foi alterado.
+Homologação local/Tailscale: 12/11/2026. Host: Linux Mint 22.1 `gabriel-Nitro-ANV15-51`, Docker Engine 29.8.2, Compose 5.6.0, Tailscale 1.104.5. Nenhum dado pessoal foi usado; as contas e registros são fictícios.
 
 ## Resultado por gate
 
-| Gate | Resultado | Evidência | Estado |
+| Gate | Resultado | Evidência | Limite |
 |---|---|---|---|
-| CP1 host/Tailscale | PASS para diagnóstico | Comandos de estado executados; sem IP/token registrado | Host certo e conectado |
-| CP2 stack persistente | PARTIAL | `deploy/persistent/compose.yaml`, Dockerfiles, script de provisionamento | Configuração preparada; containers não iniciados |
-| CP3 segredos | PARTIAL | CLI cria arquivos 0600, secrets Compose, produção rejeita defaults | Verificação de container/runtime pendente |
-| CP4 Serve/HTTPS | PARTIAL | documentação e comando Serve reversível; configuração existente vazia | Não ativado, URL HTTPS não existe ainda |
-| CP5 sete perfis remoto | PARTIAL | reutiliza `MATRIZ`, seed fail-closed, sete logins anteriores na PR #9 | Nenhum login por esta stack ou por Tailscale |
-| CP6 restart/backup/restore | PARTIAL | scripts de stop/restart/backup/restore isolado | execução em MariaDB não feita |
-| CP7 acessibilidade/segurança histórica | PARTIAL | prontidão MVP existente e limites mantidos | sem nova prova de leitor de tela; ver readiness |
-| CP8 CI/PR | PASS (HEAD documental `b948998`) | PR #10; jobs `backend-mariadb` e `frontend` verdes nos runs [43273961926](https://github.com/gabrielh063/agroFrota/actions/runs/43273961926) e [43277724846](https://github.com/gabrielh063/agroFrota/actions/runs/43277724846) | runtime remoto ainda não homologado |
+| Espaço em disco | PASS | 23 GB livres antes dos builds; 21 GB depois. Docker atual: imagens 2,153 GB, volumes 455 MB, cache de build 1,868 GB. | Nenhuma limpeza foi feita; dados e caches do operador foram preservados. |
+| Docker | PARTIAL | Daemon ativo; `sudo -n docker info` e Compose funcionam. CLI executado pelo UID 1000 através de wrapper temporário; segredos permanecem `0700/0600` e de propriedade do operador. | Usuário não acessa `/var/run/docker.sock` diretamente; grupo `docker` e sudoers não foram alterados. Inicialização automática aguarda decisão do operador. |
+| Compose | PASS | MariaDB/Gunicorn sem port mappings; Nginx apenas `127.0.0.1:18088`; rede interna `agrofrota-infra-01-private`; `host_proxy` conectado somente ao Nginx. Migrações central/tenant concluíram. | A bridge `host_proxy` dá egress de rede ao container Nginx; ela não publica porta pública. |
+| Banco persistente | PASS | Volume exclusivo `agrofrota-infra-01-mariadb`, localizado em `/var/lib/docker/volumes/agrofrota-infra-01-mariadb/_data`. Antes/depois de `stop` + `up`: 7 usuários, máquina/OS de teste preservadas por readback SQL. | Reboot do sistema operacional não foi testado. |
+| Sete perfis | PASS | 7/7 logins no Chrome headless isolado via HTTPS e `GET /api/auth/me`; menu/rotas principais do Gerente; criação negada ao Auditor por URL direta; API de criação de usuário e OS retorna 403 para Auditor. Escopo: Operador e Manutenção veem apenas a OS atribuída a cada um. | Safari/iPhone em outra rede ainda não foi testado. |
+| Backup/restore | PASS | Dump privado local de 29.552 bytes, modo 0600; restore em rede/volume/projeto aleatórios; schemas e Alembic validados. Recursos temporários foram removidos pelo CLI. | O dump permanece fora do Git em `~/.config/agrofrota-infra-01/infra02-validation.sql`. |
+| Tailscale HTTPS | PASS | Serve ativo em `https://gabriel-nitro-anv15-51.tailac6509.ts.net/`; certificado aceito no Chrome; `tailscale0:443` e status indicam “tailnet only”. Serve encaminha para `127.0.0.1:18088`. | O acesso por segundo dispositivo da tailnet ainda precisa de prova. Nenhum Funnel foi usado. |
+| Acesso remoto | PARTIAL | Chrome isolado abriu login, dashboard, Equipe, Maquinários, OS, Calendário e Central; 7/7 perfis autenticaram; health 200, preflight CORS correto, logout revogou sessão, Auditor foi negado, erro de rede na Central apareceu com alerta e loading encerrado. Nenhuma chamada do browser a `localhost:5001`, `127.0.0.1:5001` ou Vite dev server. | Chrome foi executado no próprio host. Não declarar validação em iPhone/outra rede. |
+| Reinício automático | PARTIAL | `systemd_user.py` e unidade existentes foram inspecionados. | Unidade não ativada: requer estratégia autorizada de acesso Docker para o serviço. Restart manual de stack foi aprovado; reboot do host não foi feito. |
+| CI | PENDENTE | O head remoto inicialmente verificado `8ed9cbd` tinha `backend-mariadb` e `frontend` verdes no run 43278156033. | Correções locais posteriores ainda precisam de suíte, push e CI no novo head. Atualizar após concluir publicação. |
 
-## Acesso remoto
+## Configuração Tailscale
 
-Não existe URL HTTPS comprovada para esta candidata. Após implantação, obtenha a URL real em `tailscale serve status`, e não derive um hostname por suposição. O operador deve concluir um teste com o cliente Tailscale em outra rede (por exemplo, iPhone em dados móveis), efetuar login AgroFrota, validar refresh, navegação/API, logout e perfil sem permissão, e registrar timestamp, perfil, HTTP health e capturas sem credenciais.
+MagicDNS do host: `gabriel-nitro-anv15-51.tailac6509.ts.net`. O CLI confirmou Tailscale conectado, Serve sem endpoint preexistente, 443 livre antes da ativação e sintaxe instalada compatível com `tailscale serve --bg --https=443`. A configuração final tem somente `/` para `http://127.0.0.1:18088`, sem `tailscale funnel`. A porta 443 fica vinculada à interface Tailscale; MariaDB 3306 e Gunicorn 8000 não têm portas de host.
 
-Passos reprodutíveis estão em `docs/TAILSCALE_DEPLOYMENT.md`. Não relatar esse teste como feito até haver evidência do dispositivo externo.
+Foi corrigido um bloqueio encontrado no primeiro boot: uma porta publicada em rede Compose `internal: true` não criou forwarding host no Docker deste host. O frontend agora também se conecta à bridge nomeada `agrofrota-infra-01-host-proxy`; apenas o Nginx usa essa bridge e sua porta continua limitada a loopback. Banco e backend seguem somente na bridge interna. Não houve alteração global de firewall ou Docker.
+
+## Prova de persistência e restore
+
+Uma máquina e uma OS fictícias foram criadas pela API remota com o usuário Gerente. A stack parou por `agrofrota.py stop`, sem remover o volume, e subiu com `agrofrota.py up`. API HTTPS voltou saudável e consulta direta no MariaDB confirmou 7 usuários, 1 máquina de teste e 1 OS de teste. O dump foi criado no diretório privado do operador. O primeiro ensaio de restore foi abortado pelo wrapper, que descartou overrides temporários; o volume ativo estava montado e o Docker recusou removê-lo. Após corrigir o wrapper e o CLI para propagar nomes isolados e aguardar o healthcheck, o restore passou em instância temporária. Nada foi restaurado sobre o banco ativo.
+
+## Evidências e limitações
+
+- Capturas reais do Chrome: `docs/evidence/infra-02/remote-dashboard-admin.png`, `remote-auditor-denied.png` e `remote-assistant-network-error.png`.
+- Logins, perfis e escopo testados com credenciais geradas localmente; nenhum segredo/token foi incluído em logs ou evidências versionadas.
+- A Central de Operações carregou, e uma requisição de mensagem interrompida pela automação mostrou alerta acessível e removeu o estado de carregamento. A confirmação transacional da Central não foi repetida aqui; ela já possui evidência funcional anterior.
+- A declaração do responsável de que o dump histórico é fictício continua distinta da evidência técnica independente. A verificação disponível em `docs/MVP_RELEASE_READINESS.md` não provou titularidade, reutilização ou validade; não houve rotação indiscriminada nem reescrita de histórico.
+- Acessibilidade continua conforme AGRO-FINAL-03: contrastes manuais residuais, leitor de tela sem validação confiável e sem declaração/certificação WCAG 2.2 AA.
+
+## Procedimento do iPhone
+
+1. Instale/abra o Tailscale no iPhone e entre na tailnet autorizada.
+2. Desative o Wi-Fi e confirme que o Tailscale continua conectado por dados móveis.
+3. Abra no Safari `https://gabriel-nitro-anv15-51.tailac6509.ts.net/`.
+4. Autentique-se no AgroFrota com uma das contas privadas do inicializador.
+5. Valide dashboard, OS, calendário, Central e logout. Não envie senhas por mensagem; recupere-as no terminal privado do host com `python3 deploy/persistent/agrofrota.py credentials`.
+
+## Classificação
+
+**`AGRO_INFRA_02_PARTIAL`** até validar um segundo dispositivo/rede e decidir o acesso Docker necessário para início automático. A stack privada, HTTPS pelo Serve, os sete perfis, persistência e restore isolado foram comprovados neste host. A classificação do MVP é independente e permanece **`AGRO_MVP_FINAL_PARTIAL`** por acessibilidade e risco histórico ainda não encerrados. Não houve merge ou deploy público.

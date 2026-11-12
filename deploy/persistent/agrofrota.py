@@ -154,7 +154,7 @@ def run_action(args):
     elif args.action == "logs":
         compose(directory, ["logs", "--tail", "100"])
     elif args.action == "provision":
-        compose(directory, ["run", "--rm", "--no-deps", "backend", "python", "tools/provision_persistent_demo.py"])
+        compose(directory, ["run", "--rm", "--no-deps", "backend", "python", "-m", "tools.provision_persistent_demo"])
     elif args.action == "backup":
         backup(directory, args.output)
     elif args.action == "restore-test":
@@ -192,7 +192,7 @@ def restore_test(directory, backup_path):
     overrides = {"AGROFROTA_VOLUME_NAME": volume, "AGROFROTA_NETWORK_NAME": network}
     started = True
     try:
-        compose(directory, ["up", "--detach", "database"], project=project, extra_env=overrides)
+        compose(directory, ["up", "--detach", "--wait", "database"], project=project, extra_env=overrides)
         command = ["docker", "compose", "--project-name", project, "--file", str(COMPOSE), "--env-file", str(directory / ".env"), "exec", "-T", "database", "sh", "-ec", "export MYSQL_PWD=\"$(cat /run/secrets/db_root_password)\"; exec mariadb -uroot"]
         with source.open("rb") as dump:
             subprocess.run(command, cwd=ROOT, stdin=dump, check=True)

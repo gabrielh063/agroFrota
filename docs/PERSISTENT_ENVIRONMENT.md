@@ -4,7 +4,7 @@
 
 `iniciar_agrofrota.py` permanece exclusivamente descartável. O ambiente durável é uma stack separada em `deploy/persistent/compose.yaml`, com projeto, rede e volume nomeados de forma exclusiva. Não se conecta ao MariaDB do sistema.
 
-O primeiro `up` constrói imagens e inicia MariaDB 11.4 no volume Docker nomeado `agrofrota-infra-01-mariadb`; nenhum port mapping do MariaDB existe. O banco central é `agrofrota_central`, tenant é `agrofrota_tenant`. O script de init concede ao usuário SQL dedicado acesso somente a esses dois schemas. O frontend publica somente `127.0.0.1:18088`; Flask/Gunicorn não publica porta do host.
+O primeiro `up` constrói imagens e inicia MariaDB 11.4 no volume Docker nomeado `agrofrota-infra-01-mariadb`; nenhum port mapping do MariaDB existe. O banco central é `agrofrota_central`, tenant é `agrofrota_tenant`. O script de init concede ao usuário SQL dedicado acesso somente a esses dois schemas. O frontend publica somente `127.0.0.1:18088`; Flask/Gunicorn não publica porta do host. Nginx pertence às bridges `private` e `host_proxy`; banco e Gunicorn pertencem somente à bridge interna `private`.
 
 ## Migrações e provisionamento
 
@@ -29,7 +29,7 @@ python3 deploy/persistent/agrofrota.py backup --output /caminho/privado/agrofrot
 python3 deploy/persistent/agrofrota.py restore-test --backup /caminho/privado/agrofrota-AAAA-MM-DD.sql
 ```
 
-Backup usa `mariadb-dump --single-transaction` para os dois schemas, modo `0600`, sem imprimir o conteúdo. `restore-test` cria projeto e volume aleatórios próprios, importa o dump, valida schemas/tabela Alembic e remove somente esse projeto temporário. O ensaio real não foi possível nesta execução; consulte o resultado e a limitação em `docs/REMOTE_ACCESS_VALIDATION.md` antes de tratar backups como comprovados.
+Backup usa `mariadb-dump --single-transaction` para os dois schemas, modo `0600`, sem imprimir o conteúdo. Em 12/11/2026, o backup e a restauração isolada foram executados. O dump ficou no estado privado local, fora do repositório. A restauração usou projeto, rede e volume aleatórios, aguardou healthcheck e validou os dois schemas e a versão Alembic; o CLI removeu somente esses recursos temporários após a verificação. Nunca restaure sobre `agrofrota-infra-01-mariadb` ativo.
 
 ## Unidade de usuário
 
@@ -40,8 +40,14 @@ systemctl --user enable --now agrofrota-infra-01.service
 systemctl --user status agrofrota-infra-01.service
 ```
 
-Para remoção, `python3 deploy/persistent/systemd_user.py remove`. Esse caminho não apaga volume, dados, credenciais nem configuração Tailscale. Não foi instalado/ativado durante a missão.
+Para remoção, `python3 deploy/persistent/systemd_user.py remove`. Esse caminho não apaga volume, dados, credenciais nem configuração Tailscale. A unidade não foi ativada: o usuário do host não acessa o socket sem sudo e a unidade usa `NoNewPrivileges=true`, portanto não poderia chamar sudo.
 
-## Limites do host atual
+## Estado do host e evidência de persistência
 
-O host identificado foi Linux Mint 22.1, `gabriel-Nitro-ANV15-51`, com 7,5 GiB RAM total, cerca de 2,3 GiB disponíveis e apenas 1,3 GiB livres no filesystem raiz na medição. Docker está ativo, mas o usuário não tinha permissão de acesso ao socket; MariaDB e outros serviços do operador já estavam ativos. Imagens, migrações, criação de usuários, backups e testes de restore ficaram pendentes para evitar colisão, consumo de disco ou alteração de instalação pessoal.
+Em 12/11/2026, o Linux Mint 22.1 `gabriel-Nitro-ANV15-51` tinha 23 GB livres (margem mínima pretendida: 8–10 GB), 7,5 GiB de RAM e Docker Engine 29.8.2/Compose 5.6.0. O MariaDB do host em `127.0.0.1:3306` não foi usado. O usuário não pertence ao grupo `docker`; o socket é `0660` e o CLI foi executado com `sudo -n` por um wrapper temporário, mantendo o inicializador e os segredos com UID do operador. Nenhum cache, imagem, volume ou arquivo do operador foi removido.
+
+A instância persistente está em `/var/lib/docker/volumes/agrofrota-infra-01-mariadb/_data`, montada pelo volume nomeado exclusivo `agrofrota-infra-01-mariadb`. O estado privado de credenciais/configuração está em `~/.config/agrofrota-infra-01` (diretório `0700`, arquivos `0600`). O seed criou sete usuários, uma máquina e duas OS demonstrativas. Uma máquina/OS adicional foi criada pelo endpoint HTTPS; após `stop` e novo `up`, a leitura SQL confirmou que ambos os registros e as sete contas continuavam presentes. Ver `docs/evidence/infra-02/AGRO-INFRA-02-results.md`.
+
+## Inicialização após reboot
+
+A unidade systemd de usuário da PR #10 não foi ativada. Ela tem `NoNewPrivileges=true` e chama `docker` sem sudo, enquanto o usuário não acessa diretamente o socket. A estratégia de acesso persistente ao Docker para a unidade foi solicitada ao operador; nenhum grupo, unidade ativa ou política global foi alterado.

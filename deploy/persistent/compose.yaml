@@ -104,7 +104,7 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    networks: [private]
+    networks: [private, host_proxy]
     security_opt:
       - no-new-privileges:true
 
@@ -116,6 +116,8 @@ networks:
   private:
     name: ${AGROFROTA_NETWORK_NAME:-agrofrota-infra-01-private}
     internal: true
+  host_proxy:
+    name: ${AGROFROTA_PROXY_NETWORK_NAME:-agrofrota-infra-01-host-proxy}
 
 secrets:
   db_password:
