@@ -48,8 +48,8 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Telas avaliadas:** Central, formulário de OS, detalhes da OS, Calendário e navegação móvel.
 - **Problema observado / reprodução:** Na Central anterior não havia entrada orientada a tarefa nem proposta estruturada clara para revisar antes da gravação. Severidade observada: **2**.
 - **Correção implementada:** Cards abrem tarefas sem retirar a entrada livre; proposta oferece **Confirmar operação** e **Cancelar**; existe **Nova conversa**; formulário mantém botões de retorno/cancelamento e detalhes oferecem as transições permitidas. A sidebar móvel pode ser aberta e fechada.
-- **Resultado:** A operação testada permaneceu sem gravação até confirmação e depois apresentou link para abrir a OS. Cancelamento da proposta foi inspecionado no código; o cancelamento de OS/agendamento não foi exercitado no browser.
-- **Teste de regressão:** Confirmação real via Chrome; criação manual de OS e edição de agendamento também foram percorridas. Transições e rollback cobertos pela suíte backend. Cancelamentos manuais permanecem pendentes.
+- **Resultado:** A operação testada permaneceu sem gravação até confirmação e depois apresentou link para abrir a OS. Uma OS elegível foi concluída e outra foi cancelada; um agendamento também foi cancelado pelo calendário.
+- **Teste de regressão:** Chrome autenticado e MariaDB descartável confirmaram as transições e os respectivos estados persistidos. Havia controles visíveis para retornar/cancelar antes de confirmar.
 
 ### H4 — Consistência e padrões
 
@@ -64,8 +64,8 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Telas avaliadas:** Formulário de máquina, OS, agenda e proposta da Central.
 - **Problema observado / reprodução:** Uma disponibilidade consultada pode ficar desatualizada antes da confirmação; conflito concorrente precisa ser revalidado no servidor. Severidade observada: **3** no fluxo de reserva caso a revalidação não exista.
 - **Correção implementada:** Propostas são temporárias e revalidam permissão e disponibilidade dentro da transação; agenda e indisponibilidade compartilham lock operacional; a criação/edição de indisponibilidade verifica reservas existentes; status não operacional, desativação, troca ou encerramento de OS não invalidam agenda pendente silenciosamente. Formulários desabilitam submissão enquanto processam.
-- **Resultado:** A Central selecionou o DEMO-TR-02 e confirmou apenas após mostrar recurso, OS, horário e estado inicial. Os testes backend cobrem conflitos e rollback transacional.
-- **Teste de regressão:** `python backend/tools/ci.py` — 249 aprovados em MariaDB descartável, incluindo conflito/rollback/idempotência, corrida agenda × indisponibilidade e bloqueio de máquina não operacional ou com agenda pendente. Chrome autenticado criou/editou uma agenda e recebeu erro visível ao tentar horário conflitante; a corrida concorrente foi exercitada no serviço MariaDB, não por clique simultâneo no navegador.
+- **Resultado:** A Central selecionou o DEMO-TR-02 e confirmou apenas após mostrar recurso, OS, horário e estado inicial. Calendário rejeitou reserva conflitante e não criou linha adicional.
+- **Teste de regressão:** `python backend/tools/ci.py` — 249 aprovados em MariaDB descartável, incluindo conflito/rollback/idempotência, corrida agenda × indisponibilidade e bloqueio de máquina não operacional ou com agenda pendente. No Chrome autenticado foi criado, editado e cancelado agendamento; a tentativa sobreposta mostrou erro visível e a contagem no MariaDB permaneceu igual.
 
 ### H6 — Reconhecimento em vez de memorização
 
@@ -89,15 +89,15 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Problema observado / reprodução:** Dashboard sem hierarquia forte, Central com espaço vazio excessivo e tabela pequena eram visíveis nas capturas do baseline. Severidade observada: **2**.
 - **Correção implementada:** Dashboard reorganizado com hero, KPIs mais proeminentes, atividade, status e listas; Central usa workspace de tarefas e conversa; Maquinários usa resumo e cards compactos em telas estreitas. O gráfico não desenha valores zero.
 - **Resultado:** As capturas antes/depois mostram diferenças concretas; em 375×812 os filtros e cartões ficam dentro do fluxo móvel e o menu usa controle explícito.
-- **Teste de regressão:** Screenshots reais e build. Chrome mediu `document.scrollWidth == viewport width` em 375×812, 768×1024, 1280×800 e 1600×900 nas oito telas essenciais. Inspeção visual de composição foi feita em mobile e desktop; teclado e leitor de tela permanecem pendentes.
+- **Teste de regressão:** Screenshots reais e build. Chrome mediu `document.scrollWidth == viewport width` em 375×812, 768×1024, 1280×800 e 1600×900 nas oito telas essenciais. Inspeção visual de composição foi feita em mobile e desktop; teclado do modal de calendário foi exercitado. Leitor de tela e matriz integral de contraste permanecem pendentes.
 
 ### H9 — Reconhecer, diagnosticar e recuperar erros
 
 - **Telas avaliadas:** Login, formulário e Central.
 - **Problema observado / reprodução:** A mensagem de confirmação anterior dizia apenas para conferir os dados e tentar de novo, sem orientar o usuário a verificar possível persistência após falha de resposta. Severidade observada: **2**.
 - **Correção implementada:** Mensagem de falha de confirmação agora orienta conferir Ordens de serviço e Calendário antes de tentar de novo e explica que repetição da confirmação retorna o mesmo resultado se já persistiu. Outras mensagens do login e da Central dão ação de recuperação.
-- **Resultado:** A interface não afirma rollback quando não sabe o resultado da rede. Nenhum erro foi simulado no navegador nesta rodada.
-- **Teste de regressão:** Conflito de agenda no Chrome exibiu mensagem para o usuário; idempotência e rollback demonstrados na suíte backend; revisão textual do tratamento de erro. Falha de conexão em navegador permanece pendente.
+- **Resultado:** A interface não afirma rollback quando não sabe o resultado da rede. Offline antes do envio mostrou orientação de recuperação; resposta perdida após commit e timeout mostraram resultado incerto, sem informar sucesso prematuro.
+- **Teste de regressão:** No Chrome, a confirmação repetida retornou o mesmo ID após resposta perdida, timeout e reload; clique duplo persistiu uma linha. Conflito de agenda exibiu mensagem para o usuário, e a UI usou `role=alert` no modal de conflito.
 
 ### H10 — Ajuda e documentação
 
@@ -107,8 +107,12 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Resultado:** Guia descreve o percurso de login, ativos, OS, agenda, Central e encerramento; não apresenta módulos não existentes como utilizáveis.
 - **Teste de regressão:** Revisão do guia contra rotas presentes no `App.jsx` e inspeção real da Central e sidebar.
 
-## Pendências da avaliação
+## Fechamento AGRO-FINAL-02 — 12/11/2026
 
-- Medir contraste WCAG 2.2 AA, validar teclado/foco em formulários e executar leitor de tela.
-- Exercitar conflito e recuperação de falha pelo fluxo visual da interface autenticada.
-- Fazer teste com pelo menos uma pessoa usuária representativa antes de uso fora da demonstração acadêmica.
+- **H1/H9:** offline antes do envio exibiu recuperação; resposta HTTP 200 interceptada depois do commit e timeout de 30 s deixaram o resultado incerto na interface. Atualizar a página recuperou o estado; reenviar a mesma confirmação retornou o mesmo agendamento sem duplicação. Ver `evidence/final/gate-confirmation-pending.png` e `evidence/final/AGRO-FINAL-02-results.md`.
+- **H3:** cancelamento de OS e de agendamento realizado pelo navegador; após cancelar, o banco exibiu estado `CANCELADO`. O erro de conflito foi apresentado em `role=alert`.
+- **H5:** reserva conflitante foi rejeitada com mensagem de indisponibilidade; a contagem de agendamentos persistidos não mudou.
+- **Modal/teclado:** diálogo “Agendar serviço” aparece nomeado na árvore de acessibilidade do Chrome. Foco inicia dentro do modal; Tab e Shift+Tab circulam; Escape fecha e devolve foco ao acionador. Os labels estão associados aos campos. A captura do erro acessível está em `evidence/final/gate-calendar-conflict-accessible-desktop.png` e sua versão mobile em `evidence/final/gate-calendar-conflict-accessible-mobile.png`.
+- **Contraste:** amostra composta de 52 textos visíveis na Central, incluindo transparências, teve mínimo medido de 4,68:1 e nenhum resultado amostrado abaixo de 4,5:1. Isso não cobre toda a aplicação, todos os estados, texto grande, foco ou conteúdo dinâmico.
+- **Automação/leitor de tela:** axe-core não está instalado. Orca está disponível no sistema, mas não havia sessão ativa; não foi iniciada para evitar assumir ou alterar a sessão gráfica do operador. A árvore AX do Chrome foi inspecionada. Não houve validação por leitor de tela e não se declara conformidade WCAG 2.2 AA.
+- **Limite de pesquisa:** não houve teste moderado com pessoa usuária representativa.

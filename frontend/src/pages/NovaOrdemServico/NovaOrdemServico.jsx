@@ -787,7 +787,7 @@ function NovaOrdemServico() {
 
 
                 {erro && (
-                    <div className="nova-os-error">
+                    <div className="nova-os-error" role="alert">
 
                         <i className="bi bi-exclamation-circle" />
 

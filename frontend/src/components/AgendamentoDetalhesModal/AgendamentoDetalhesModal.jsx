@@ -1,5 +1,6 @@
 import {
     useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -56,6 +57,15 @@ function AgendamentoDetalhesModal({
     onCancelar,
     onVerOS,
 }) {
+    const dialogRef = useRef(null);
+    const closeRef = useRef(onClose);
+    const savingRef = useRef(salvando);
+
+    useEffect(() => {
+        closeRef.current = onClose;
+        savingRef.current = salvando;
+    }, [onClose, salvando]);
+
     const [editando, setEditando] =
         useState(false);
 
@@ -103,6 +113,52 @@ function AgendamentoDetalhesModal({
         });
 
     }, [agendamento]);
+
+    useEffect(() => {
+        if (!aberto || !agendamento) {
+            return;
+        }
+
+        const dialog = dialogRef.current;
+        const previous = document.activeElement;
+        const focusable = () => [...dialog.querySelectorAll(
+            'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+        )];
+
+        requestAnimationFrame(() => focusable()[0]?.focus());
+
+        function handleKeyDown(event) {
+            if (event.key === "Escape" && !savingRef.current) {
+                event.preventDefault();
+                closeRef.current();
+                return;
+            }
+
+            if (event.key !== "Tab") {
+                return;
+            }
+
+            const items = focusable();
+            const first = items[0];
+            const last = items[items.length - 1];
+
+            if (!first || !last) {
+                event.preventDefault();
+            } else if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            previous?.focus?.();
+        };
+    }, [aberto, agendamento]);
 
 
     if (
@@ -251,7 +307,14 @@ function AgendamentoDetalhesModal({
             }}
         >
 
-            <div className="agd-detail-modal">
+            <div
+                className="agd-detail-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="agd-detail-title"
+                ref={dialogRef}
+                tabIndex={-1}
+            >
 
                 <header className="agd-detail-header">
 
@@ -261,7 +324,7 @@ function AgendamentoDetalhesModal({
                             Agendamento #{agendamento.id}
                         </span>
 
-                        <h2>
+                        <h2 id="agd-detail-title">
                             {
                                 ordem
                                     ? ordem.titulo
@@ -299,6 +362,7 @@ function AgendamentoDetalhesModal({
                         <button
                             type="button"
                             className="agd-close"
+                            aria-label="Fechar detalhes do agendamento"
                             onClick={onClose}
                             disabled={salvando}
                         >
@@ -480,11 +544,12 @@ function AgendamentoDetalhesModal({
 
                             <div className="agd-field">
 
-                                <label>
+                                <label htmlFor="agd-edit-inicio">
                                     Início *
                                 </label>
 
                                 <input
+                                    id="agd-edit-inicio"
                                     type="datetime-local"
                                     required
                                     value={
@@ -503,11 +568,12 @@ function AgendamentoDetalhesModal({
 
                             <div className="agd-field">
 
-                                <label>
+                                <label htmlFor="agd-edit-fim">
                                     Fim *
                                 </label>
 
                                 <input
+                                    id="agd-edit-fim"
                                     type="datetime-local"
                                     required
                                     value={
@@ -526,11 +592,12 @@ function AgendamentoDetalhesModal({
 
                             <div className="agd-field">
 
-                                <label>
+                                <label htmlFor="agd-edit-responsavel">
                                     Responsável
                                 </label>
 
                                 <select
+                                    id="agd-edit-responsavel"
                                     value={
                                         form.responsavelId
                                     }
@@ -577,11 +644,12 @@ function AgendamentoDetalhesModal({
 
                             <div className="agd-field">
 
-                                <label>
+                                <label htmlFor="agd-edit-status">
                                     Status
                                 </label>
 
                                 <select
+                                    id="agd-edit-status"
                                     value={
                                         form.status
                                     }
@@ -610,11 +678,12 @@ function AgendamentoDetalhesModal({
 
                             <div className="agd-field full">
 
-                                <label>
+                                <label htmlFor="agd-edit-observacoes">
                                     Observações
                                 </label>
 
                                 <textarea
+                                    id="agd-edit-observacoes"
                                     rows={4}
                                     value={
                                         form.observacoes
@@ -633,7 +702,7 @@ function AgendamentoDetalhesModal({
 
 
                         {erro && (
-                            <div className="agd-error">
+                            <div className="agd-error" role="alert">
 
                                 <i className="bi bi-exclamation-circle" />
 
