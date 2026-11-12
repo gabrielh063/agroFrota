@@ -46,3 +46,28 @@ Uma máquina e uma OS fictícias foram criadas pela API remota com o usuário Ge
 ## Classificação
 
 **`AGRO_INFRA_02_PARTIAL`** até validar um segundo dispositivo/rede e decidir o acesso Docker necessário para início automático. A stack privada, HTTPS pelo Serve, os sete perfis, persistência e restore isolado foram comprovados neste host. A classificação do MVP é independente e permanece **`AGRO_MVP_FINAL_PARTIAL`** por acessibilidade e risco histórico ainda não encerrados. Não houve merge ou deploy público.
+
+## Verificação AGRO-INFRA-03 — 12/11/2026
+
+| Gate | Resultado | Evidência desta verificação | Limite |
+|---|---|---|---|
+| Inicialização automática segura | PARTIAL | Docker system service observado como `enabled` e `active`; template de unidade restrita e scripts para instalação root-owned preparados em `deploy/persistent/`. | Nenhuma unidade foi instalada/habilitada. Reboot real não foi executado. Não foi possível inspecionar as políticas efetivas dos containers pelo socket dentro do contexto de execução atual; o Compose declara `unless-stopped`. |
+| MariaDB persistente e aplicação | PASS (estado atual) | `GET http://127.0.0.1:18088/api/health` respondeu `200` com `status=online`; checks anteriores de stop/up, registros e backup/restore permanecem válidos. | A verificação desta missão não reiniciou containers nem sistema operacional. |
+| Tailscale Serve | PASS (estado observado) | `tailscale serve status` retornou o hostname MagicDNS configurado como `tailnet only`, proxy para `127.0.0.1:18088`; HTTPS `/api/health` respondeu HTTP/2 200 com certificado aceito pelo cliente curl. | Status válido no instante da coleta; sem prova por Safari nesta missão. |
+| Segundo dispositivo | PENDING | O estado Tailscale mostrou peer iOS online e peer Linux online. A resposta HTTPS e o Chrome usados nesta sessão originam do host AgroFrota. | Não há automação/controle de Safari no iPhone nem acesso de navegador ao peer Linux. Não declarar login externo aprovado. |
+| Rootless Docker | Avaliado, não escolhido | Ferramentas base `dockerd-rootless`/`rootlesskit` e faixas subuid/subgid existem. | `slirp4netns` e `fuse-overlayfs` não foram encontrados; `loginctl` informa `Linger=no`. Usaria daemon e armazenamento diferentes e exigiria migração do volume ativo, então não foi iniciado. |
+| Unidade systemd de usuário | Não aplicável neste host | `systemd_user.py` permanece inalterado. | UID do operador não tem acesso direto ao socket Docker; não foi adicionado ao grupo `docker` nem recebeu regra sudo. |
+
+Host: Linux Mint 22.1 `gabriel-Nitro-ANV15-51`; `/` com 21 GB livres na coleta. A inspeção de processos confirma backend Gunicorn e Nginx em execução, sem alteração na stack. O socket Docker não estava acessível diretamente ao UID do ambiente de execução, e comandos Tailscale/systemd de usuário não estavam disponíveis fora do contexto elevado. Não foi feita alteração global, reinício do host, remoção de dados ou migração do volume.
+
+### Decisão de inicialização
+
+Rootless Docker foi rejeitado para esta ativação porque separaria daemon/volume e demandaria uma migração do MariaDB ativo, além de dependências e linger. Uma unidade de sistema baseada em Compose também foi evitada porque poderia executar definição de serviço ou build alterável pelo usuário como root. A proposta instala uma unidade e dois scripts root-owned que chamam somente `docker inspect`, `start` e `stop` para os três containers preexistentes após validar a label do projeto; o arquivo da unidade não chama Compose e não lê scripts ou arquivos de configuração do checkout em runtime. A instalação em `/etc/systemd/system` e `/usr/local/libexec` requer autorização específica e ainda não ocorreu. Procedimento e rollback estão em `docs/TAILSCALE_DEPLOYMENT.md`.
+
+### Teste pelo iPhone
+
+O peer iOS aparece online na tailnet, mas não foi possível automatizar Safari nesta sessão; o gate permanece `PENDING`. No iPhone conectado à tailnet, desative Wi-Fi e use dados móveis, abra `https://gabriel-nitro-anv15-51.tailac6509.ts.net/` no Safari, faça login com uma conta do AgroFrota, confira dashboard, OS, calendário, Central, uma ação permitida/negada conforme o perfil e logout. O operador deve registrar apenas o resultado e horário, sem capturar ou compartilhar senha/token. Para validar rede móvel, confirme que o Tailscale permanece conectado antes de abrir o endereço.
+
+### Classificação
+
+**`AGRO_INFRA_03_PARTIAL`**. HTTPS Serve privado, aplicação no estado atual e infraestrutura persistente anteriormente homologada têm evidência. Permanecem pendentes a autorização/ativação da unidade systemd root-owned, prova de inicialização após reboot e homologação real de navegador no segundo dispositivo. A classificação do MVP continua independente; nenhuma evidência nova encerra acessibilidade ou segurança histórica da PR #9.

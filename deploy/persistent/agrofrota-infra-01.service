@@ -1,0 +1,29 @@
+# Install as /etc/systemd/system/agrofrota-infra-01.service, owned by root.
+[Unit]
+Description=AgroFrota persistent containers (private Tailscale service)
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/libexec/agrofrota-infra-01-start
+ExecStop=/usr/local/libexec/agrofrota-infra-01-stop
+TimeoutStartSec=7min
+TimeoutStopSec=5min
+Restart=on-failure
+RestartSec=15s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

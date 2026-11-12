@@ -1,0 +1,65 @@
+#!/bin/sh
+set -eu
+
+project=agrofrota-infra-01
+database="${project}-database-1"
+backend="${project}-backend-1"
+frontend="${project}-frontend-1"
+
+assert_project_container() {
+    name=$1
+    actual=$(/usr/bin/docker inspect --type=container --format '{{ index .Config.Labels "com.docker.compose.project" }}' "$name")
+    if [ "$actual" != "$project" ]; then
+        echo "Recusando container fora do projeto AgroFrota esperado: $name" >&2
+        exit 1
+    fi
+}
+
+start_if_stopped() {
+    name=$1
+    running=$(/usr/bin/docker inspect --type=container --format '{{.State.Running}}' "$name")
+    if [ "$running" != true ]; then
+        /usr/bin/docker start "$name" >/dev/null
+    fi
+}
+
+wait_for_database() {
+    attempt=0
+    while [ "$attempt" -lt 90 ]; do
+        health=$(/usr/bin/docker inspect --type=container --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}missing{{end}}' "$database")
+        if [ "$health" = healthy ]; then
+            return 0
+        fi
+        attempt=$((attempt + 1))
+        sleep 2
+    done
+    echo "MariaDB não ficou saudável dentro de 180 segundos." >&2
+    return 1
+}
+
+wait_for_api() {
+    attempt=0
+    while [ "$attempt" -lt 60 ]; do
+        response=$(/usr/bin/curl --fail --silent --max-time 2 http://127.0.0.1:18088/api/health 2>/dev/null || true)
+        case "$response" in
+            *'"status":"online"'*'"success":true'*) return 0 ;;
+        esac
+        attempt=$((attempt + 1))
+        sleep 2
+    done
+    echo "Healthcheck HTTP do AgroFrota não respondeu como online em 120 segundos." >&2
+    return 1
+}
+
+# Validate all names before causing any state change. This service never runs
+# Compose, builds images, reads secrets, or removes containers/volumes.
+assert_project_container "$database"
+assert_project_container "$backend"
+assert_project_container "$frontend"
+
+start_if_stopped "$database"
+wait_for_database
+start_if_stopped "$backend"
+start_if_stopped "$frontend"
+wait_for_api
+echo "AgroFrota persistente iniciado e healthcheck confirmado."

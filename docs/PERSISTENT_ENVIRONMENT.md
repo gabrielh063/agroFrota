@@ -50,4 +50,10 @@ A instância persistente está em `/var/lib/docker/volumes/agrofrota-infra-01-ma
 
 ## Inicialização após reboot
 
-A unidade systemd de usuário da PR #10 não foi ativada. Ela tem `NoNewPrivileges=true` e chama `docker` sem sudo, enquanto o usuário não acessa diretamente o socket. A estratégia de acesso persistente ao Docker para a unidade foi solicitada ao operador; nenhum grupo, unidade ativa ou política global foi alterado.
+O Docker system service está habilitado e ativo no host. Os três serviços duráveis declaram `restart: unless-stopped`, mas a prova AGRO-INFRA-03 não reiniciou o sistema operacional. Como `docker compose stop` registra os containers como parados, as políticas `unless-stopped` podem manter essa parada depois de um reboot; não contar apenas com elas como prova de inicialização automática.
+
+`deploy/persistent/systemd_user.py` continua sendo uma alternativa de usuário, mas não serve neste host: o UID do operador não acessa o socket Docker e a unidade tem `NoNewPrivileges=true`. Não adicionar o operador ao grupo `docker` nem criar sudoers genérico para Compose.
+
+Foi preparada a unidade systemd de sistema `deploy/persistent/agrofrota-infra-01.service` e os auxiliares `agrofrota-infra-01-start`/`agrofrota-infra-01-stop`. A unidade invoca somente cópias root-owned desses scripts; eles validam a label do projeto dos três containers nomeados, iniciam MariaDB e esperam seu healthcheck antes do backend/frontend, aguardam o healthcheck HTTP e param em ordem inversa. Não executam Compose, build, migração, leitura de secrets ou remoção de volumes. A configuração já estática e revisável ainda não foi instalada em `/etc` nem habilitada.
+
+A ativação cria três arquivos root-owned em `/usr/local/libexec` e uma unidade em `/etc/systemd/system`, executa `systemctl daemon-reload` e habilita a unidade no boot. Isso concede à unidade root permissão para iniciar/parar apenas os containers preexistentes verificados pelo nome e pela label de projeto via socket Docker. O passo é persistente e depende de autorização específica do operador. O template e o procedimento reversível estão em `docs/TAILSCALE_DEPLOYMENT.md`.
