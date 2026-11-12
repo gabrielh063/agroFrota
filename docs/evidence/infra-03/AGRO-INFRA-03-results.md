@@ -37,7 +37,7 @@ Os scripts não executam Compose/build, não carregam secrets, não fazem migra�
 - `sh -n` nos dois auxiliares: passou.
 - `systemd-analyze verify` da unidade e dos executáveis no caminho temporário de staging: passou. A verificação não instalou nem ativou a unidade real.
 - `git diff --check`: passou.
-- CI remoto ainda precisa rodar no novo HEAD após publicação.
+- CI remota no HEAD `cbb80cda9a247c62694c8c0dbc8a349aadb2e97a`: jobs `backend-mariadb` e `frontend` passaram no run [43303527278](https://github.com/gabrielh063/agroFrota/actions/runs/43303527278).
 
 ## Classificação
 

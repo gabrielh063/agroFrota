@@ -71,3 +71,5 @@ O peer iOS aparece online na tailnet, mas não foi possível automatizar Safari 
 ### Classificação
 
 **`AGRO_INFRA_03_PARTIAL`**. HTTPS Serve privado, aplicação no estado atual e infraestrutura persistente anteriormente homologada têm evidência. Permanecem pendentes a autorização/ativação da unidade systemd root-owned, prova de inicialização após reboot e homologação real de navegador no segundo dispositivo. A classificação do MVP continua independente; nenhuma evidência nova encerra acessibilidade ou segurança histórica da PR #9.
+
+CI remota no HEAD `cbb80cda9a247c62694c8c0dbc8a349aadb2e97a`: `backend-mariadb` e `frontend` passaram no run [43303527278](https://github.com/gabrielh063/agroFrota/actions/runs/43303527278).
