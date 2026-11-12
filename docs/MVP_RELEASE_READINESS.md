@@ -1,6 +1,6 @@
 # Prontidão da release candidate do AgroFrota
 
-Data de registro: 12/11/2026. Classificação nesta etapa: **`AGRO_MVP_FINAL_PARTIAL`**. Há implementação, suíte backend e build aprovados e uma homologação local real autenticada; os checks remotos da PR estão em andamento, e fluxos manuais de erro/conflito e a revisão de acessibilidade permanecem parciais. Não foi feito merge nem deploy.
+Data de registro: 12/11/2026. Classificação nesta etapa: **`AGRO_MVP_FINAL_PARTIAL`**. Há implementação, suíte backend, build e checks remotos aprovados, além de homologação local autenticada; permanecem parciais as transições finais de OS/agendamento, recuperação de falha de rede e revisão de acessibilidade. Não foi feito merge nem deploy.
 
 ## Branch e histórico
 
@@ -9,7 +9,7 @@ Data de registro: 12/11/2026. Classificação nesta etapa: **`AGRO_MVP_FINAL_PAR
 - A cadeia consultada no remoto via `gh`: #5 (base Main), #6 (base #5), #7 (base #6), #8 (base #7). PRs #1–#8 permanecem abertas; a PR final #9 foi aberta para `Main`.
 - Commit da candidata funcional: `1e8bd157a4d808b2e7f8fe01c923760422c4fee1` (`Finalize AgroFrota MVP candidate`). A atualização deste relatório será o head mais recente publicado na PR.
 - PR final: [#9](https://github.com/gabrielh063/agroFrota/pull/9), `release/agrofrota-mvp-final` → `Main`.
-- Estado remoto após abrir a PR: `backend-mariadb` em andamento, `frontend` na fila, decisão de revisão vazia, merge state `UNSTABLE`. Não integrado em `Main`; nenhuma branch protection foi contornada e nenhuma PR anterior foi fechada.
+- Checks remotos no head `b6b014884f8b65d52e8570b0b849bbd3b63ca575`: `backend-mariadb` e `frontend` passaram. Decisão de revisão vazia; merge state `CLEAN`; API informa que `Main` não tem branch protection configurada. Não integrado em `Main`; nenhuma PR anterior foi fechada. Esta atualização posterior de evidências/documentação precisa disparar e passar CI novamente.
 
 ## Verificações executadas
 
@@ -29,11 +29,11 @@ Data de registro: 12/11/2026. Classificação nesta etapa: **`AGRO_MVP_FINAL_PAR
 ## Fluxos homologados
 
 - **A — Login/Dashboard:** login demonstrativo real; KPIs e listas carregaram dados do tenant isolado; sidebar navegou entre telas.
-- **B — Gestão de ativos:** listas reais de máquinas/equipamentos renderizaram; busca/filtros disponíveis. Criação e edição manual pelo formulário não foram percorridas nesta sessão de navegador.
-- **C — OS manual:** tabela e detalhe autenticados abriram; edição/criação manual não foram percorridas no browser. Criação de OS pela Central foi confirmada e persistida; backend cobre criação e transições.
-- **D — Agenda:** calendário autenticado abriu; a Central gravou uma agenda. Alteração manual não foi exercitada nesta sessão; testes backend cobrem conflito/rollback, disputa concorrente com indisponibilidade, bloqueio de ativo não operacional e de OS com agenda pendente.
+- **B — Gestão de ativos:** no Chrome autenticado foram criadas e editadas uma máquina e um equipamento fictícios; listas e controles de busca/filtro renderizaram. Não foi verificado um cenário de filtro que prove o subconjunto retornado.
+- **C — OS:** tabela e detalhe autenticados abriram; criação manual por formulário e criação via Central foram exercitadas. Editar, concluir e cancelar manualmente não foram percorridos no browser; testes backend cobrem transições e auditoria.
+- **D — Agenda:** calendário autenticado; criação e edição manuais foram exercitadas, e uma reserva sobreposta foi recusada com erro visível. A Central também gravou agenda. Cancelamento manual não foi percorrido; testes backend cobrem rollback, disputa concorrente com indisponibilidade, bloqueio de ativo não operacional e OS com agenda pendente.
 - **E — Central:** conversa em duas mensagens, contexto mantido, ativo disponível identificado, proposta revisável, confirmação e links de resultado. Dados conferidos diretamente no MariaDB temporário.
-- **F — Repetição/falha:** suíte backend cobre idempotência, concorrência e rollback; não foi simulada falha de rede nem clique duplicado via browser nesta sessão.
+- **F — Repetição/falha:** conflito real no navegador foi bloqueado; suíte backend cobre idempotência, concorrência e rollback. Falha de rede após confirmação e clique duplicado pelo browser não foram simulados.
 - **G — Logout:** logout real realizado no browser e rota protegida redirecionou para login.
 
 ## Nielsen, visual e acessibilidade
@@ -54,14 +54,14 @@ Capturas mobile foram feitas em 375×812 e desktop em 1600×900. A largura do do
 ## Pendências para classificação READY
 
 1. Medir contraste, validar todos os fluxos por teclado e testar leitor de tela.
-2. Percorrer cadastro/edição manual de ativos, OS manual e edição/cancelamento de agenda em navegador; simular conflito e erro de rede.
-3. Aguardar conclusão dos checks remotos da PR #9 e revisar branch protection/review exigida.
+2. Percorrer editar/concluir/cancelar OS, cancelar agendamento, testar filtros, erro de rede e confirmação repetida em navegador.
+3. Atualizar e aguardar CI remoto referente à atualização documental/evidências da PR #9; confirmar revisão necessária antes de eventual merge.
 4. Executar os fluxos manuais de navegador pendentes e completar a avaliação de acessibilidade antes de reclassificar a release.
 5. Manter pendência histórica de credenciais/dump como ação do responsável do repositório; nenhuma rotação externa foi realizada nesta missão.
 
 ## Estado do gate e classificação
 
-Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. Implementação local, testes backend, build/lint, inicializador isolado e fluxo autenticado da Central passaram. A PR #9 está publicada e os checks GitHub estavam pendentes na última consulta. Os fluxos manuais de CRUD/agenda no browser e a revisão de acessibilidade ainda estão parciais. Portanto, não está autorizada a integração na branch `Main` pelos gates definidos na missão.
+Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. Implementação local, testes backend, build/lint, inicializador isolado, Central autenticada e checks GitHub no head funcional passaram. Alguns fluxos manuais de OS/agenda, erro de rede e revisão de acessibilidade ainda estão parciais. Portanto, não está autorizada a integração na branch `Main` pelos gates definidos na missão.
 
 ## Inicialização e encerramento
 

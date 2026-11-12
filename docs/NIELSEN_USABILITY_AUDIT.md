@@ -48,8 +48,8 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Telas avaliadas:** Central, formulário de OS, detalhes da OS, Calendário e navegação móvel.
 - **Problema observado / reprodução:** Na Central anterior não havia entrada orientada a tarefa nem proposta estruturada clara para revisar antes da gravação. Severidade observada: **2**.
 - **Correção implementada:** Cards abrem tarefas sem retirar a entrada livre; proposta oferece **Confirmar operação** e **Cancelar**; existe **Nova conversa**; formulário mantém botões de retorno/cancelamento e detalhes oferecem as transições permitidas. A sidebar móvel pode ser aberta e fechada.
-- **Resultado:** A operação testada permaneceu sem gravação até confirmação e depois apresentou link para abrir a OS. O cancelamento foi inspecionado no código; não foi executado como fluxo de navegador nesta rodada.
-- **Teste de regressão:** Confirmação real via Chrome; transições e rollback cobertos pela suíte backend. Falta o roteiro visual de cancelamento no navegador.
+- **Resultado:** A operação testada permaneceu sem gravação até confirmação e depois apresentou link para abrir a OS. Cancelamento da proposta foi inspecionado no código; o cancelamento de OS/agendamento não foi exercitado no browser.
+- **Teste de regressão:** Confirmação real via Chrome; criação manual de OS e edição de agendamento também foram percorridas. Transições e rollback cobertos pela suíte backend. Cancelamentos manuais permanecem pendentes.
 
 ### H4 — Consistência e padrões
 
@@ -65,7 +65,7 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Problema observado / reprodução:** Uma disponibilidade consultada pode ficar desatualizada antes da confirmação; conflito concorrente precisa ser revalidado no servidor. Severidade observada: **3** no fluxo de reserva caso a revalidação não exista.
 - **Correção implementada:** Propostas são temporárias e revalidam permissão e disponibilidade dentro da transação; agenda e indisponibilidade compartilham lock operacional; a criação/edição de indisponibilidade verifica reservas existentes; status não operacional, desativação, troca ou encerramento de OS não invalidam agenda pendente silenciosamente. Formulários desabilitam submissão enquanto processam.
 - **Resultado:** A Central selecionou o DEMO-TR-02 e confirmou apenas após mostrar recurso, OS, horário e estado inicial. Os testes backend cobrem conflitos e rollback transacional.
-- **Teste de regressão:** `python backend/tools/ci.py` — 249 aprovados em MariaDB descartável, incluindo conflito/rollback/idempotência, corrida agenda × indisponibilidade e bloqueio de máquina não operacional ou com agenda pendente. A corrida foi exercitada no serviço MariaDB, não por clique simultâneo no navegador.
+- **Teste de regressão:** `python backend/tools/ci.py` — 249 aprovados em MariaDB descartável, incluindo conflito/rollback/idempotência, corrida agenda × indisponibilidade e bloqueio de máquina não operacional ou com agenda pendente. Chrome autenticado criou/editou uma agenda e recebeu erro visível ao tentar horário conflitante; a corrida concorrente foi exercitada no serviço MariaDB, não por clique simultâneo no navegador.
 
 ### H6 — Reconhecimento em vez de memorização
 
@@ -81,7 +81,7 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Problema observado / reprodução:** A Central anterior reservava uma coluna de ajuda estática e grande área de conversa vazia, sem fluxo inicial por tarefa. Severidade observada: **2**.
 - **Correção implementada:** Quatro cards de ação rápida, entrada livre na tela inicial e ações contextuais; Dashboard traz atalho de criação de OS; filtros e busca permanecem disponíveis nas listas.
 - **Resultado:** A tarefa de agendar foi concluída com duas mensagens e confirmação, sem navegar entre telas para escolher recurso. OS e agenda persistiram em uma confirmação.
-- **Teste de regressão:** Chrome autenticado registrou conversa de contexto, proposta, confirmação e links; teste backend cobre repetição/idempotência. Não houve teste com usuário representativo.
+- **Teste de regressão:** Chrome autenticado registrou conversa de contexto, proposta, confirmação e links; criação manual de ativos/OS e agenda foi concluída com menos navegação. Backend cobre repetição/idempotência. Não houve teste com usuário representativo.
 
 ### H8 — Estética e design minimalista
 
@@ -97,7 +97,7 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Problema observado / reprodução:** A mensagem de confirmação anterior dizia apenas para conferir os dados e tentar de novo, sem orientar o usuário a verificar possível persistência após falha de resposta. Severidade observada: **2**.
 - **Correção implementada:** Mensagem de falha de confirmação agora orienta conferir Ordens de serviço e Calendário antes de tentar de novo e explica que repetição da confirmação retorna o mesmo resultado se já persistiu. Outras mensagens do login e da Central dão ação de recuperação.
 - **Resultado:** A interface não afirma rollback quando não sabe o resultado da rede. Nenhum erro foi simulado no navegador nesta rodada.
-- **Teste de regressão:** Idempotência e rollback demonstrados na suíte backend; revisão textual do tratamento de erro. Teste de falha de conexão em navegador permanece pendente.
+- **Teste de regressão:** Conflito de agenda no Chrome exibiu mensagem para o usuário; idempotência e rollback demonstrados na suíte backend; revisão textual do tratamento de erro. Falha de conexão em navegador permanece pendente.
 
 ### H10 — Ajuda e documentação
 
