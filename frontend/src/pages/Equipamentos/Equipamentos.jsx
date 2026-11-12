@@ -391,6 +391,7 @@ function Equipamentos() {
                     <i className="bi bi-search" />
 
                     <input
+                        aria-label="Buscar equipamento"
                         value={busca}
                         onChange={(event) =>
                             setBusca(
@@ -404,6 +405,7 @@ function Equipamentos() {
 
 
                 <select
+                    aria-label={`${({ TODOS: "Todos os status", DISPONIVEL: "Disponível", EM_USO: "Em uso", MANUTENCAO: "Manutenção", INATIVO: "Inativo" })[status]}, filtro de equipamentos`}
                     value={status}
                     onChange={(event) =>
                         setStatus(
@@ -434,6 +436,7 @@ function Equipamentos() {
 
 
                 <select
+                    aria-label={`${({ ATIVOS: "Ativos", INATIVOS: "Inativos", TODOS: "Todos" })[situacao]}, filtro de situação`}
                     value={situacao}
                     onChange={(event) =>
                         setSituacao(
@@ -458,7 +461,7 @@ function Equipamentos() {
 
 
             {erro && (
-                <div className="equipamentos-error">
+                <div className="equipamentos-error" role="alert">
                     {erro}
                 </div>
             )}
@@ -510,7 +513,7 @@ function Equipamentos() {
 
                 ) : (
 
-                    <div className="equipamentos-table-wrapper">
+                    <div className="equipamentos-table-wrapper" role="region" aria-label="Tabela de equipamentos" tabIndex={0}>
 
                         <table className="equipamentos-table">
 
@@ -522,7 +525,7 @@ function Equipamentos() {
                                     <th>Localização</th>
                                     <th>Status</th>
                                     <th>Situação</th>
-                                    <th />
+                                    <th scope="col">Ações</th>
                                 </tr>
                             </thead>
 

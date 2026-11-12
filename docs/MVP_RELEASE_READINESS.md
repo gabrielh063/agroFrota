@@ -1,10 +1,10 @@
 # Prontidão da release candidate do AgroFrota
 
-Data de registro: 12/11/2026. Classificação após AGRO-FINAL-02: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário e rede/idempotência passaram em navegador contra MariaDB descartável; backend (249), build/lint locais e CI remota passaram. Permanecem bloqueios concretos: segurança de hashes no histórico público sem decisão/mitigação do responsável e acessibilidade sem axe-core/leitor de tela nem matriz integral de contraste. Não foi feito merge nem deploy.
+Data de registro: 12/11/2026. Classificação após AGRO-FINAL-03: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário e rede/idempotência passaram em navegador contra MariaDB descartável; backend (249), build/lint locais e CI remota passaram. Permanecem bloqueios concretos: segurança de hashes no histórico público sem decisão/mitigação do responsável e acessibilidade PARTIAL: axe-core reportou zero violações confirmadas em 27 estados, mas leitor de tela, anúncios dinâmicos da Central e contraste manual completo seguem pendentes. Não foi feito merge nem deploy.
 
 ## Branch e histórico
 
-- Branch local/remota: `release/agrofrota-mvp-final`; head publicado durante esta etapa `5c042c25547f2c221fd6accb435d4051e105f174`. Correções acessíveis de calendário e evidências compõem esse commit; relatório documental de fechamento segue nesta branch.
+- Branch local/remota: `release/agrofrota-mvp-final`; head de entrada desta rodada `49c8fa6b416135ba5e09ec68fa84be0fc36c65a8`; após publicação, atualizar este campo para o head da PR #9.
 - `Main` é a branch padrão confirmada via GitHub. Head #5: `7759213e31666868946ba305b86841274b6a0897`.
 - A cadeia consultada no remoto via `gh`: #5 (base Main), #6 (base #5), #7 (base #6), #8 (base #7). PRs #1–#8 permanecem abertas; a PR final #9 foi aberta para `Main`.
 - Commit da candidata funcional: `1e8bd157a4d808b2e7f8fe01c923760422c4fee1` (`Finalize AgroFrota MVP candidate`). A atualização deste relatório será o head mais recente publicado na PR.
@@ -42,7 +42,7 @@ Data de registro: 12/11/2026. Classificação após AGRO-FINAL-02: **`AGRO_MVP_F
 
 As dez heurísticas estão avaliadas em [`NIELSEN_USABILITY_AUDIT.md`](NIELSEN_USABILITY_AUDIT.md), com observações, severidade, correções, resultados e evidências. As capturas incluem Login, Dashboard, Central inicial/proposta/confirmada, Maquinários, Equipamentos, Ordens de serviço, detalhe e Calendário em desktop; Login, Central inicial e Maquinários em 375×812. O material antes/depois do UI-02 está em `docs/evidence/agro-ui-02/`.
 
-Capturas e inventário foram feitos em 375×812 e 1600×900; a largura também foi previamente verificada em 768×1024 e 1280×800. Os modais agora têm rótulos associados, nome de diálogo, foco inicial, ciclo Tab/Shift+Tab, Escape, restauração do foco e alertas semânticos. Chrome AX tree confirmou diálogo nomeado; amostra de contraste alfa composta mediu mínimo 4,68:1 na Central. Axe-core não está instalado; Orca está instalado, mas não foi iniciado porque não havia processo ativo e isso assumiria a sessão gráfica do operador. A medição de contraste não cobriu todas as páginas/estados. Não declarar conformidade WCAG.
+Capturas e inventário foram feitos em 375×812 e 1600×900; a largura também foi previamente verificada em 768×1024 e 1280×800. Os modais agora têm rótulos associados, nome de diálogo, foco inicial, ciclo Tab/Shift+Tab, Escape, restauração do foco e alertas semânticos. Chrome AX tree confirmou diálogo nomeado; amostra de contraste alfa composta mediu mínimo 4,68:1 na Central. Axe-core 4.14.0 temporário varreu 27 estados sem violações confirmadas. 89 contornos de controles medidos ficaram em pelo menos 3,55:1; casos de contraste incompletos pela ferramenta ainda requerem revisão manual. Orca foi tentado em Xvfb isolado, mas não apresentou janela Chrome acessível; Central dinâmica e leitor de tela permanecem não verificados. Não declarar conformidade WCAG.
 
 ## Problemas corrigidos nesta rodada
 
@@ -57,12 +57,12 @@ Capturas e inventário foram feitos em 375×812 e 1600×900; a largura também f
 ## Pendências para classificação READY
 
 1. O responsável deve classificar os dados do dump público, identificar contas potencialmente reais e forçar redefinição/rotação quando aplicável; avaliar reutilização com os titulares sem usar os hashes como prova de inexistência de reutilização. Não reescrever histórico remoto automaticamente.
-2. Completar auditoria instrumental de contraste em todas as páginas/estados, executar axe-core quando disponível e testar leitor de tela em ambiente isolado.
+2. Concluir manualmente os casos de contraste marcados incompletos pelo axe; validar carregamento/erro dinâmicos da Central e repetir teste com leitor de tela em sessão isolada funcional.
 3. Publicar esta atualização e aguardar CI remota verde no novo head da PR #9.
 
 ## Estado do gate e classificação
 
-Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário, rede/idempotência, suíte backend, build/lint locais e CI remota em `5c042c2` passaram. A acessibilidade geral permanece parcial. A segurança histórica está bloqueada porque há hashes de senha potencialmente reais em histórico de repositório público sem classificação/mitigação do responsável. Não aprovar merge até esses bloqueios serem resolvidos.
+Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. A acessibilidade está PARTIAL conforme evidência AGRO-FINAL-03. A segurança histórica permanece bloqueada porque há hashes de senha potencialmente reais em histórico de repositório público sem classificação/mitigação do responsável. A PR #9 não deve ser aprovada para merge até a decisão/mitigação histórica e a cobertura residual de acessibilidade. Ver atualização AGRO-FINAL-03 abaixo.
 
 ## Inicialização e encerramento
 
@@ -71,3 +71,14 @@ Na raiz do repositório, rode `python iniciar_agrofrota.py`. As credenciais alea
 ## Limitações acadêmicas
 
 Assistente usa parser determinístico nas operações e Ollama local para orientação documental; não é um planejador autônomo. Não existe métrica real de uso/conclusão no prazo. Não há homologação de produção, restore, múltiplos workers nem segurança operacional de infraestrutura pública. O calendário usa lock transacional compartilhado e tem testes concorrentes, mas não oferece timezone por empresa nem versão otimista de edição.
+
+
+## Atualização AGRO-FINAL-03 — 12/11/2026
+
+- **Acessibilidade: PARTIAL.** axe-core 4.14.0, servido temporariamente sem alterar dependências do produto, varreu 27 estados reais em Login e páginas autenticadas, desktop 1600×900/mobile 375×812; não encontrou violações confirmadas. Houve 89 medições de bordas de controles, mínimo 3,71:1 contra superfície adjacente e 3,55:1 contra preenchimento. Foco observável: outline sólido 2 px; 9,08:1 contra a superfície escura amostrada. O axe marcou nós de contraste incompletos, que requerem inspeção manual.
+- Teclado no diálogo de calendário: Espaço aciona; foco entra e cicla com Tab/Shift+Tab; Escape fecha e foco retorna ao acionador. Erro de conflito está em `role=alert`; formulário de OS/login foi coberto em estados de validação.
+- Cobertura ainda pendente: estado dinâmico de carregamento/erro da Central por falha de autenticação na automação de interceptação; leitor de tela — Orca com Xvfb inicializou AT-SPI/Chrome, mas nenhuma janela acessível ativa ficou disponível. A sessão desktop do operador não foi tocada. Sem declaração de conformidade/certificação WCAG 2.2 AA.
+- Regressão local após correções: `python backend/tools/ci.py` 249 passed (74 avisos de depreciação); `npm run build` aprovado; `npm run lint` exit 0 com avisos existentes.
+- Na entrada desta rodada, a PR #9 estava aberta no head `49c8fa6b416135ba5e09ec68fa84be0fc36c65a8`, e `backend-mariadb`/`frontend` estavam verdes ([Actions run 43243860436](https://github.com/gabrielh063/agroFrota/actions/runs/43243860436)). A confirmação CI após o novo commit é obrigatória e será registrada no fechamento publicado.
+- O gate de segurança histórica continua independente e bloqueante para classificar o MVP como READY; os dados não foram reproduzidos nem o histórico remoto reescrito.
+- Relatório reproduzível e capturas: [`evidence/final/accessibility/AGRO-FINAL-03-results.md`](evidence/final/accessibility/AGRO-FINAL-03-results.md), screenshots `a11y-*` e [`axe-results.json`](evidence/final/accessibility/axe-results.json).

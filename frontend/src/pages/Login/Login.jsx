@@ -83,7 +83,7 @@ function Login() {
     return (
         <div className="login-page">
 
-            <section className="login-brand">
+            <aside className="login-brand" aria-label="Sobre o AgroFrota">
 
                 <div className="login-logo">
                     <div className="login-logo-icon">
@@ -126,10 +126,10 @@ function Login() {
 
                 <div className="login-glow" />
 
-            </section>
+            </aside>
 
 
-            <section className="login-form-area">
+            <main className="login-form-area">
 
                 <div className="login-form-container">
 
@@ -239,7 +239,7 @@ function Login() {
 
                 </div>
 
-            </section>
+            </main>
 
         </div>
     );

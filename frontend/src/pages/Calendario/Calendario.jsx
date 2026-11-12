@@ -619,6 +619,7 @@ function Calendario() {
 
 
                 <button
+                    type="button"
                     className="calendario-new"
                     onClick={() => {
                         setErroFormulario("");
@@ -634,7 +635,7 @@ function Calendario() {
 
 
             {erro && (
-                <div className="calendario-error">
+                <div className="calendario-error" role="alert">
                     {erro}
                 </div>
             )}
@@ -649,6 +650,8 @@ function Calendario() {
                         <div className="calendar-navigation">
 
                             <button
+                                type="button"
+                                aria-label="Mês anterior"
                                 onClick={
                                     mesAnterior
                                 }
@@ -670,6 +673,8 @@ function Calendario() {
 
 
                             <button
+                                type="button"
+                                aria-label="Próximo mês"
                                 onClick={
                                     proximoMes
                                 }
@@ -694,7 +699,7 @@ function Calendario() {
 
                     {carregando ? (
 
-                        <div className="calendar-loading">
+                        <div className="calendar-loading" role="status" aria-live="polite">
 
                             <div className="spinner-border spinner-border-sm" />
 

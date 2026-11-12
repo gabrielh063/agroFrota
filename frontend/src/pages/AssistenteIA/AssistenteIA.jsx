@@ -147,7 +147,7 @@ export default function AssistenteIA() {
           </button>)}
         </div>
         {erro && <div className="agro-ai-inline-error" role="alert">{erro}</div>}
-        {carregando && <p className="operations-start-loading"><span className="spinner-border spinner-border-sm" aria-hidden="true" /> Preparando a Central…</p>}
+        {carregando && <p className="operations-start-loading" role="status" aria-live="polite"><span className="spinner-border spinner-border-sm" aria-hidden="true" /> Preparando a Central…</p>}
         <form onSubmit={(event) => { event.preventDefault(); enviar(); }} className="agro-ai-form operations-start-form">
           <input aria-label="Descreva o que precisa consultar ou planejar" value={mensagem} onChange={(event) => setMensagem(event.target.value)} maxLength={800} placeholder="Escreva uma solicitação ou escolha uma ação acima…" disabled={carregando} />
           <button type="submit" disabled={!mensagem.trim() || carregando}><i className="bi bi-arrow-up" /><span>Enviar</span></button>
@@ -166,7 +166,7 @@ export default function AssistenteIA() {
               {item.resultado?.agendamento_id && <Link className="agro-ai-result-link" to="/calendario"><i className="bi bi-calendar3" /> Ver calendário</Link>}
             </div>
           ))}
-          {carregando && <p className="agro-ai-loading"><span className="spinner-border spinner-border-sm" aria-hidden="true" /> Processando solicitação…</p>}
+          {carregando && <p className="agro-ai-loading" role="status" aria-live="polite"><span className="spinner-border spinner-border-sm" aria-hidden="true" /> Processando solicitação…</p>}
         </div>
         {proposta && <div className="agro-ai-proposal">
           <div className="agro-ai-proposal-heading"><span className="agro-ai-proposal-icon"><i className={`bi ${agendaExistente ? 'bi-calendar-check' : 'bi-clipboard-check'}`} /></span><span><small>REVISÃO NECESSÁRIA</small><strong>{agendaExistente ? 'Proposta de agendamento' : 'Proposta de ordem de serviço'}</strong></span><em>Não gravada</em></div>

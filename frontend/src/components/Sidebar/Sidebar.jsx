@@ -57,7 +57,7 @@ function Sidebar() {
 
 
     return (
-        <aside className="sidebar">
+        <aside className="sidebar" aria-label="Navegação e sessão">
 
             <div className="sidebar-mobile-bar">
                 <div className="sidebar-mobile-brand">
@@ -88,7 +88,7 @@ function Sidebar() {
             </div>
 
 
-            <nav id="sidebar-navigation" className={`sidebar-nav ${menuAberto ? "sidebar-nav-open" : ""}`}>
+            <nav id="sidebar-navigation" aria-label="Menu principal" className={`sidebar-nav ${menuAberto ? "sidebar-nav-open" : ""}`}>
                 <div className="sidebar-group">
                     <span className="sidebar-section-label">OPERAÇÕES</span>
                     {operacional.map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"} onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}
@@ -130,6 +130,7 @@ function Sidebar() {
 
                 <button
                     className="sidebar-logout"
+                    aria-label="Sair da conta"
                     onClick={handleLogout}
                     type="button"
                 >

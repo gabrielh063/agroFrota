@@ -4,7 +4,7 @@ Data: 12/11/2026. Método: inspeção heurística de telas e fluxos, com screens
 
 ## Escala de severidade
 
-0 — não é um problema; 1 — cosmético; 2 — menor; 3 — grave; 4 — crítico. A coluna “severidade observada” registra o problema antes da correção quando aplicável. Nenhum problema de severidade 3 ou 4 foi observado nos fluxos exercitados ao final desta inspeção. Isso não declara conformidade WCAG: contraste numérico e leitores de tela ainda não foram medidos.
+0 — não é um problema; 1 — cosmético; 2 — menor; 3 — grave; 4 — crítico. A coluna “severidade observada” registra o problema antes da correção quando aplicável. Nenhum problema de severidade 3 ou 4 foi observado nos fluxos exercitados ao final desta inspeção. A rodada AGRO-FINAL-03 mediu contrastes amostrados e executou axe-core; o teste com leitor de tela não foi concluído e isto não declara conformidade WCAG.
 
 ## Capturas examinadas
 
@@ -116,3 +116,14 @@ As imagens de referência anteriores e posteriores do redesign estão em [`evide
 - **Contraste:** amostra composta de 52 textos visíveis na Central, incluindo transparências, teve mínimo medido de 4,68:1 e nenhum resultado amostrado abaixo de 4,5:1. Isso não cobre toda a aplicação, todos os estados, texto grande, foco ou conteúdo dinâmico.
 - **Automação/leitor de tela:** axe-core não está instalado. Orca está disponível no sistema, mas não havia sessão ativa; não foi iniciada para evitar assumir ou alterar a sessão gráfica do operador. A árvore AX do Chrome foi inspecionada. Não houve validação por leitor de tela e não se declara conformidade WCAG 2.2 AA.
 - **Limite de pesquisa:** não houve teste moderado com pessoa usuária representativa.
+
+
+## Fechamento de acessibilidade AGRO-FINAL-03 — 12/11/2026
+
+- axe-core 4.14.0 foi executado temporariamente (fora das dependências do produto) em 27 estados do Login, páginas autenticadas, filtros, erros, formulário, tabela, diálogo, conflito e Central, em 375×812 e 1600×900. Resultado: zero violações confirmadas; as ocorrências de contraste marcadas incompletas pela ferramenta continuam exigindo inspeção manual. Evidência detalhada e JSON reproduzível: [`evidence/final/accessibility/AGRO-FINAL-03-results.md`](evidence/final/accessibility/AGRO-FINAL-03-results.md) e [`axe-results.json`](evidence/final/accessibility/axe-results.json).
+- H1: erros de login/OS e conflito de agenda foram varridos com axe; conflito usa `role=alert`. Carregamentos da Central estão em `role=status`/`aria-live=polite`; o anúncio dinâmico sob interceptação de rede não pôde ser exercitado nesta rodada.
+- H3: acionador do modal funciona com Espaço; foco entra e circula com Tab/Shift+Tab; Escape fecha e foco retorna ao acionador.
+- H5: formulários obrigatórios são rotulados; erros e conflito são anunciados semanticamente; axe não encontrou violações confirmadas nos estados testados.
+- H9: erro de conflito em `role=alert`; tratamento de erro de rede da Central é semanticamente marcado em `role=alert`, porém a resposta dinâmica não foi validada por leitor de tela.
+- Contraste de componente: 89 controles medidos; mínimo 3,71:1 contra superfície adjacente e 3,55:1 contra preenchimento. Foco: outline de 2 px, contraste calculado 9,08:1 contra superfície escura de referência. Axe não reportou violações de contraste confirmadas, mas conservou casos incompletos.
+- Leitor de tela: tentativa com Xvfb + Orca/AT-SPI isolados não encontrou janela Chrome ativa acessível. Display do operador não foi usado. Não houve validação de fala/navegação por leitor de tela e não se declara certificação/conformidade WCAG 2.2 AA. Gate de acessibilidade permanece PARTIAL até cobrir a Central dinâmica, tecnologia assistiva e contrastes incompletos.

@@ -756,7 +756,7 @@ function DetalhesOrdemServico() {
 
             <div className="detalhes-os-grid">
 
-                <main className="detalhes-os-main">
+                <section className="detalhes-os-main" aria-label="Detalhes da ordem de serviço">
 
                     <section className="detalhes-card">
 
@@ -865,10 +865,10 @@ function DetalhesOrdemServico() {
 
                     </section>
 
-                </main>
+                </section>
 
 
-                <aside className="detalhes-os-sidebar">
+                <aside className="detalhes-os-sidebar" aria-label="Ações e informações da OS">
 
                     <section className="detalhes-card">
 
