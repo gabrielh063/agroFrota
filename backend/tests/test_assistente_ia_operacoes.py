@@ -39,6 +39,28 @@ def test_parser_reconhece_solicitacao_nova_de_os_com_agenda():
     assert action["tipo"] == "selecionar_recurso", action
 
 
+def test_rota_conversas_e_preflight_cors_presentes(base_url, auth_headers):
+    origin = Config.CORS_ORIGINS[0]
+    preflight = requests.options(
+        f"{base_url}/api/assistente/conversas",
+        headers={
+            "Origin": origin,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization,content-type",
+        }, timeout=10,
+    )
+    assert preflight.status_code == 200, preflight.text
+    assert preflight.headers.get("Access-Control-Allow-Origin") == origin
+    assert "POST" in preflight.headers.get("Access-Control-Allow-Methods", "").upper()
+
+    response = requests.get(
+        f"{base_url}/api/assistente/conversas", headers=auth_headers, timeout=10,
+    )
+    assert response.status_code == 200, response.text
+    assert response.json().get("success") is True
+    assert isinstance(response.json().get("conversas"), list)
+
+
 def test_memoria_conversa_interpreta_continuacao_e_trator(
     base_url, auth_headers, codigo_unico, cleanup_registros_teste,
 ):

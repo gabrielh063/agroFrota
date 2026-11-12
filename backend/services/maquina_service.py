@@ -5,6 +5,7 @@ from sqlalchemy import select
 from database.session import criar_sessao_tenant
 
 from models.tenant.maquina import Maquina
+from services.operacao_lock import bloquear_operacoes, ha_agendamento_aberto
 
 
 STATUS_VALIDOS = {
@@ -148,6 +149,7 @@ def atualizar_maquina(
         autorizar_ativo(session, contexto, 'MAQUINA_EDITAR', escrita=True)
         if ativo is not None:
             autorizar_ativo(session, contexto, 'MAQUINA_DESATIVAR')
+        bloquear_operacoes(session)
 
         maquina = session.execute(
             select(Maquina).where(
@@ -159,6 +161,13 @@ def atualizar_maquina(
             raise ValueError(
                 "Máquina não encontrada."
             )
+
+        indisponivel = (
+            (ativo is False and maquina.ativo)
+            or (status is not None and status != maquina.status and status != "OPERANDO")
+        )
+        if indisponivel and ha_agendamento_aberto(session, maquina_id=maquina.id):
+            raise ValueError("Reagende ou cancele os serviços pendentes antes de indisponibilizar esta máquina.")
 
         if identificacao is not None:
 

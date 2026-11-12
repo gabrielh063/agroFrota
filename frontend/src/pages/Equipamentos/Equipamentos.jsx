@@ -632,6 +632,10 @@ function Equipamentos() {
 
                                                 <button
                                                     className="equipamento-actions"
+                                                    type="button"
+                                                    aria-label={`Ações de ${equipamento.identificacao}`}
+                                                    aria-haspopup="menu"
+                                                    aria-expanded={menuAberto === equipamento.id}
                                                     onClick={() =>
                                                         setMenuAberto(
                                                             menuAberto
@@ -647,9 +651,11 @@ function Equipamentos() {
 
                                                 {menuAberto === equipamento.id && (
 
-                                                    <div className="equipamento-action-menu">
+                                                    <div className="equipamento-action-menu" role="menu">
 
                                                         <button
+                                                            type="button"
+                                                            role="menuitem"
                                                             onClick={() =>
                                                                 abrirEdicao(
                                                                     equipamento
@@ -663,6 +669,8 @@ function Equipamentos() {
 
 
                                                         <button
+                                                            type="button"
+                                                            role="menuitem"
                                                             className={
                                                                 equipamento.ativo
                                                                     ? "danger"

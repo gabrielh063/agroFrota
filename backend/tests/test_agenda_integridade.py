@@ -4,6 +4,7 @@ from threading import Barrier
 from uuid import uuid4
 
 import pytest
+import requests
 from sqlalchemy import select
 from config import Config
 from database.session import criar_sessao_tenant
@@ -12,6 +13,8 @@ from models.tenant.indisponibilidade import Indisponibilidade
 from models.tenant.maquina import Maquina
 from models.tenant.ordem_servico import OrdemServico
 from services.calendario_service import criar_agendamento, cancelar_agendamento
+from services.indisponibilidade_service import criar_indisponibilidade
+from schemas.indisponibilidade import IndisponibilidadeCriarSchema
 from conftest import DATABASE_NAME, _exigir_ambiente_descartavel
 
 
@@ -71,6 +74,95 @@ def test_concorrencia_duas_conexoes(banco):
     assert sorted(resultados) == ['conflito', 'criado']
     with factory() as s:
         assert len(s.scalars(select(Agendamento).where(Agendamento.ordem_servico_id == ordem)).all()) == 1
+
+
+def test_concorrencia_agendamento_e_indisponibilidade_nao_cria_sobreposicao(banco):
+    factory, (maquina, ordem) = banco
+    inicio = datetime(2034, 1, 1, 8)
+    barreira = Barrier(2, timeout=10)
+
+    def reservar():
+        with factory() as s:
+            barreira.wait()
+            try:
+                criar_agendamento(s, ordem, inicio, inicio + timedelta(hours=2))
+                return "agendamento"
+            except ValueError:
+                s.rollback()
+                return "conflito"
+
+    def bloquear():
+        with factory() as s:
+            barreira.wait()
+            try:
+                criar_indisponibilidade(s, IndisponibilidadeCriarSchema(
+                    maquina_id=maquina, inicio=inicio,
+                    fim=inicio + timedelta(hours=2), motivo="Quebra de teste",
+                    tipo="QUEBRA",
+                ))
+                return "indisponibilidade"
+            except ValueError:
+                s.rollback()
+                return "conflito"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        resultados = list(pool.map(lambda fn: fn(), (reservar, bloquear)))
+
+    assert resultados.count("conflito") == 1
+    assert len(set(resultados) - {"conflito"}) == 1
+    with factory() as s:
+        agendamentos = s.scalars(select(Agendamento).where(
+            Agendamento.ordem_servico_id == ordem,
+        )).all()
+        indisponibilidades = s.scalars(select(Indisponibilidade).where(
+            Indisponibilidade.maquina_id == maquina,
+        )).all()
+        assert len(agendamentos) + len(indisponibilidades) == 1
+
+
+def test_maquina_fora_de_operacao_nao_pode_ser_agendada(banco):
+    factory, (maquina, ordem) = banco
+    with factory() as s:
+        item = s.get(Maquina, maquina)
+        item.status = "MANUTENCAO"
+        s.commit()
+        with pytest.raises(ValueError, match="condição operacional"):
+            criar_agendamento(s, ordem, datetime(2035, 1, 1, 8), datetime(2035, 1, 1, 10))
+        s.rollback()
+        assert s.scalars(select(Agendamento).where(Agendamento.ordem_servico_id == ordem)).all() == []
+
+
+def test_recurso_com_agenda_pendente_nao_pode_ser_indisponibilizado(
+    base_url, auth_headers, codigo_unico, cleanup_registros_teste,
+):
+    machine = requests.post(f"{base_url}/api/maquinas/", headers=auth_headers,
+        json={"identificacao": f"LOCK-{codigo_unico}", "modelo": "Trator teste",
+              "fabricante": "Fabricante", "categoria": "TRATOR", "status": "OPERANDO"}, timeout=10)
+    assert machine.status_code == 201, machine.text
+    machine_id = machine.json()["data"]["id"]
+    cleanup_registros_teste("maquinas", machine_id)
+
+    order = requests.post(f"{base_url}/api/ordens-servico/", headers=auth_headers,
+        json={"tipo": "SERVICO", "titulo": "OS com agenda", "maquina_id": machine_id}, timeout=10)
+    assert order.status_code == 201, order.text
+    order_id = order.json()["ordem_servico"]["id"]
+    cleanup_registros_teste("ordens_servico", order_id)
+
+    start = "2036-01-01T08:00:00"
+    appointment = requests.post(f"{base_url}/api/calendario/", headers=auth_headers,
+        json={"ordem_servico_id": order_id, "inicio": start, "fim": "2036-01-01T10:00:00"}, timeout=10)
+    assert appointment.status_code == 201, appointment.text
+    cleanup_registros_teste("agendamentos", appointment.json()["agendamento"]["id"])
+
+    update = requests.put(f"{base_url}/api/maquinas/{machine_id}", headers=auth_headers,
+        json={"status": "MANUTENCAO"}, timeout=10)
+    assert update.status_code == 400, update.text
+    assert "Reagende ou cancele" in update.json()["message"]
+
+    close = requests.patch(f"{base_url}/api/ordens-servico/{order_id}/cancelar",
+        headers=auth_headers, timeout=10)
+    assert close.status_code == 400, close.text
+    assert "agendamentos pendentes" in close.json()["erro"]
 
 
 def test_concorrencia_ordens_distintas_mesma_maquina(banco):

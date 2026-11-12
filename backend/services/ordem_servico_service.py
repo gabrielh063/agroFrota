@@ -11,6 +11,7 @@ from models.tenant.usuario import Usuario
 from models.tenant.maquina import Maquina
 from models.tenant.equipamento import Equipamento
 from services.operacao_lock import bloquear_operacoes
+from services.operacao_lock import ha_agendamento_aberto
 
 
 TIPOS_OS = {
@@ -332,6 +333,9 @@ def atualizar_ordem_servico(
                 "Ordem de serviço não encontrada."
             )
 
+        if status in {"CONCLUIDA", "CANCELADA"} and ha_agendamento_aberto(session, ordem_id=ordem.id):
+            raise ValueError("Conclua ou cancele os agendamentos pendentes antes de encerrar esta OS.")
+
 
         if ordem.status in {
             "CONCLUIDA",
@@ -432,6 +436,10 @@ def atualizar_ordem_servico(
                 is _NAO_INFORMADO
                 else equipamento_id
             )
+
+            if ((maquina_final, equipamento_final) != (ordem.maquina_id, ordem.equipamento_id)
+                    and ha_agendamento_aberto(session, ordem_id=ordem.id)):
+                raise ValueError("Cancele ou reprograme os agendamentos antes de trocar o recurso desta OS.")
 
 
             _validar_relacionamentos(

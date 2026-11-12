@@ -38,7 +38,7 @@ function ActivityChart({ activity }) {
     const temDados = activity.some((item) => item.quantidade > 0);
     return <div className="activity-chart" aria-label="Ordens de serviço criadas por mês">
         {!temDados ? <div className="chart-empty">Sem histórico de ordens de serviço para este período.</div> : <>
-            <div className="bar-grid">{activity.map((item) => <div className="bar-column" key={`${item.ano}-${item.mes}`} title={`${MESES[item.mes - 1]} ${item.ano}: ${item.quantidade} OS`}><div className="bar-track"><span className="activity-bar" style={{ height: `${Math.max(3, item.quantidade / max * 100)}%` }} /></div><small>{MESES[item.mes - 1]}</small></div>)}</div>
+            <div className="bar-grid">{activity.map((item) => <div className="bar-column" key={`${item.ano}-${item.mes}`} title={`${MESES[item.mes - 1]} ${item.ano}: ${item.quantidade} OS`}><div className="bar-track">{item.quantidade > 0 && <><small className="bar-value">{item.quantidade}</small><span className="activity-bar" style={{ height: `${Math.max(3, item.quantidade / max * 100)}%` }} /></>}</div><small className="bar-month">{MESES[item.mes - 1]}</small></div>)}</div>
             <div className="chart-footnote">Ordens de serviço registradas por mês <b>{activity.reduce((sum, item) => sum + item.quantidade, 0)} no período</b></div>
         </>}
     </div>;
@@ -95,8 +95,15 @@ export default function Home() {
     const dataHoje = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
     return <div className="home-page">
-        <div className="home-topline"><span>Operações <i>/</i> <b>Visão geral</b></span><div><time>{dataHoje}</time>{demo && <span className="demo-badge"><i /> DADOS FICTÍCIOS · DEMONSTRAÇÃO</span>}</div></div>
-        <header className="home-header"><div><span className="eyebrow">GESTÃO OPERACIONAL</span><h1>Painel de controle</h1><p>Visão geral da frota, manutenções e ordens de serviço.</p></div><button className="home-new-os" onClick={() => navigate("/ordens-servico/nova")}><i className="bi bi-plus-lg" /> Nova ordem de serviço</button></header>
+        <header className="dashboard-hero">
+            <div className="dashboard-hero-copy">
+                <span className="eyebrow"><i className="bi bi-grid-1x2" /> GESTÃO OPERACIONAL</span>
+                <h1>Visão geral da frota</h1>
+                <p>Indicadores, serviços e disponibilidade em um só lugar.</p>
+                <div className="dashboard-hero-meta"><span><i className="bi bi-calendar3" />{dataHoje}</span>{demo && <span className="demo-badge"><i /> Dados demonstrativos</span>}</div>
+            </div>
+            <button className="home-new-os" onClick={() => navigate("/ordens-servico/nova")}><i className="bi bi-plus-lg" /> Nova ordem de serviço</button>
+        </header>
         {carregando ? <section className="dashboard-loading"><span className="spinner-border spinner-border-sm" />Carregando indicadores...</section> : erro ? <section className="home-error" role="alert"><i className="bi bi-exclamation-circle" />{erro}<button onClick={carregarDashboard}>Tentar novamente</button></section> : <>
             <section className="dashboard-cards">
                 <DashboardCard titulo="Ativos cadastrados" valor={total} descricao={ativosLabel} icone="bi-truck" />

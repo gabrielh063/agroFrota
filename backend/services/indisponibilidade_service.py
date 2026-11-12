@@ -5,6 +5,9 @@ from models.tenant.indisponibilidade import Indisponibilidade
 from models.tenant.maquina import Maquina
 from models.tenant.equipamento import Equipamento
 from models.tenant.manutencao import Manutencao
+from models.tenant.agendamento import Agendamento
+from models.tenant.ordem_servico import OrdemServico
+from services.os_policy import iniciar_escrita
 
 from schemas.indisponibilidade import (
     IndisponibilidadeCriarSchema,
@@ -85,10 +88,38 @@ def _validar_manutencao(
         )
 
 
+def _validar_sem_agendamento_no_periodo(
+    session: Session,
+    maquina_id: int | None,
+    equipamento_id: int | None,
+    inicio,
+    fim,
+    excluir_id: int | None = None,
+) -> None:
+    recurso = (OrdemServico.maquina_id == maquina_id if maquina_id is not None
+               else OrdemServico.equipamento_id == equipamento_id)
+    consulta = (
+        select(Agendamento.id)
+        .join(OrdemServico, Agendamento.ordem_servico_id == OrdemServico.id)
+        .where(
+            recurso,
+            Agendamento.status != "CANCELADO",
+            Agendamento.inicio < fim if fim is not None else True,
+            Agendamento.fim > inicio,
+        )
+    )
+    if excluir_id is not None:
+        consulta = consulta.where(Agendamento.id != excluir_id)
+    if session.execute(consulta.with_for_update()).first() is not None:
+        raise ValueError("Há um agendamento ativo para este recurso no período.")
+
+
 def criar_indisponibilidade(
     session: Session,
     dados: IndisponibilidadeCriarSchema,
 ) -> Indisponibilidade:
+
+    iniciar_escrita(session)
 
     _validar_tipo(dados.tipo)
 
@@ -107,6 +138,11 @@ def criar_indisponibilidade(
         raise ValueError(
             "O fim deve ser posterior ao início."
         )
+
+    _validar_sem_agendamento_no_periodo(
+        session, dados.maquina_id, dados.equipamento_id,
+        dados.inicio, dados.fim,
+    )
 
     registro = Indisponibilidade(
         maquina_id=dados.maquina_id,
@@ -183,6 +219,8 @@ def atualizar_indisponibilidade(
     dados: IndisponibilidadeAtualizarSchema,
 ) -> Indisponibilidade:
 
+    iniciar_escrita(session)
+
     registro = buscar_indisponibilidade(
         session,
         indisponibilidade_id,
@@ -248,6 +286,13 @@ def atualizar_indisponibilidade(
             "O fim deve ser posterior ao início."
         )
 
+    status_final = dados.status if dados.status is not None else registro.status
+    if status_final != "CANCELADA":
+        _validar_sem_agendamento_no_periodo(
+            session, maquina_id, equipamento_id, inicio, fim,
+            excluir_id=registro.id,
+        )
+
     if dados.maquina_id is not None:
         registro.maquina_id = dados.maquina_id
 
@@ -290,6 +335,8 @@ def finalizar_indisponibilidade(
     fim,
 ) -> Indisponibilidade:
 
+    iniciar_escrita(session)
+
     registro = buscar_indisponibilidade(
         session,
         indisponibilidade_id,
@@ -323,6 +370,8 @@ def cancelar_indisponibilidade(
     session: Session,
     indisponibilidade_id: int,
 ) -> Indisponibilidade:
+
+    iniciar_escrita(session)
 
     registro = buscar_indisponibilidade(
         session,

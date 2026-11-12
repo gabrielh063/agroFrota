@@ -5,6 +5,7 @@ from sqlalchemy import select
 from database.session import criar_sessao_tenant
 
 from models.tenant.equipamento import Equipamento
+from services.operacao_lock import bloquear_operacoes, ha_agendamento_aberto
 
 
 STATUS_VALIDOS = {
@@ -143,6 +144,7 @@ def atualizar_equipamento(
         autorizar_ativo(session, contexto, 'EQUIPAMENTO_EDITAR', escrita=True)
         if ativo is not None:
             autorizar_ativo(session, contexto, 'EQUIPAMENTO_DESATIVAR')
+        bloquear_operacoes(session)
 
         equipamento = session.execute(
             select(Equipamento).where(
@@ -154,6 +156,13 @@ def atualizar_equipamento(
             raise ValueError(
                 "Equipamento não encontrado."
             )
+
+        indisponivel = (
+            (ativo is False and equipamento.ativo)
+            or (status is not None and status != equipamento.status and status != "DISPONIVEL")
+        )
+        if indisponivel and ha_agendamento_aberto(session, equipamento_id=equipamento.id):
+            raise ValueError("Reagende ou cancele os serviços pendentes antes de indisponibilizar este equipamento.")
 
         if identificacao is not None:
 

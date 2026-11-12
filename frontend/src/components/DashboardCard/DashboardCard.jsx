@@ -15,26 +15,12 @@ function DashboardCard({
                 dashboard-card-${variante}
             `}
         >
-            <div className="dashboard-card-content">
-
-                <span className="dashboard-card-title">
-                    {titulo}
-                </span>
-
-                <strong className="dashboard-card-value">
-                    {valor}
-                </strong>
-
-                <span className="dashboard-card-description">
-                    {descricao}
-                </span>
-
+            <div className="dashboard-card-head">
+                <span className="dashboard-card-title">{titulo}</span>
+                <span className="dashboard-card-icon" aria-hidden="true"><i className={`bi ${icone}`} /></span>
             </div>
-
-
-            <div className="dashboard-card-icon">
-                <i className={`bi ${icone}`} />
-            </div>
+            <strong className="dashboard-card-value">{valor}</strong>
+            <span className="dashboard-card-description"><i className="bi bi-dot" aria-hidden="true" />{descricao}</span>
 
         </article>
     );

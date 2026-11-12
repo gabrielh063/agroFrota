@@ -39,6 +39,10 @@ def _validar_disponibilidade(session, ordem_id, responsavel_id, inicio, fim, exc
                 raise ValueError("Responsável não encontrado.")
             if recurso is None or not recurso.ativo:
                 raise ValueError("Recurso ou responsável inexistente ou inativo.")
+            if model is Maquina and recurso.status != "OPERANDO":
+                raise ValueError("A máquina não está em condição operacional para agendamento.")
+            if model is Equipamento and recurso.status != "DISPONIVEL":
+                raise ValueError("O equipamento não está disponível para agendamento.")
     recurso_os = (OrdemServico.maquina_id == ordem.maquina_id if ordem.maquina_id is not None
                   else OrdemServico.equipamento_id == ordem.equipamento_id)
     condicoes = [recurso_os]
@@ -125,6 +129,7 @@ def atualizar_agendamento(
     status=_NAO_INFORMADO,
     observacoes=_NAO_INFORMADO,
 ):
+    iniciar_escrita(session)
     agendamento = buscar_agendamento(
         session,
         agendamento_id
@@ -252,6 +257,7 @@ def atualizar_agendamento(
     return agendamento
 
 def cancelar_agendamento(session, agendamento_id: int):
+    iniciar_escrita(session)
     agendamento = buscar_agendamento(
         session,
         agendamento_id
