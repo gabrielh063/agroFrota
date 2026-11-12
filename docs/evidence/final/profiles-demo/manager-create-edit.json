@@ -1,0 +1,8 @@
+{
+  "createViaUi": true,
+  "editViaUi": true,
+  "editReadback": true,
+  "initialUsers": 7,
+  "usersAfterCreate": 8,
+  "credentialsIncluded": false
+}

@@ -72,6 +72,17 @@ Na raiz do repositório, rode `python iniciar_agrofrota.py`. As credenciais alea
 
 Assistente usa parser determinístico nas operações e Ollama local para orientação documental; não é um planejador autônomo. Não existe métrica real de uso/conclusão no prazo. Não há homologação de produção, restore, múltiplos workers nem segurança operacional de infraestrutura pública. O calendário usa lock transacional compartilhado e tem testes concorrentes, mas não oferece timezone por empresa nem versão otimista de edição.
 
+## Complemento AGRO-FINAL-05 — perfis de demonstração
+
+O gate de apresentação de perfis foi concluído no incremento desta branch. Consulte [`DEMO_PERFIS.md`](DEMO_PERFIS.md) para a matriz observável, os fluxos por perfil e o índice de evidências.
+
+- `iniciar_agrofrota.py` provisiona sete contas no tenant MariaDB temporário próprio do inicializador. Senhas únicas aleatórias são impressas no terminal privado; o payload de credenciais é passado somente ao subprocesso de seed, e o estado temporário fica em arquivo `0600` até o encerramento. Nenhuma senha foi incluída no repositório ou nas capturas.
+- A tela **Equipe e Permissões** permite consulta de usuários/perfis/permissões efetivas e criação/edição condicionada à matriz. A UI consulta `/api/auth/me`, filtra menus e ações e informa recusa em rota direta; a API mantém a autorização final.
+- Homologação Chrome: 7/7 logins; diferenças de navegação/ações comprovadas para Gerente, Gestor, Operador, Manutenção e Auditor; Auditor não acessa por URL direta a criação de OS. Gerente criou e editou uma conta fictícia pela UI com readback.
+- Regressão backend: `python backend/tools/ci.py` — **250 aprovados**, 74 avisos de depreciação. O teste `backend/tests/test_demo_perfis.py` inclui matriz de HTTP permitidos/negados, escopo próprio/atribuído, edição administrativa, evento de auditoria, revogação de sessão após troca de perfil e novo login com perfil atualizado. Isolamento entre tenants é coberto também por `backend/tests/test_multitenant.py`.
+- Evidências: `docs/evidence/final/profiles-demo/` (`api-results.json`, `browser-profiles.json`, `manager-create-edit.json` e screenshots reais). Build e lint passaram localmente; lint mantém avisos de hooks existentes e um aviso da nova tela sobre carregamento por efeito. CI remota do HEAD publicado ainda será verificada após o commit normal.
+- Este incremento não modifica a decisão/documentação de segurança histórica nem fecha a acessibilidade pendente. A classificação geral permanece **`AGRO_MVP_FINAL_PARTIAL`**; nenhuma certificação WCAG 2.2 AA é declarada e não há merge.
+
 
 ## Atualização AGRO-FINAL-03 — 12/11/2026
 

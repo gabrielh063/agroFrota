@@ -224,7 +224,8 @@ def usuario_atual(**kwargs):
         "data": {
             "usuario": {"id": usuario.id, "nome": usuario.nome,
                         "username": usuario.username, "email": usuario.email,
-                        "perfil_id": usuario.perfil_id, "cargo_id": usuario.cargo_id},
+                        "perfil_id": usuario.perfil_id, "perfil_nome": usuario.perfil.nome,
+                        "cargo_id": usuario.cargo_id},
             "tenant": {"id": kwargs["tenant"].id, "nome": kwargs["tenant"].nome},
             "permissoes": sorted(p.codigo for p in usuario.perfil.permissoes),
         },

@@ -31,6 +31,7 @@ import {
  * utilizado na criação da OS.
  */
 import "../NovaOrdemServico/NovaOrdemServico.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function dataParaInput(valor) {
@@ -54,6 +55,8 @@ function dataParaInput(valor) {
 function EditarOrdemServico() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
+    const podeAtribuirUsuarios = pode("USUARIO_VISUALIZAR");
 
     const {
         id,
@@ -114,9 +117,7 @@ function EditarOrdemServico() {
                     incluirInativos: true,
                 }),
 
-                listarUsuarios({
-                    apenasAtivos: false,
-                }),
+                podeAtribuirUsuarios ? listarUsuarios({ apenasAtivos: false }) : Promise.resolve({ data: [] }),
             ]);
 
 
@@ -410,7 +411,7 @@ function EditarOrdemServico() {
     ) {
         event.preventDefault();
 
-        if (!form.ativoId) {
+        if (podeAtribuirUsuarios && !form.ativoId) {
             setErro(
                 "Selecione uma máquina ou equipamento."
             );
@@ -477,6 +478,7 @@ function EditarOrdemServico() {
          * ATIVO
          */
 
+        if (podeAtribuirUsuarios) {
         const tipoAtivoOriginal =
             ordem.maquina_id
                 ? "MAQUINA"
@@ -569,6 +571,7 @@ function EditarOrdemServico() {
         ) {
             dados.responsavel_id =
                 responsavelNovo;
+        }
         }
 
 
@@ -923,7 +926,7 @@ function EditarOrdemServico() {
                 </section>
 
 
-                <section className="nova-os-card">
+                {podeAtribuirUsuarios && <section className="nova-os-card">
 
                     <div className="nova-os-card-header">
 
@@ -1046,7 +1049,7 @@ function EditarOrdemServico() {
 
                     </div>
 
-                </section>
+                </section>}
 
 
                 <section className="nova-os-card">
@@ -1071,7 +1074,7 @@ function EditarOrdemServico() {
 
                         <div className="nova-os-grid">
 
-                            <div className="nova-os-field">
+                            {podeAtribuirUsuarios && <div className="nova-os-field">
 
                                 <label htmlFor="editar-operador">
                                     Operador
@@ -1120,10 +1123,10 @@ function EditarOrdemServico() {
 
                                 </select>
 
-                            </div>
+                            </div>}
 
 
-                            <div className="nova-os-field">
+                            {podeAtribuirUsuarios && <div className="nova-os-field">
 
                                 <label htmlFor="editar-responsavel">
                                     Responsável
@@ -1172,7 +1175,7 @@ function EditarOrdemServico() {
 
                                 </select>
 
-                            </div>
+                            </div>}
 
 
                             <div className="nova-os-field full">

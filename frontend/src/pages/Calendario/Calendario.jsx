@@ -30,6 +30,7 @@ import AgendamentoDetalhesModal
     from "../../components/AgendamentoDetalhesModal/AgendamentoDetalhesModal";
 
 import "./Calendario.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const MESES = [
@@ -62,6 +63,8 @@ const DIAS_SEMANA = [
 function Calendario() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
+    const podeVerUsuarios = pode("USUARIO_VISUALIZAR");
 
     const hoje =
         new Date();
@@ -138,9 +141,7 @@ function Calendario() {
 
                 listarOrdensServico(),
 
-                listarUsuarios({
-                    apenasAtivos: false,
-                }),
+                podeVerUsuarios ? listarUsuarios({ apenasAtivos: false }) : Promise.resolve({ data: [] }),
             ]);
 
 
@@ -618,7 +619,7 @@ function Calendario() {
                 </div>
 
 
-                <button
+                {pode("OS.EDITAR") && <button
                     type="button"
                     className="calendario-new"
                     onClick={() => {
@@ -629,7 +630,7 @@ function Calendario() {
                     <i className="bi bi-plus-lg" />
 
                     Agendar serviço
-                </button>
+                </button>}
 
             </header>
 
@@ -978,6 +979,8 @@ function Calendario() {
 
 
             <AgendamentoDetalhesModal
+                podeEditar={pode("OS.EDITAR")}
+                podeCancelar={pode("OS.CANCELAR")}
                 aberto={
                     Boolean(
                         agendamentoSelecionado

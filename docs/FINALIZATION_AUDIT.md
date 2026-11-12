@@ -56,3 +56,13 @@ Foram percorridas no Chrome as transições requeridas de OS/agenda, erro de con
 ## Estado do gate
 
 Classificação final desta etapa: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário, rede/idempotência e CI (local e remota) passaram. Acessibilidade geral ainda é parcial; segurança histórica está bloqueada até decisão/mitigação do responsável. Nenhum merge foi feito. Ver `MVP_RELEASE_READINESS.md`.
+
+## Complemento AGRO-FINAL-05 — apresentação de perfis
+
+O incremento de perfis adiciona provisionamento somente no tenant descartável do inicializador, a página administrativa **Equipe e Permissões** e menus/ações condicionados a `/api/auth/me`. Não altera `MATRIZ`, políticas de escopo ou privilégios do backend. Senhas de demonstração são únicas por inicialização, ficam em estado temporário `0600`, são passadas ao subprocesso seed e são mostradas somente no terminal do launcher; não há senha em arquivo versionado ou captura.
+
+Chrome real/headless validou 7/7 logins, rótulos de perfil, navegação/ações diferentes, escopo de OS atribuídas para Manutenção e Operador e bloqueio da URL de criação ao Auditor. A tela do Gerente criou e editou uma conta fictícia, com readback. Evidências sem credenciais em `docs/evidence/final/profiles-demo/`; matriz e passos em `docs/DEMO_PERFIS.md`.
+
+O teste de integração `backend/tests/test_demo_perfis.py` cobre as respostas autorizadas/negadas dos sete perfis, OS próprias/atribuídas, escrita de máquina, escrita administrativa, auditoria, revogação após alteração de perfil e reautenticação com permissões atuais. A suíte completa fechou com **250 aprovados**; build aprovado e lint sem erros. A suíte também inclui os testes de isolamento tenant `test_multitenant.py`.
+
+Este adendo não reclassifica acessibilidade nem a análise de segurança do dump histórico. Ambas permanecem independentes conforme a documentação de prontidão; o MVP segue **`AGRO_MVP_FINAL_PARTIAL`**. A checagem remota da PR #9 será confirmada no HEAD publicado desta atualização. Não houve merge, force-push ou reescrita de histórico.

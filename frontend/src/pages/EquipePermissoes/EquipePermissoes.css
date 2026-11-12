@@ -1,0 +1,37 @@
+.team-page { max-width: 1180px; margin: 0 auto; color: var(--text-primary); }
+.team-header { margin-bottom: 22px; padding: 26px 28px; border: 1px solid var(--border-subtle); border-radius: 16px; background: radial-gradient(ellipse at 90% 0, rgb(86 183 110 / 12%), transparent 42%), var(--bg-sidebar); }
+.team-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--accent-hover); font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+.team-header h1 { margin: 11px 0 4px; font-size: clamp(26px, 4vw, 34px); }
+.team-header > p { max-width: 700px; margin: 0; color: var(--text-secondary); }
+.team-current-role { display: inline-flex; gap: 5px; margin-top: 16px; padding: 6px 10px; border: 1px solid var(--border-default); border-radius: 999px; color: var(--text-secondary); font-size: 12px; }
+.team-current-role strong { color: var(--text-primary); }
+.team-form-card, .team-list-card { margin-top: 16px; padding: 22px; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--bg-card); }
+.team-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.team-section-heading h2 { margin: 0; font-size: 18px; }
+.team-section-heading p { margin: 3px 0 0; color: var(--text-muted); font-size: 12px; }
+.team-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.team-form label { display: flex; min-width: 0; flex-direction: column; gap: 6px; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.team-form input, .team-form select { min-height: 42px; width: 100%; padding: 8px 11px; border: 1px solid #607965; border-radius: 8px; background: #0c140e; color: var(--text-primary); }
+.team-form small { color: var(--text-muted); font-size: 11px; font-weight: 400; }
+.team-form-actions { display: flex; align-items: end; }
+.team-form-actions button, .team-edit { min-height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: var(--accent-primary); color: #07110a; font-size: 12px; font-weight: 700; }
+.team-form-actions button:disabled { opacity: .55; }
+.team-secondary { min-height: 36px; padding: 0 11px; border: 1px solid var(--border-default); border-radius: 8px; background: transparent; color: var(--text-secondary); font-size: 12px; }
+.team-notice { margin: 12px 0; padding: 11px 14px; border-radius: 8px; font-size: 13px; }
+.team-success { border: 1px solid rgb(86 183 110 / 30%); background: rgb(86 183 110 / 9%); color: #a8e7b4; }
+.team-error { border: 1px solid rgb(219 107 107 / 34%); background: rgb(219 107 107 / 9%); color: #f1b0b0; }
+.team-table-wrap { overflow-x: auto; }
+.team-table { width: 100%; border-collapse: collapse; text-align: left; }
+.team-table th { padding: 10px 12px; border-bottom: 1px solid var(--border-default); color: var(--text-muted); font-size: 10px; letter-spacing: .6px; text-transform: uppercase; }
+.team-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+.team-table td:first-child { min-width: 170px; }
+.team-table td:first-child strong, .team-table td:first-child span { display: block; }
+.team-table td:first-child span { margin-top: 2px; color: var(--text-muted); font-size: 11px; }
+.team-role-chip { display: inline-flex !important; padding: 5px 9px; border: 1px solid rgb(86 183 110 / 20%); border-radius: 999px; background: rgb(86 183 110 / 8%); color: #a8e7b4 !important; font-size: 11px !important; }
+.team-permissions summary { color: var(--accent-hover); cursor: pointer; font-size: 11px; }
+.team-permissions ul { display: flex; max-width: 560px; flex-wrap: wrap; gap: 5px; margin: 9px 0 2px; padding: 0; list-style: none; }
+.team-permissions li { padding: 3px 7px; border: 1px solid var(--border-default); border-radius: 5px; color: var(--text-secondary); font-family: var(--font-mono); font-size: 10px; }
+.team-muted, .team-empty { color: var(--text-muted); font-size: 12px; }
+.team-empty { padding: 20px 4px; }
+.team-edit { min-height: 32px; background: #203d29; color: #c4edca; }
+@media (max-width: 700px) { .team-header, .team-form-card, .team-list-card { padding: 17px; } .team-form { grid-template-columns: 1fr; } .team-section-heading { align-items: flex-start; } .team-table { min-width: 650px; } }

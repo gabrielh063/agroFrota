@@ -56,6 +56,8 @@ function AgendamentoDetalhesModal({
     onSalvar,
     onCancelar,
     onVerOS,
+    podeEditar = false,
+    podeCancelar = false,
 }) {
     const dialogRef = useRef(null);
     const closeRef = useRef(onClose);
@@ -499,9 +501,9 @@ function AgendamentoDetalhesModal({
                             </button>
 
 
-                            {!finalizado && (
+                            {!finalizado && (podeEditar || podeCancelar) && (
                                 <>
-                                    <button
+                                    {podeEditar && <button
                                         type="button"
                                         className="agd-edit"
                                         onClick={() =>
@@ -513,10 +515,10 @@ function AgendamentoDetalhesModal({
                                         <i className="bi bi-pencil" />
 
                                         Editar
-                                    </button>
+                                    </button>}
 
 
-                                    <button
+                                    {podeCancelar && <button
                                         type="button"
                                         className="agd-danger"
                                         onClick={onCancelar}
@@ -525,7 +527,7 @@ function AgendamentoDetalhesModal({
                                         <i className="bi bi-x-circle" />
 
                                         Cancelar agendamento
-                                    </button>
+                                    </button>}
                                 </>
                             )}
 
@@ -728,7 +730,7 @@ function AgendamentoDetalhesModal({
                             </button>
 
 
-                            <button
+                            {podeEditar && <button
                                 type="submit"
                                 className="agd-save"
                                 disabled={salvando}
@@ -738,7 +740,7 @@ function AgendamentoDetalhesModal({
                                         ? "Salvando..."
                                         : "Salvar alterações"
                                 }
-                            </button>
+                            </button>}
 
                         </footer>
 

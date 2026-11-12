@@ -16,9 +16,14 @@ import EquipamentoFormModal
     from "../../components/EquipamentoFormModal/EquipamentoFormModal";
 
 import "./Equipamentos.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function Equipamentos() {
+    const { pode } = useAuth();
+    const podeCriar = pode("EQUIPAMENTO_CRIAR");
+    const podeEditar = pode("EQUIPAMENTO_EDITAR");
+    const podeDesativar = pode("EQUIPAMENTO_DESATIVAR");
     const [equipamentos, setEquipamentos] =
         useState([]);
 
@@ -361,14 +366,14 @@ function Equipamentos() {
                 </div>
 
 
-                <button
+                {podeCriar && <button
                     className="equipamentos-new"
                     onClick={abrirCadastro}
                 >
                     <i className="bi bi-plus-lg" />
 
                     Novo equipamento
-                </button>
+                </button>}
 
             </header>
 
@@ -633,7 +638,7 @@ function Equipamentos() {
 
                                             <td className="equipamento-actions-cell">
 
-                                                <button
+                                                {(podeEditar || podeDesativar) && <button
                                                     className="equipamento-actions"
                                                     type="button"
                                                     aria-label={`Ações de ${equipamento.identificacao}`}
@@ -649,14 +654,14 @@ function Equipamentos() {
                                                     }
                                                 >
                                                     <i className="bi bi-three-dots" />
-                                                </button>
+                                                </button>}
 
 
                                                 {menuAberto === equipamento.id && (
 
                                                     <div className="equipamento-action-menu" role="menu">
 
-                                                        <button
+                                                        {podeEditar && <button
                                                             type="button"
                                                             role="menuitem"
                                                             onClick={() =>
@@ -668,10 +673,10 @@ function Equipamentos() {
                                                             <i className="bi bi-pencil" />
 
                                                             Editar
-                                                        </button>
+                                                        </button>}
 
 
-                                                        <button
+                                                        {podeDesativar && <button
                                                             type="button"
                                                             role="menuitem"
                                                             className={
@@ -698,7 +703,7 @@ function Equipamentos() {
                                                                     ? "Desativar"
                                                                     : "Ativar"
                                                             }
-                                                        </button>
+                                                        </button>}
 
                                                     </div>
 

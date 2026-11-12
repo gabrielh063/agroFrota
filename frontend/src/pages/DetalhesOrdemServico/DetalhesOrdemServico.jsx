@@ -28,11 +28,13 @@ import {
 } from "../../api/usuarioService";
 
 import "./DetalhesOrdemServico.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function DetalhesOrdemServico() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
 
     const {
         id,
@@ -988,7 +990,7 @@ function DetalhesOrdemServico() {
 
                     <div className="detalhes-actions-buttons">
 
-                        <button
+                        {pode("OS.EDITAR") && <button
                             type="button"
                             className="os-action-edit"
                             onClick={() =>
@@ -1005,12 +1007,12 @@ function DetalhesOrdemServico() {
                             <i className="bi bi-pencil" />
 
                             Editar
-                        </button>
+                        </button>}
 
                         {
                             ordem.status
                             === "ABERTA"
-                            && (
+                            && pode("OS.EDITAR") && (
                                 <button
                                     type="button"
                                     className="os-action-start"
@@ -1036,7 +1038,7 @@ function DetalhesOrdemServico() {
                         }
 
 
-                        <button
+                        {pode("OS.CONCLUIR") && <button
                             type="button"
                             className="os-action-complete"
                             onClick={
@@ -1056,10 +1058,10 @@ function DetalhesOrdemServico() {
                                     ? "Concluindo..."
                                     : "Concluir"
                             }
-                        </button>
+                        </button>}
 
 
-                        <button
+                        {pode("OS.CANCELAR") && <button
                             type="button"
                             className="os-action-cancel"
                             onClick={
@@ -1079,7 +1081,7 @@ function DetalhesOrdemServico() {
                                     ? "Cancelando..."
                                     : "Cancelar OS"
                             }
-                        </button>
+                        </button>}
 
                     </div>
 

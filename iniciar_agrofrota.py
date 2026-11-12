@@ -41,6 +41,15 @@ CENTRAL_DB = "agrofrota_demo_central"
 TENANT_DB = "agrofrota_demo_tenant"
 LOGIN = "admin_demo"
 PREFIX = "agrofrota-sessao-"
+DEMO_PROFILES = (
+    ("ADMIN_EMPRESA", "Administrador/Gerente", LOGIN),
+    ("DIRETORIA", "Diretoria", "diretoria_demo"),
+    ("GESTOR_FROTA", "Gestor de Frota", "gestor_frota_demo"),
+    ("ADMINISTRATIVO", "Administrativo", "administrativo_demo"),
+    ("MANUTENCAO", "Manutenção", "manutencao_demo"),
+    ("OPERADOR", "Operador", "operador_demo"),
+    ("AUDITOR", "Auditor", "auditor_demo"),
+)
 
 
 def echo(msg=""):
@@ -118,9 +127,13 @@ from models.tenant.equipamento import Equipamento
 from models.tenant.ordem_servico import OrdemServico
 from models.tenant.agendamento import Agendamento
 from models.tenant.operacao_lock import OperacaoLock
+from models.tenant.perfil import Perfil
+from models.tenant.usuario import Usuario
 from services.seed_service import (criar_permissoes_padrao, criar_perfis_padrao,
                                    criar_usuario_gerente_padrao)
+from utils.security import gerar_hash_senha
 import os
+import json
 
 central = os.environ["DB_NAME"]
 tenant = os.environ["AGROFROTA_TENANT_DB"]
@@ -132,6 +145,31 @@ criar_permissoes_padrao(Config, tenant)
 criar_perfis_padrao(Config, tenant)
 criar_usuario_gerente_padrao(Config, tenant, "Administrador Demo",
                             os.environ["AGRO_DEMO_USER"], os.environ["AGRO_DEMO_PASSWORD"])
+
+demo_credentials = json.loads(os.environ["AGRO_DEMO_PROFILE_CREDENTIALS"])
+SessionTenant, _ = criar_sessao_tenant(Config, tenant)
+with SessionTenant.begin() as session:
+    profiles = {profile.nome: profile for profile in session.execute(select(Perfil)).scalars()}
+    demo_user_ids = {}
+    for credential in demo_credentials:
+        profile = profiles.get(credential["profile"])
+        if profile is None or not profile.ativo:
+            raise RuntimeError("Perfil demonstrativo não foi provisionado pelas migrations/seed")
+        if credential["profile"] == "ADMIN_EMPRESA":
+            usuario = session.execute(select(Usuario).where(
+                Usuario.username == credential["username"]
+            )).scalar_one()
+        else:
+            usuario = Usuario(
+                nome=f"Demo — {credential['label']}",
+                username=credential["username"],
+                senha_hash=gerar_hash_senha(credential["password"]),
+                perfil_id=profile.id,
+                ativo=True,
+            )
+            session.add(usuario)
+            session.flush()
+        demo_user_ids[credential["profile"]] = usuario.id
 
 if os.environ.get("AGRO_DEMO_SEED_DATA") == "1":
     SessionTenant, _ = criar_sessao_tenant(Config, tenant)
@@ -155,8 +193,8 @@ if os.environ.get("AGRO_DEMO_SEED_DATA") == "1":
             raise RuntimeError("operacao_lock não inicializado pelas migrations")
         start = lock.proximo_numero_os
         os_rows = [
-            OrdemServico(numero=start, tipo="MANUTENCAO", titulo="Revisão preventiva do trator", descricao="Revisão demonstrativa", maquina_id=m[0].id, prioridade="MEDIA", status="ABERTA", ativo=True),
-            OrdemServico(numero=start + 1, tipo="MANUTENCAO", titulo="Troca de filtros hidráulicos", maquina_id=m[2].id, prioridade="ALTA", status="EM_ANDAMENTO", ativo=True),
+            OrdemServico(numero=start, tipo="MANUTENCAO", titulo="Revisão preventiva do trator", descricao="OS fictícia atribuída à equipe de manutenção", maquina_id=m[0].id, responsavel_id=demo_user_ids["MANUTENCAO"], prioridade="MEDIA", status="ABERTA", ativo=True),
+            OrdemServico(numero=start + 1, tipo="MANUTENCAO", titulo="Troca de filtros hidráulicos", descricao="OS fictícia atribuída ao operador", maquina_id=m[2].id, operador_id=demo_user_ids["OPERADOR"], prioridade="ALTA", status="EM_ANDAMENTO", ativo=True),
             OrdemServico(numero=start + 2, tipo="MANUTENCAO", titulo="Inspeção da colheitadeira", maquina_id=m[3].id, prioridade="URGENTE", status="ABERTA", ativo=True),
             OrdemServico(numero=start + 3, tipo="MANUTENCAO", titulo="Ajuste de grade aradora", equipamento_id=e[0].id, prioridade="MEDIA", status="ABERTA", ativo=True),
             OrdemServico(numero=start + 4, tipo="MANUTENCAO", titulo="Teste elétrico de partida", maquina_id=m[0].id, prioridade="ALTA", status="CONCLUIDA", ativo=True),
@@ -232,6 +270,15 @@ class Session:
             "central_db": CENTRAL_DB,
             "tenant_db": TENANT_DB,
         }
+        self.state["demo_profiles"] = [
+            {
+                "profile": role,
+                "label": label,
+                "username": username,
+                "password": self.state["app_password"] if role == "ADMIN_EMPRESA" else secrets.token_urlsafe(18),
+            }
+            for role, label, username in DEMO_PROFILES
+        ]
         self.state["api_port"] = free_port(avoid={self.state["db_port"]})
         self.state["frontend_port"] = free_port(preferred=5173, avoid={self.state["db_port"], self.state["api_port"]})
         s = self.state
@@ -249,8 +296,6 @@ class Session:
             "AGRO_AI_OLLAMA_URL": "http://127.0.0.1:11434",
             "AGRO_AI_TIMEZONE": "America/Sao_Paulo",
             "AGRO_AI_INDEX_PATH": str(self.dir / "vault.sqlite3"),
-            "AGRO_DEMO_USER": s["app_user"],
-            "AGRO_DEMO_PASSWORD": s["app_password"],
             "AGRO_DEMO_SEED_DATA": "0" if self.sem_dados else "1",
             "VITE_API_URL": f"http://127.0.0.1:{s['api_port']}",
             "VITE_TENANT_DATABASE": TENANT_DB,
@@ -297,7 +342,10 @@ class Session:
             env = dict(self.env, AGROFROTA_TENANT_DB=dbname)
             self.run_logged([sys.executable, "-m", "alembic", "-c", ini, "upgrade", "head"],
                             cwd=BACKEND, env=env)
-        self.run_logged([sys.executable, "-c", SEED_CODE], cwd=BACKEND, env=self.env)
+        seed_env = dict(self.env, AGRO_DEMO_USER=s["app_user"],
+                        AGRO_DEMO_PASSWORD=s["app_password"],
+                        AGRO_DEMO_PROFILE_CREDENTIALS=json.dumps(s["demo_profiles"]))
+        self.run_logged([sys.executable, "-c", SEED_CODE], cwd=BACKEND, env=seed_env)
 
         echo("[3/5] Verificando o Ollama...")
         ollama_up, _ = http_status("http://127.0.0.1:11434/api/tags", timeout=1.2)
@@ -367,8 +415,9 @@ class Session:
         echo(f"  API Flask:      http://127.0.0.1:{s['api_port']}")
         echo(f"  Ollama:         http://127.0.0.1:11434  (modelo: {self.model})")
         echo("-" * 66)
-        echo(f"  Usuário LOGIN:  {s['app_user']}")
-        echo(f"  Senha LOGIN:    {s['app_password']}")
+        echo("  CONTAS TEMPORÁRIAS DE DEMONSTRAÇÃO (credenciais válidas somente nesta sessão):")
+        for profile in s["demo_profiles"]:
+            echo(f"  {profile['label']:<24} usuário: {profile['username']}  senha: {profile['password']}")
         echo(f"  Empresa/tenant: {s['tenant_db']}")
         echo("-" * 66)
         echo(f"  Banco central:  {s['central_db']}")

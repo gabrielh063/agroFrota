@@ -6,6 +6,7 @@ import { listarMaquinas } from "../../api/maquinaService";
 import { listarEquipamentos } from "../../api/equipamentoService";
 import { listarAgendamentos } from "../../api/calendarioService";
 import DashboardCard from "../../components/DashboardCard/DashboardCard";
+import { useAuth } from "../../contexts/AuthContext";
 import "./Home.css";
 
 const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -45,6 +46,7 @@ function ActivityChart({ activity }) {
 }
 
 export default function Home() {
+    const { pode } = useAuth();
     const navigate = useNavigate();
     const [capacidade, setCapacidade] = useState(null);
     const [ordens, setOrdens] = useState([]);
@@ -102,7 +104,7 @@ export default function Home() {
                 <p>Indicadores, serviços e disponibilidade em um só lugar.</p>
                 <div className="dashboard-hero-meta"><span><i className="bi bi-calendar3" />{dataHoje}</span>{demo && <span className="demo-badge"><i /> Dados demonstrativos</span>}</div>
             </div>
-            <button className="home-new-os" onClick={() => navigate("/ordens-servico/nova")}><i className="bi bi-plus-lg" /> Nova ordem de serviço</button>
+            {pode("OS.CRIAR") && <button className="home-new-os" onClick={() => navigate("/ordens-servico/nova")}><i className="bi bi-plus-lg" /> Nova ordem de serviço</button>}
         </header>
         {carregando ? <section className="dashboard-loading"><span className="spinner-border spinner-border-sm" />Carregando indicadores...</section> : erro ? <section className="home-error" role="alert"><i className="bi bi-exclamation-circle" />{erro}<button onClick={carregarDashboard}>Tentar novamente</button></section> : <>
             <section className="dashboard-cards">

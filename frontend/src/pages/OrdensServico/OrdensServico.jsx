@@ -22,6 +22,7 @@ import {
 } from "../../api/equipamentoService";
 
 import "./OrdensServico.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const STATUS_FINAIS = [
@@ -33,6 +34,7 @@ const STATUS_FINAIS = [
 function OrdensServico() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
 
     const [ordens, setOrdens] =
         useState([]);
@@ -381,7 +383,7 @@ function OrdensServico() {
                 </div>
 
 
-                <button
+                {pode("OS.CRIAR") && <button
                     className="os-new"
                     type="button"
                     onClick={() =>
@@ -393,7 +395,7 @@ function OrdensServico() {
                     <i className="bi bi-plus-lg" />
 
                     Nova OS
-                </button>
+                </button>}
 
             </header>
 

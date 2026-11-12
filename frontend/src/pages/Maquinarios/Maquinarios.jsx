@@ -16,9 +16,14 @@ import MaquinaFormModal
     from "../../components/MaquinaFormModal/MaquinaFormModal";
 
 import "./Maquinarios.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function Maquinarios() {
+    const { pode } = useAuth();
+    const podeCriar = pode("MAQUINA_CRIAR");
+    const podeEditar = pode("MAQUINA_EDITAR");
+    const podeDesativar = pode("MAQUINA_DESATIVAR");
     const [maquinas, setMaquinas] =
         useState([]);
 
@@ -386,7 +391,7 @@ function Maquinarios() {
                 </div>
 
 
-                <button
+                {podeCriar && <button
                     className="maquinarios-new"
                     type="button"
                     onClick={abrirCadastro}
@@ -394,7 +399,7 @@ function Maquinarios() {
                     <i className="bi bi-plus-lg" />
 
                     Novo maquinário
-                </button>
+                </button>}
 
             </header>
 
@@ -712,7 +717,7 @@ function Maquinarios() {
 
                                             <td className="actions-cell">
 
-                                                <button
+                                                {(podeEditar || podeDesativar) && <button
                                                     className="maquina-actions"
                                                     type="button"
                                                     aria-label={`Ações de ${maquina.identificacao}`}
@@ -728,7 +733,7 @@ function Maquinarios() {
                                                     }
                                                 >
                                                     <i className="bi bi-three-dots" />
-                                                </button>
+                                                </button>}
 
 
                                                 {
@@ -737,7 +742,7 @@ function Maquinarios() {
                                                     && (
                                                         <div className="maquina-action-menu" role="menu">
 
-                                                            <button
+                                                            {podeEditar && <button
                                                                 type="button"
                                                                 role="menuitem"
                                                                 onClick={() =>
@@ -749,10 +754,10 @@ function Maquinarios() {
                                                                 <i className="bi bi-pencil" />
 
                                                                 Editar
-                                                            </button>
+                                                            </button>}
 
 
-                                                            <button
+                                                            {podeDesativar && <button
                                                                 type="button"
                                                                 role="menuitem"
                                                                 className={
@@ -779,7 +784,7 @@ function Maquinarios() {
                                                                         ? "Desativar"
                                                                         : "Ativar"
                                                                 }
-                                                            </button>
+                                                            </button>}
 
                                                         </div>
                                                     )

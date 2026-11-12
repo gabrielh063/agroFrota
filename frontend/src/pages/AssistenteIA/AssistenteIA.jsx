@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/api';
+import { useAuth } from '../../contexts/AuthContext';
 import './AssistenteIA.css';
 
 const EXEMPLOS = [
@@ -19,12 +20,18 @@ function dataBonita(value) {
 }
 
 export default function AssistenteIA() {
+  const { pode } = useAuth();
   const [mensagem, setMensagem] = useState('');
   const [historico, setHistorico] = useState(BOAS_VINDAS);
   const [proposta, setProposta] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const exemplosVisiveis = EXEMPLOS.filter(({ label }) => {
+    if (label === 'Criar ordem de serviço') return pode('OS.CRIAR');
+    if (label === 'Agendar serviço') return pode('OS.EDITAR');
+    return true;
+  });
 
   async function abrirRecente() {
     setCarregando(true);
@@ -140,7 +147,7 @@ export default function AssistenteIA() {
           <p>Consulte sua frota, organize serviços e acompanhe suas operações.</p>
         </div>
         <div className="operations-task-grid">
-          {EXEMPLOS.map(({ icon, label, description, prompt }) => <button className="operations-task-card" type="button" key={label} onClick={() => enviar(prompt)} disabled={carregando}>
+          {exemplosVisiveis.map(({ icon, label, description, prompt }) => <button className="operations-task-card" type="button" key={label} onClick={() => enviar(prompt)} disabled={carregando}>
             <span className="operations-task-icon"><i className={`bi ${icon}`} /></span>
             <span className="operations-task-copy"><strong>{label}</strong><small>{description}</small></span>
             <i className="bi bi-arrow-up-right operations-task-arrow" aria-hidden="true" />
