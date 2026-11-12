@@ -1,15 +1,15 @@
 # Prontidão da release candidate do AgroFrota
 
-Data de registro: 12/11/2026. Classificação após AGRO-FINAL-02: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário e rede/idempotência passaram em navegador contra MariaDB descartável; backend (249), build e lint locais passaram. Permanecem bloqueios concretos: segurança de hashes no histórico público e decisão/mitigação do responsável; acessibilidade ainda não cobre axe-core/leitor de tela nem a matriz de contraste integral; CI remota do novo head precisa ser observada após o push. Não foi feito merge nem deploy.
+Data de registro: 12/11/2026. Classificação após AGRO-FINAL-02: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário e rede/idempotência passaram em navegador contra MariaDB descartável; backend (249), build/lint locais e CI remota passaram. Permanecem bloqueios concretos: segurança de hashes no histórico público sem decisão/mitigação do responsável e acessibilidade sem axe-core/leitor de tela nem matriz integral de contraste. Não foi feito merge nem deploy.
 
 ## Branch e histórico
 
-- Branch local: `release/agrofrota-mvp-final`; head inicial desta missão `0c22328ceb7901047f39590d8cdaa7f079891170`. Correções acessíveis de calendário e atualização documental compõem o commit final desta etapa.
+- Branch local/remota: `release/agrofrota-mvp-final`; head publicado durante esta etapa `5c042c25547f2c221fd6accb435d4051e105f174`. Correções acessíveis de calendário e evidências compõem esse commit; relatório documental de fechamento segue nesta branch.
 - `Main` é a branch padrão confirmada via GitHub. Head #5: `7759213e31666868946ba305b86841274b6a0897`.
 - A cadeia consultada no remoto via `gh`: #5 (base Main), #6 (base #5), #7 (base #6), #8 (base #7). PRs #1–#8 permanecem abertas; a PR final #9 foi aberta para `Main`.
 - Commit da candidata funcional: `1e8bd157a4d808b2e7f8fe01c923760422c4fee1` (`Finalize AgroFrota MVP candidate`). A atualização deste relatório será o head mais recente publicado na PR.
 - PR final: [#9](https://github.com/gabrielh063/agroFrota/pull/9), `release/agrofrota-mvp-final` → `Main`.
-- Checks remotos em `0c22328ceb7901047f39590d8cdaa7f079891170`: `backend-mariadb` e `frontend` passaram. A atualização desta etapa requer nova execução remota. O PR #9 continua aberto; não integrado em `Main`; nenhum merge foi feito.
+- Checks remotos em `5c042c25547f2c221fd6accb435d4051e105f174`: `backend-mariadb` e `frontend` passaram na execução [43243144116](https://github.com/gabrielh063/agroFrota/actions/runs/43243144116). O PR #9 continua aberto; não integrado em `Main`; nenhum merge foi feito.
 
 ## Verificações executadas
 
@@ -25,7 +25,7 @@ Data de registro: 12/11/2026. Classificação após AGRO-FINAL-02: **`AGRO_MVP_F
 | Ollama real | **Disponível**; servidor local tinha `llama3.2:3b`, `llama3.1:8b`, `qwen3:1.7b` entre modelos listados. Não foi feita inferência de conhecimento nesta homologação; fluxo operacional é determinístico | `GET /api/tags` em loopback |
 | Rede/idempotência | **Passou**: offline antes do envio recuperou a proposta; resposta POST 200 foi retida após o commit; timeout real de 30 s; reload/replay e clique duplo sem duplicar IDs. | `docs/evidence/final/AGRO-FINAL-02-results.md`, screenshots `gate-confirmation-*`; MariaDB descartável |
 | Frontend build/lint | **Passou**: build concluído; lint exit 0, avisos preexistentes de hooks/efeitos ainda presentes. | Execução local após correções |
-| Checks remotos | `backend-mariadb` e `frontend` passaram no head `0c22328`; **novo head requer CI remota após push**. | PR #9 / GitHub Actions |
+| Checks remotos | **Passou** no head `5c042c2`: `backend-mariadb` e `frontend` verdes. | PR #9 / [GitHub Actions](https://github.com/gabrielh063/agroFrota/actions/runs/43243144116) |
 | Segurança histórica | **Bloqueio**: 6 endereços e 7 hashes scrypt estão no dump removido da árvore atual, alcançável no histórico local do repositório público. Nenhum padrão de chave privada/token conhecido ou alerta GitHub foi encontrado; sinteticidade e uso das contas não podem ser comprovados. | `docs/evidence/final/AGRO-FINAL-02-results.md`; conteúdo não reproduzido |
 
 ## Fluxos homologados
@@ -62,7 +62,7 @@ Capturas e inventário foram feitos em 375×812 e 1600×900; a largura também f
 
 ## Estado do gate e classificação
 
-Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário, rede/idempotência, suíte backend, build e lint locais passaram. A acessibilidade geral e a CI remota do novo head ainda são parciais. A segurança histórica está bloqueada porque há hashes de senha potencialmente reais em histórico de repositório público sem classificação/mitigação do responsável. Não aprovar merge até esses bloqueios serem resolvidos.
+Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. OS, calendário, rede/idempotência, suíte backend, build/lint locais e CI remota em `5c042c2` passaram. A acessibilidade geral permanece parcial. A segurança histórica está bloqueada porque há hashes de senha potencialmente reais em histórico de repositório público sem classificação/mitigação do responsável. Não aprovar merge até esses bloqueios serem resolvidos.
 
 ## Inicialização e encerramento
 

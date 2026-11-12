@@ -42,9 +42,9 @@ Hashes distintos não provam ausência de reutilização de senha, pois hashes s
 
 Decisão necessária do responsável pelo repositório: identificar os titulares/contas afetados, invalidar ou redefinir senhas ainda válidas, apurar reutilização com os titulares por canal seguro e rotacionar outros segredos caso sejam identificados. Nenhuma rotação ou reescrita de histórico remoto foi executada. O gate segue aberto até a decisão e mitigação do responsável; não reproduzir os valores no PR ou nos logs.
 
-## Gate F — CI e release: PARTIAL até CI do head publicado
+## Gate F — CI e release: PASS
 
-No head de entrada `0c22328ceb7901047f39590d8cdaa7f079891170`, os jobs remotos `backend-mariadb` e `frontend` estavam verdes. Localmente, `python backend/tools/ci.py` aprovou 249 testes (74 avisos de depreciação); `npm run build` passou e `npm run lint` terminou com exit 0 e avisos já existentes. A CI precisa ser observada no commit desta finalização antes de considerar o gate remoto aprovado.
+No head `5c042c25547f2c221fd6accb435d4051e105f174`, os jobs remotos `backend-mariadb` e `frontend` passaram na execução [43243144116](https://github.com/gabrielh063/agroFrota/actions/runs/43243144116). Localmente, `python backend/tools/ci.py` aprovou 249 testes (74 avisos de depreciação); `npm run build` passou e `npm run lint` terminou com exit 0 e avisos de lint/deprecation.
 
 Nenhum merge ou deploy foi feito.
 
