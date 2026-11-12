@@ -1,14 +1,15 @@
 # Prontidão da release candidate do AgroFrota
 
-Data de registro: 12/11/2026. Classificação nesta etapa: **`AGRO_MVP_FINAL_PARTIAL`**. Há implementação, suíte backend e build aprovados e uma homologação local real autenticada; ainda faltam checks remotos do head definitivo, PR final publicada, alguns fluxos de erro/conflito via browser e fechamento de limitações materiais de agenda. Não foi feito merge nem deploy.
+Data de registro: 12/11/2026. Classificação nesta etapa: **`AGRO_MVP_FINAL_PARTIAL`**. Há implementação, suíte backend e build aprovados e uma homologação local real autenticada; os checks remotos da PR estão em andamento, e fluxos manuais de erro/conflito e a revisão de acessibilidade permanecem parciais. Não foi feito merge nem deploy.
 
 ## Branch e histórico
 
 - Branch local: `release/agrofrota-mvp-final`, derivada do head de #8 `9990955a8bcb5c4487721f2f6f933f555c04dd37` (AGRO-UI-02 estava sem commit no início e agora compõe esta branch local).
 - `Main` é a branch padrão confirmada via GitHub. Head #5: `7759213e31666868946ba305b86841274b6a0897`.
-- A cadeia consultada no remoto via `gh`: #5 (base Main), #6 (base #5), #7 (base #6), #8 (base #7). PRs #1–#8 permanecem abertas na consulta. Não há PR #9.
-- Resultado final local: **ainda não commitado/publicado nesta edição do relatório**. Atualizar este campo depois do commit/push e substituir pelo SHA final.
-- Estado de integração: **não integrado em Main**. Nenhuma branch protection foi contornada; nenhuma PR foi fechada.
+- A cadeia consultada no remoto via `gh`: #5 (base Main), #6 (base #5), #7 (base #6), #8 (base #7). PRs #1–#8 permanecem abertas; a PR final #9 foi aberta para `Main`.
+- Commit da candidata funcional: `1e8bd157a4d808b2e7f8fe01c923760422c4fee1` (`Finalize AgroFrota MVP candidate`). A atualização deste relatório será o head mais recente publicado na PR.
+- PR final: [#9](https://github.com/gabrielh063/agroFrota/pull/9), `release/agrofrota-mvp-final` → `Main`.
+- Estado remoto após abrir a PR: `backend-mariadb` em andamento, `frontend` na fila, decisão de revisão vazia, merge state `UNSTABLE`. Não integrado em `Main`; nenhuma branch protection foi contornada e nenhuma PR anterior foi fechada.
 
 ## Verificações executadas
 
@@ -54,13 +55,13 @@ Capturas mobile foram feitas em 375×812 e desktop em 1600×900. A largura do do
 
 1. Medir contraste, validar todos os fluxos por teclado e testar leitor de tela.
 2. Percorrer cadastro/edição manual de ativos, OS manual e edição/cancelamento de agenda em navegador; simular conflito e erro de rede.
-3. Atualizar CI remota para o head de release e revisar branch protection/review exigida.
-4. Criar commit, publicar `release/agrofrota-mvp-final` e abrir PR final apontada para `Main`; atualizar este documento com SHA, URL e checks.
+3. Aguardar conclusão dos checks remotos da PR #9 e revisar branch protection/review exigida.
+4. Executar os fluxos manuais de navegador pendentes e completar a avaliação de acessibilidade antes de reclassificar a release.
 5. Manter pendência histórica de credenciais/dump como ação do responsável do repositório; nenhuma rotação externa foi realizada nesta missão.
 
 ## Estado do gate e classificação
 
-Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. Implementação local, testes backend, build/lint, inicializador isolado e fluxo autenticado da Central passaram. A release ainda não tem commit/head remoto, checks GitHub ou PR final. Os fluxos manuais de CRUD/agenda no browser e a revisão de acessibilidade ainda estão parciais. Portanto, não está autorizada a integração na branch `Main` pelos gates definidos na missão.
+Classificação: **`AGRO_MVP_FINAL_PARTIAL`**. Implementação local, testes backend, build/lint, inicializador isolado e fluxo autenticado da Central passaram. A PR #9 está publicada e os checks GitHub estavam pendentes na última consulta. Os fluxos manuais de CRUD/agenda no browser e a revisão de acessibilidade ainda estão parciais. Portanto, não está autorizada a integração na branch `Main` pelos gates definidos na missão.
 
 ## Inicialização e encerramento
 
