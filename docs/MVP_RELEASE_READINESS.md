@@ -4,7 +4,7 @@ Data de registro: 12/11/2026. Classificação após AGRO-FINAL-03: **`AGRO_MVP_F
 
 ## Branch e histórico
 
-- Branch local/remota: `release/agrofrota-mvp-final`; head de entrada desta rodada `49c8fa6b416135ba5e09ec68fa84be0fc36c65a8`; após publicação, atualizar este campo para o head da PR #9.
+- Branch local/remota: `release/agrofrota-mvp-final`; HEAD publicado após AGRO-FINAL-03: `2d3c2896d4290eaebca6854134001ceab680d012`.
 - `Main` é a branch padrão confirmada via GitHub. Head #5: `7759213e31666868946ba305b86841274b6a0897`.
 - A cadeia consultada no remoto via `gh`: #5 (base Main), #6 (base #5), #7 (base #6), #8 (base #7). PRs #1–#8 permanecem abertas; a PR final #9 foi aberta para `Main`.
 - Commit da candidata funcional: `1e8bd157a4d808b2e7f8fe01c923760422c4fee1` (`Finalize AgroFrota MVP candidate`). A atualização deste relatório será o head mais recente publicado na PR.
@@ -79,6 +79,6 @@ Assistente usa parser determinístico nas operações e Ollama local para orient
 - Teclado no diálogo de calendário: Espaço aciona; foco entra e cicla com Tab/Shift+Tab; Escape fecha e foco retorna ao acionador. Erro de conflito está em `role=alert`; formulário de OS/login foi coberto em estados de validação.
 - Cobertura ainda pendente: estado dinâmico de carregamento/erro da Central por falha de autenticação na automação de interceptação; leitor de tela — Orca com Xvfb inicializou AT-SPI/Chrome, mas nenhuma janela acessível ativa ficou disponível. A sessão desktop do operador não foi tocada. Sem declaração de conformidade/certificação WCAG 2.2 AA.
 - Regressão local após correções: `python backend/tools/ci.py` 249 passed (74 avisos de depreciação); `npm run build` aprovado; `npm run lint` exit 0 com avisos existentes.
-- Na entrada desta rodada, a PR #9 estava aberta no head `49c8fa6b416135ba5e09ec68fa84be0fc36c65a8`, e `backend-mariadb`/`frontend` estavam verdes ([Actions run 43243860436](https://github.com/gabrielh063/agroFrota/actions/runs/43243860436)). A confirmação CI após o novo commit é obrigatória e será registrada no fechamento publicado.
+- A PR #9 segue aberta no head `2d3c2896d4290eaebca6854134001ceab680d012`; `backend-mariadb` e `frontend` passaram no run [43252716698](https://github.com/gabrielh063/agroFrota/actions/runs/43252716698).
 - O gate de segurança histórica continua independente e bloqueante para classificar o MVP como READY; os dados não foram reproduzidos nem o histórico remoto reescrito.
 - Relatório reproduzível e capturas: [`evidence/final/accessibility/AGRO-FINAL-03-results.md`](evidence/final/accessibility/AGRO-FINAL-03-results.md), screenshots `a11y-*` e [`axe-results.json`](evidence/final/accessibility/axe-results.json).
