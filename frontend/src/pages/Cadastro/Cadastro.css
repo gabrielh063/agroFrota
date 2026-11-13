@@ -29,3 +29,5 @@
 .signup-error { padding: 12px; border: 1px solid #c96e6e; border-radius: 9px; background: rgba(145, 35, 35, .2); color: #ffd0d0; }
 .signup-footer { margin: 24px 0 0; text-align: center; }
 .signup-footer a { color: #b6e7ad; }
+.signup-complete { padding: 16px; border: 1px solid #73b66b; border-radius: 10px; background: rgba(82, 168, 91, .12); }
+.signup-login-link { display: inline-flex; align-items: center; min-height: 44px; color: #b6e7ad; font-weight: 700; }

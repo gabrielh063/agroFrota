@@ -25,6 +25,7 @@ function EquipePermissoes() {
     const [filtroSituacao, setFiltroSituacao] = useState("ativos");
     const [linkConvite, setLinkConvite] = useState("");
     const [copiado, setCopiado] = useState(false);
+    const [erroCopia, setErroCopia] = useState("");
     const [conviteForm, setConviteForm] = useState({ nome: "", email: "", perfil_id: "" });
     const [form, setForm] = useState({ nome: "", username: "", email: "", senha: "", perfil_id: "" });
 
@@ -162,6 +163,19 @@ function EquipePermissoes() {
         } finally { setSalvando(false); }
     }
 
+    async function copiarLinkConvite() {
+        setCopiado(false);
+        setErroCopia("");
+        try {
+            if (!navigator.clipboard?.writeText) throw new Error("Clipboard indisponível");
+            await navigator.clipboard.writeText(linkConvite);
+            setCopiado(true);
+        } catch {
+            document.getElementById("invite-link")?.select();
+            setErroCopia("Não foi possível copiar automaticamente. O link está selecionado para cópia manual.");
+        }
+    }
+
     return (
         <div className="team-page">
             <header className="team-header">
@@ -203,7 +217,7 @@ function EquipePermissoes() {
                         <label>Perfil<select required value={conviteForm.perfil_id} onChange={(event) => setConviteForm({ ...conviteForm, perfil_id: event.target.value })}><option value="">Selecione um perfil</option>{perfisAtivos.map((profile) => <option key={profile.id} value={profile.id}>{nomePerfil(profile.nome)}</option>)}</select></label>
                         <div className="team-form-actions"><button type="submit" disabled={salvando || !conviteForm.perfil_id}>{salvando ? "Emitindo…" : "Emitir convite"}</button></div>
                     </form>
-                    {linkConvite && <div className="team-notice team-success invite-link" role="status"><label htmlFor="invite-link">Link de cadastro (visível somente nesta sessão)</label><input id="invite-link" readOnly value={linkConvite} onFocus={(event) => event.target.select()} /><button type="button" className="team-secondary" onClick={async () => { await navigator.clipboard.writeText(linkConvite); setCopiado(true); }}> {copiado ? "Copiado" : "Copiar link"}</button></div>}
+                    {linkConvite && <div className="team-notice team-success invite-link" role="status"><label htmlFor="invite-link">Link de cadastro (visível somente nesta sessão)</label><input id="invite-link" readOnly value={linkConvite} onFocus={(event) => event.target.select()} /><button type="button" className="team-secondary" onClick={copiarLinkConvite}>{copiado ? "Copiado" : "Copiar link"}</button>{erroCopia && <p role="alert">{erroCopia}</p>}</div>}
                     <div className="team-table-wrap"><table className="team-table"><thead><tr><th scope="col">Convite</th><th scope="col">Situação</th><th scope="col">Expira em</th><th scope="col">Ação</th></tr></thead><tbody>{convites.map((invite) => <tr key={invite.id}><td><strong>{invite.nome}</strong>{invite.email && <span>{invite.email}</span>}</td><td>{invite.status}</td><td>{new Date(`${invite.expira_em}Z`).toLocaleString()}</td><td>{invite.status === "pendente" && <button type="button" className="team-secondary" disabled={salvando} onClick={() => revogarConvite(invite)}>Revogar</button>}</td></tr>)}</tbody></table>{convites.length === 0 && <p className="team-empty">Nenhum convite emitido.</p>}</div>
                 </section>
             )}
