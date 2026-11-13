@@ -8,7 +8,7 @@ Data: 13/11/2026. Estado: **`AGRO_MVP_100_FINAL_REVIEW_READY`** para revisão da
 - HEAD inicial: `7fb0ee1e6eb2f45d5762a65041907c7c496fc995`; coincidiu com a branch remota da PR #13. `origin/Main` confirmado em `892108a3f0b9aebf141030517ef0d3974fed9549`.
 - Alterações locais e arquivos não rastreados de sessões anteriores foram preservados. Não foi necessário criar worktree. Nenhuma alteração foi feita em `Main`.
 - PR #13 continua sendo o destino desta missão. PR #12 permanece independente e não foi alterada. Não houve merge, deploy, reboot ou acesso de escrita ao `techcell`.
-- O checkpoint recuperado era a PR #13 publicada em `7fb0ee1`; o CI remoto conhecido nesse checkpoint estava verde. A CI do HEAD final será registrada após publicação desta branch.
+- O checkpoint recuperado era a PR #13 publicada em `7fb0ee1`. O código e as evidências foram publicados em `3761d9bd03adca7914891a1bb4b71d05111a15a8`; nesse SHA, `backend-mariadb` e `frontend` passaram no run [43491393900](https://github.com/gabrielh063/agroFrota/actions/runs/43491393900). A PR está aberta contra `Main`, sem reviews ou comentários novos.
 
 ## Gates
 
@@ -62,7 +62,8 @@ Data: 13/11/2026. Estado: **`AGRO_MVP_100_FINAL_REVIEW_READY`** para revisão da
 - Chrome 155: 39 verificações; 25 pares de rota/resolução sem overflow, 14 verificações de convite/cadastro/teclado. Foram exercitados link válido, inválido, expirado, revogado, mismatch corrigido, username duplicado, falha de rede, duplo clique, criação, login e reuso bloqueado.
 - axe-core 4.11.0: seis rotas avaliadas (`/login`, `/cadastro`, `/equipe-permissoes`, `/ordens-servico`, `/calendario`, `/assistente`) com WCAG 2.0/2.1 A/AA; **zero violações reportadas**.
 - Scanner estático do histórico: não houve impressão de e-mails, hashes ou linhas SQL. Nenhum teste ou evidência usou credenciais de produção.
-- `git diff --check`: aprovado antes da atualização documental; repetir após o registro final.
+- `git diff --check`: aprovado antes dos commits finais.
+- CI remota PR #13 no SHA de código/evidências `3761d9bd03adca7914891a1bb4b71d05111a15a8`: `backend-mariadb` e `frontend` concluídos com sucesso, run [43491393900](https://github.com/gabrielh063/agroFrota/actions/runs/43491393900). O branch está atualizado; confira no cabeçalho da PR o check do HEAD documental corrente.
 
 ## Operação: revisão, publicação e rollback
 
