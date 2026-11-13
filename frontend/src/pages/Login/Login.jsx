@@ -4,6 +4,7 @@ import {
 
 import {
     useNavigate,
+    useLocation,
 } from "react-router-dom";
 
 import {
@@ -15,6 +16,7 @@ import "./Login.css";
 
 function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const {
         entrar,
@@ -139,8 +141,7 @@ function Login() {
                         </h2>
 
                         <p>
-                            Acesse o painel de gestão
-                            da frota.
+                            {location.state?.mensagem || "Acesse o painel de gestão da frota."}
                         </p>
                     </header>
 

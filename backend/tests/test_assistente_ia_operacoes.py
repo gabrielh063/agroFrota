@@ -1,8 +1,11 @@
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
+import hashlib
 import json
 import os
+import secrets
 from threading import Barrier
+import uuid
 
 import jwt
 import requests
@@ -14,6 +17,10 @@ from services.assistente_conversa_service import iniciar_ou_continuar
 from config import Config
 from database.session import criar_sessao_tenant
 from models.tenant.conversa_assistente import ConversaAssistente
+from models.tenant.proposta_agendamento import PropostaAgendamento
+from models.tenant.perfil import Perfil
+from models.tenant.permissao import Permissao
+from models.tenant.usuario import Usuario
 from sqlalchemy import select
 
 
@@ -237,3 +244,104 @@ def test_falha_de_agenda_reverte_os_e_contador(
     assert failed.status_code == 409, failed.text
     orders = requests.get(f"{base_url}/api/ordens-servico/", headers=auth_headers, timeout=10).json()["ordens_servico"]
     assert not any(item["titulo"] == "Colheita de silagem" and item["maquina_id"] == machine_id for item in orders)
+
+
+def test_cancelamento_da_proposta_na_conversa_persiste_sem_escrita_operacional(
+    base_url, auth_headers, token,
+):
+    claims = jwt.decode(token, options={"verify_signature": False})
+    conversation_id = str(uuid.uuid4())
+    database = os.environ["AGROFROTA_TEST_DATABASE"]
+    tenant_id = int(claims["tenant_id"])
+    user_id = int(claims["sub"])
+    version = int(claims["session_version"])
+    factory, _ = criar_sessao_tenant(Config, database)
+    with factory() as session:
+        proposal = PropostaAgendamento(
+            token_hash=hashlib.sha256(uuid.uuid4().bytes).hexdigest(),
+            tenant_id=tenant_id, database_name=database, usuario_id=user_id,
+            session_version=version, operacao="AGENDAR_OS", dados_json="{}",
+            expira_em=datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=5),
+        )
+        session.add(proposal)
+        session.flush()
+        conversation = ConversaAssistente(
+            id=conversation_id, tenant_id=tenant_id, database_name=database,
+            usuario_id=user_id, session_version=version,
+            estado_json=json.dumps({"estado_proposta": "AGUARDANDO_CONFIRMACAO",
+                                    "proposta_id": proposal.id,
+                                    "operacao": "AGENDAR_OS"}),
+            mensagens_json="[]", expira_em=datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1),
+        )
+        session.add(conversation)
+        session.commit()
+        proposal_id = proposal.id
+
+    cancelled = requests.post(f"{base_url}/api/assistente/mensagem", headers=auth_headers,
+        json={"conversation_id": conversation_id, "mensagem": "Cancele a proposta."}, timeout=10)
+    assert cancelled.status_code == 200, cancelled.text
+    assert cancelled.json()["proposta"] is None
+    assert "Cancelei a proposta" in cancelled.json()["resposta"]
+    with factory() as session:
+        stored_proposal = session.get(PropostaAgendamento, proposal_id)
+        stored_conversation = session.get(ConversaAssistente, conversation_id)
+        assert stored_proposal.consumida_em is not None
+        assert json.loads(stored_conversation.estado_json) == {}
+
+
+def test_conversa_de_outro_tenant_nao_pode_ser_lida(base_url, auth_headers):
+    created = requests.post(f"{base_url}/api/assistente/conversas", headers=auth_headers, timeout=10)
+    assert created.status_code == 201, created.text
+    other_login = requests.post(f"{base_url}/api/auth/login", json={
+        "username": os.environ["AGROFROTA_TEST_USERNAME_B"],
+        "senha": os.environ["AGROFROTA_TEST_PASSWORD_B"],
+        "database_name": os.environ["AGROFROTA_TEST_DATABASE_B"],
+    }, timeout=10)
+    assert other_login.status_code == 200
+    other_headers = {"Authorization": f"Bearer {other_login.json()['data']['access_token']}"}
+    response = requests.get(
+        f"{base_url}/api/assistente/conversas/{created.json()['conversation_id']}",
+        headers=other_headers, timeout=10,
+    )
+    assert response.status_code == 404
+    assert "historico" not in response.json()
+
+
+def test_perfil_sem_permissao_operacional_nao_acessa_a_central(base_url, auth_headers):
+    profiles_response = requests.get(f"{base_url}/api/perfis/", headers=auth_headers, timeout=10)
+    assert profiles_response.status_code == 200
+    profile_id = next(p["id"] for p in profiles_response.json()["data"] if p["nome"] == "OPERADOR")
+    username = f"no_assistant_{uuid.uuid4().hex[:12]}"
+    password = secrets.token_urlsafe(18)
+    created = requests.post(f"{base_url}/api/usuarios/", headers=auth_headers, json={
+        "nome": "Usuário sem acesso à Central", "username": username,
+        "senha": password, "perfil_id": profile_id,
+    }, timeout=10)
+    assert created.status_code == 201, created.text
+    database = os.environ["AGROFROTA_TEST_DATABASE"]
+    factory, _ = criar_sessao_tenant(Config, database)
+    with factory() as session:
+        profile = session.get(Perfil, profile_id)
+        permission = session.execute(select(Permissao).where(
+            Permissao.codigo == "OS.VISUALIZAR"
+        )).scalar_one()
+        assert permission in profile.permissoes
+        profile.permissoes.remove(permission)
+        session.commit()
+    try:
+        login = requests.post(f"{base_url}/api/auth/login", json={
+            "username": username, "senha": password, "database_name": database,
+        }, timeout=10)
+        assert login.status_code == 200
+        headers = {"Authorization": f"Bearer {login.json()['data']['access_token']}"}
+        denied = requests.post(f"{base_url}/api/assistente/conversas", headers=headers, json={}, timeout=10)
+        assert denied.status_code == 403
+    finally:
+        with factory() as session:
+            profile = session.get(Perfil, profile_id)
+            if permission not in profile.permissoes:
+                profile.permissoes.append(session.get(Permissao, permission.id))
+            user = session.execute(select(Usuario).where(Usuario.username == username)).scalar_one_or_none()
+            if user:
+                session.delete(user)
+            session.commit()

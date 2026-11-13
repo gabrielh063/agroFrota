@@ -12,6 +12,7 @@ from database.central import criar_engine_central
 from database.base import CentralBase
 
 from models.central.tenant import Tenant
+from models.central.convite import Convite
 from models.tenant.usuario import Usuario
 
 from services.tenant_service import criar_tenant
@@ -32,6 +33,7 @@ from routes.indisponibilidades import indisponibilidades_bp
 from routes.dashboard import dashboard_bp
 from routes.auditoria import auditoria_bp
 from routes.assistente_ia import assistente_ia_bp
+from routes.convites import convites_bp
 
 from middleware.auth import autenticar
 from middleware.tenant import resolver_tenant
@@ -78,6 +80,7 @@ def create_app():
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auditoria_bp)
     app.register_blueprint(assistente_ia_bp)
+    app.register_blueprint(convites_bp)
 
     # --------------------------------------------------
     # BANCO CENTRAL

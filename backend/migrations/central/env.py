@@ -45,6 +45,7 @@ from database.base import CentralBase
 #
 
 from models.central.tenant import Tenant
+from models.central.convite import Convite
 
 
 # --------------------------------------------------

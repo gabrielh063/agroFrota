@@ -60,6 +60,10 @@ class Usuario(TenantBase):
         Integer, nullable=False, default=0, server_default="0"
     )
 
+    convite_id: Mapped[str | None] = mapped_column(
+        String(36), nullable=True, unique=True
+    )
+
     ultimo_login: Mapped[datetime | None] = mapped_column(
         DateTime,
         nullable=True
