@@ -13,6 +13,7 @@ function EquipePermissoes() {
     const podeVerPermissoes = permissoes.includes("PERFIL_PERMISSAO_GERENCIAR");
     const perfilAtualId = usuario?.perfil_id;
     const [usuarios, setUsuarios] = useState(null);
+    const [convites, setConvites] = useState([]);
     const [perfis, setPerfis] = useState([]);
     const [permissoesPorPerfil, setPermissoesPorPerfil] = useState({});
     const [salvando, setSalvando] = useState(false);
@@ -22,17 +23,22 @@ function EquipePermissoes() {
     const [busca, setBusca] = useState("");
     const [filtroPerfil, setFiltroPerfil] = useState("todos");
     const [filtroSituacao, setFiltroSituacao] = useState("ativos");
+    const [linkConvite, setLinkConvite] = useState("");
+    const [copiado, setCopiado] = useState(false);
+    const [conviteForm, setConviteForm] = useState({ nome: "", email: "", perfil_id: "" });
     const [form, setForm] = useState({ nome: "", username: "", email: "", senha: "", perfil_id: "" });
 
     const carregar = useCallback(async () => {
         try {
-            const [usuariosResponse, perfisResponse] = await Promise.all([
+            const [usuariosResponse, perfisResponse, convitesResponse] = await Promise.all([
                 api.get("/api/usuarios/", { params: { apenas_ativos: false } }),
                 podeVerPerfis ? api.get("/api/perfis/") : Promise.resolve({ data: { data: [] } }),
+                podeCriar ? api.get("/api/convites/") : Promise.resolve({ data: { data: [] } }),
             ]);
             const perfisList = perfisResponse.data.data || [];
             setErro("");
             setUsuarios(usuariosResponse.data.data || []);
+            setConvites(convitesResponse.data.data || []);
             setPerfis(perfisList);
             if (podeVerPermissoes) {
                 const results = await Promise.all(perfisList.map(async (profile) => {
@@ -49,7 +55,7 @@ function EquipePermissoes() {
                 : requestError.response?.data?.message || "Não foi possível carregar a equipe. Tente novamente.");
             setUsuarios([]);
         }
-    }, [podeVerPerfis, podeVerPermissoes, perfilAtualId, permissoes]);
+    }, [podeVerPerfis, podeVerPermissoes, podeCriar, perfilAtualId, permissoes]);
 
     useEffect(() => { carregar(); }, [carregar]);
 
@@ -118,6 +124,44 @@ function EquipePermissoes() {
         } finally { setSalvando(false); }
     }
 
+    async function emitirConvite(event) {
+        event.preventDefault();
+        setSalvando(true);
+        setErro("");
+        setMensagem("");
+        setLinkConvite("");
+        try {
+            const response = await api.post("/api/convites/", {
+                nome: conviteForm.nome.trim(),
+                email: conviteForm.email.trim() || null,
+                perfil_id: Number(conviteForm.perfil_id),
+            });
+            const token = response.data.data.token;
+            setLinkConvite(`${window.location.origin}/cadastro?token=${encodeURIComponent(token)}`);
+            setConviteForm({ nome: "", email: "", perfil_id: "" });
+            setMensagem("Convite emitido. Copie e compartilhe o link por um canal privado; ele expira em 72 horas e só pode ser usado uma vez.");
+            await carregar();
+        } catch (requestError) {
+            setErro(requestError.response?.status === 403
+                ? "Seu perfil não pode emitir convites."
+                : requestError.response?.data?.message || "Não foi possível emitir o convite.");
+        } finally { setSalvando(false); }
+    }
+
+    async function revogarConvite(invite) {
+        if (!window.confirm(`Revogar o convite de ${invite.nome}?`)) return;
+        setSalvando(true);
+        setErro("");
+        setMensagem("");
+        try {
+            await api.patch(`/api/convites/${invite.id}/revogar`);
+            setMensagem(`Convite de ${invite.nome} revogado.`);
+            await carregar();
+        } catch (requestError) {
+            setErro(requestError.response?.data?.message || "Não foi possível revogar o convite.");
+        } finally { setSalvando(false); }
+    }
+
     return (
         <div className="team-page">
             <header className="team-header">
@@ -145,6 +189,22 @@ function EquipePermissoes() {
                         <label>Perfil<select required value={form.perfil_id} onChange={(event) => setForm({ ...form, perfil_id: event.target.value })}><option value="">Selecione um perfil</option>{perfisAtivos.map((profile) => <option key={profile.id} value={profile.id}>{nomePerfil(profile.nome)}</option>)}</select></label>
                         <div className="team-form-actions"><button type="submit" disabled={salvando || !form.perfil_id}>{salvando ? "Salvando…" : editando ? "Salvar alterações" : "Criar usuário"}</button></div>
                     </form>
+                </section>
+            )}
+
+            {podeCriar && (
+                <section className="team-form-card" aria-labelledby="invite-form-heading">
+                    <div className="team-section-heading">
+                        <div><h2 id="invite-form-heading">Convidar pessoa</h2><p>O link fica disponível uma única vez. Envie-o por um canal privado.</p></div>
+                    </div>
+                    <form className="team-form" onSubmit={emitirConvite}>
+                        <label>Nome<input required maxLength={150} value={conviteForm.nome} onChange={(event) => setConviteForm({ ...conviteForm, nome: event.target.value })} /></label>
+                        <label>E-mail (opcional)<input type="email" maxLength={150} autoComplete="email" value={conviteForm.email} onChange={(event) => setConviteForm({ ...conviteForm, email: event.target.value })} /></label>
+                        <label>Perfil<select required value={conviteForm.perfil_id} onChange={(event) => setConviteForm({ ...conviteForm, perfil_id: event.target.value })}><option value="">Selecione um perfil</option>{perfisAtivos.map((profile) => <option key={profile.id} value={profile.id}>{nomePerfil(profile.nome)}</option>)}</select></label>
+                        <div className="team-form-actions"><button type="submit" disabled={salvando || !conviteForm.perfil_id}>{salvando ? "Emitindo…" : "Emitir convite"}</button></div>
+                    </form>
+                    {linkConvite && <div className="team-notice team-success invite-link" role="status"><label htmlFor="invite-link">Link de cadastro (visível somente nesta sessão)</label><input id="invite-link" readOnly value={linkConvite} onFocus={(event) => event.target.select()} /><button type="button" className="team-secondary" onClick={async () => { await navigator.clipboard.writeText(linkConvite); setCopiado(true); }}> {copiado ? "Copiado" : "Copiar link"}</button></div>}
+                    <div className="team-table-wrap"><table className="team-table"><thead><tr><th scope="col">Convite</th><th scope="col">Situação</th><th scope="col">Expira em</th><th scope="col">Ação</th></tr></thead><tbody>{convites.map((invite) => <tr key={invite.id}><td><strong>{invite.nome}</strong>{invite.email && <span>{invite.email}</span>}</td><td>{invite.status}</td><td>{new Date(`${invite.expira_em}Z`).toLocaleString()}</td><td>{invite.status === "pendente" && <button type="button" className="team-secondary" disabled={salvando} onClick={() => revogarConvite(invite)}>Revogar</button>}</td></tr>)}</tbody></table>{convites.length === 0 && <p className="team-empty">Nenhum convite emitido.</p>}</div>
                 </section>
             )}
 

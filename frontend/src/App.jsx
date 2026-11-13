@@ -15,6 +15,7 @@ import EditarOrdemServico from "./pages/EditarOrdemServico/EditarOrdemServico";
 import Calendario from "./pages/Calendario/Calendario";
 import AssistenteIA from "./pages/AssistenteIA/AssistenteIA";
 import EquipePermissoes from "./pages/EquipePermissoes/EquipePermissoes";
+import Cadastro from "./pages/Cadastro/Cadastro";
 
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -44,6 +45,8 @@ function App() {
                     <Login />
                 }
             />
+
+            <Route path="/cadastro" element={<Cadastro />} />
 
 
             <Route
