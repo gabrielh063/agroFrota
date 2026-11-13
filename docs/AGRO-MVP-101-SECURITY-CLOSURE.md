@@ -51,7 +51,7 @@ Não iniciei as verificações remotas, pois o usuário condicionou o acesso à 
 - Cron/timer das 03:30 e primeira execução automática: **não verificados**. Uma execução manual do script, se existir, não comprova o agendamento futuro.
 - Último backup AgroFrota, retenção, espaço, integridade e restore isolado atual: **não verificados**. Há registro histórico de backup/restauração em ambiente isolado, mas não foi tratado como estado atual.
 - Configuração do Restic do Immich e `restic check`: **não identificados/executados**; não se usou config presumida e não houve alteração no Immich ou ROMM.
-- Única verificação operacional independente nesta sessão: health HTTPS de AgroFrota respondeu `200` com `status=online` em `https://techcell.tailac6509.ts.net:8443/api/health`.
+- O checkpoint AGRO-MVP-100 anterior registrou health HTTPS de AgroFrota com `200` e `status=online` em `https://techcell.tailac6509.ts.net:8443/api/health`; essa consulta não foi repetida nesta missão.
 - Nenhum reboot, `prune`, `forget`, `repair`, restore em dados reais, `down -v`, alteração de sudoers ou contorno de autenticação ocorreu.
 
 Depois de validar a chave, executar as coletas read-only documentadas em [AGRO-MVP-100-RELEASE-GATE.md](AGRO-MVP-100-RELEASE-GATE.md). Identificar a unidade Restic e executar exclusivamente o comando existente que comprovadamente chama `restic check`, de preferência fora do horário de pico. Nunca imprimir configurações, tokens, conteúdo dos dumps ou ambiente com segredos.
