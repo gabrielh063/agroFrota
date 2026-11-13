@@ -71,6 +71,8 @@ Limites aplicados e reaplicados pelo `ExecStartPost` da unidade:
 
 Chrome headless 155.0.8059.39 abriu o endereço HTTPS publicado em emulação de 390×844. A página Ordens de Serviço carregou 2 registros; `document.scrollWidth=390`, sem overflow horizontal da página, e todas as chamadas de rede da tela retornaram 200. A captura está em [AGRO-SERVER-01-ordens-390x844.png](AGRO-SERVER-01-ordens-390x844.png). Não foi realizado teste em Safari físico.
 
+A página Calendário também carregou em 390×844 via HTTPS, sem overflow horizontal; `/api/auth/me`, `/api/usuarios/`, `/api/calendario/` e `/api/ordens-servico/` retornaram 200.
+
 ## Unidade e recuperação
 
 A unidade `agrofrota-infra-01.service` está habilitada e ativa no `systemd --user`; seu `ExecStart` aguarda os healthchecks e seu `ExecStop` para somente o projeto AgroFrota. A unidade evita build no servidor e reaplica os limites.
