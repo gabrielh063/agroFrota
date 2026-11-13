@@ -77,7 +77,8 @@ A página Calendário também carregou em 390×844 via HTTPS, sem overflow horiz
 
 A unidade `agrofrota-infra-01.service` está habilitada e ativa no `systemd --user`; seu `ExecStart` aguarda os healthchecks e seu `ExecStop` para somente o projeto AgroFrota. A unidade evita build no servidor e reaplica os limites.
 
-`loginctl` ainda informa `Linger=no`. Assim, a unidade do usuário sobe após login; os containers têm política `unless-stopped` para reiniciar com o daemon Docker após falta de energia, desde que não tenham sido parados manualmente. Não foi feito reboot do host. Verificação pós-falta de energia: `docker ps` do projeto, `systemctl --user status agrofrota-infra-01.service` após login, `curl -fsS https://techcell.tailac6509.ts.net:8443/api/health` e status do Immich.
+`docker.service`, `tailscaled.service`, `ufw.service` e `cron.service` estão enabled; Docker e Tailscale estão ativos. `loginctl` ainda informa `Linger=no`. Assim, a unidade do usuário sobe após login; os containers têm política `unless-stopped` para reiniciar com o daemon Docker após falta de energia, desde que não tenham sido parados manualmente.
+Não foi feito reboot do host. Verificação pós-falta de energia: `docker ps` do projeto, `systemctl --user status agrofrota-infra-01.service` após login, `curl -fsS https://techcell.tailac6509.ts.net:8443/api/health` e status do Immich.
 
 Operação:
 
