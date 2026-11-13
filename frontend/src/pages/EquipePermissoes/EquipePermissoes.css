@@ -34,4 +34,14 @@
 .team-muted, .team-empty { color: var(--text-muted); font-size: 12px; }
 .team-empty { padding: 20px 4px; }
 .team-edit { min-height: 32px; background: #203d29; color: #c4edca; }
-@media (max-width: 700px) { .team-header, .team-form-card, .team-list-card { padding: 17px; } .team-form { grid-template-columns: 1fr; } .team-section-heading { align-items: flex-start; } .team-table { min-width: 650px; } }
+.team-filters { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(150px, 1fr) minmax(130px, 1fr); gap: 12px; margin: 4px 0 16px; }
+.team-filters label { display: grid; gap: 5px; color: var(--text-secondary); font-size: 12px; }
+.team-filters input, .team-filters select { min-height: 42px; width: 100%; padding: 8px 10px; border: 1px solid var(--border-default); border-radius: 8px; background: #0c140e; color: var(--text-primary); }
+.team-status { display: block; margin-top: 7px; font-size: 11px; }
+.team-status.is-active { color: #9edaaa; }
+.team-status.is-inactive { color: #f1b0b0; }
+.team-actions { min-width: 110px; }
+.team-actions > * { margin: 2px; }
+.team-table-wrap { -webkit-overflow-scrolling: touch; }
+.team-error button { display: block; min-height: 40px; margin-top: 8px; padding: 0 12px; border: 1px solid currentColor; border-radius: 7px; background: transparent; color: inherit; }
+@media (max-width: 700px) { .team-header, .team-form-card, .team-list-card { padding: 17px; } .team-form { grid-template-columns: 1fr; } .team-section-heading { align-items: flex-start; } .team-section-heading > * { min-width: 0; } .team-filters { grid-template-columns: 1fr; } .team-table { min-width: 650px; } .team-table-wrap { margin-right: -17px; padding-right: 17px; } .team-actions { min-width: 125px; } .team-actions button, .team-secondary, .team-edit { min-height: 40px; } }
