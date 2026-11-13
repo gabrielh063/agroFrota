@@ -61,6 +61,12 @@ def exigir_permissao(codigo_permissao: str):
                     )
                 }), 403
 
+            # The tenant resolver opened this session to validate the request
+            # and the permission check. Release its connection before the view
+            # runs: service functions often open their own session, and browser
+            # pages issue several authorized API requests at once.
+            tenant_session.close()
+
             return func(*args, **kwargs)
 
         return wrapper

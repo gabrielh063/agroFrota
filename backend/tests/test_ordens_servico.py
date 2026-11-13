@@ -1,4 +1,5 @@
 import requests
+from concurrent.futures import ThreadPoolExecutor
 
 
 def criar_maquina_para_os(
@@ -828,6 +829,52 @@ def test_listar_apenas_ativas(
         "ordens_servico"
     ]:
         assert ordem["ativo"] is True
+
+
+def test_tela_os_concorrente_lista_tres_ordens_sem_500(
+    base_url,
+    auth_headers,
+    codigo_unico,
+    cleanup_registros_teste,
+):
+    maquina = criar_maquina_para_os(base_url, auth_headers, codigo_unico)
+    criadas = [
+        criar_os_maquina(base_url, auth_headers, maquina["id"], f"{codigo_unico}-{i}")
+        for i in range(3)
+    ]
+
+    chamadas = (
+        ("ordens_servico", f"{base_url}/api/ordens-servico/?apenas_ativas=false"),
+        ("maquinas", f"{base_url}/api/maquinas/?incluir_inativas=true"),
+        ("equipamentos", f"{base_url}/api/equipamentos/?incluir_inativos=true"),
+    )
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        respostas = list(executor.map(
+            lambda chamada: requests.get(
+                chamada[1], headers=auth_headers, timeout=10
+            ),
+            chamadas,
+        ))
+
+    assert [resposta.status_code for resposta in respostas] == [200, 200, 200]
+    listagem = respostas[0].json()["ordens_servico"]
+    ids = {ordem["id"] for ordem in listagem}
+    assert {ordem["id"] for ordem in criadas} <= ids
+
+    perfis = requests.get(
+        f"{base_url}/api/perfis/", headers=auth_headers, timeout=10
+    ).json()["data"]
+    consulta_permissoes = [
+        f"{base_url}/api/perfis/{perfil['id']}/permissoes"
+        for perfil in perfis[:3]
+    ]
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        permissoes = list(executor.map(
+            lambda url: requests.get(url, headers=auth_headers, timeout=10),
+            consulta_permissoes,
+        ))
+    assert [resposta.status_code for resposta in permissoes] == [200, 200, 200]
 
 
 def test_ordens_servico_sem_token(
