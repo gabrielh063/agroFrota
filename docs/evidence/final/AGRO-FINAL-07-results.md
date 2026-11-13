@@ -75,6 +75,6 @@ O Safari físico no iPhone e a rede móvel não foram controlados nesta sessão.
 
 ## PR e limitações
 
-A mudança está na branch `fix/agro-final-07-mobile-tenant-rbac`, empilhada sobre o HEAD da PR #10. A PR #9 e a PR #10 permanecem abertas e não houve merge. Checks remotos do novo head serão acrescentados após publicação. O checkout original `release/agrofrota-mvp-final` foi preservado.
+A mudança está na branch `fix/agro-final-07-mobile-tenant-rbac`, empilhada sobre o HEAD da PR #10, e publicada na [PR #11](https://github.com/gabrielh063/agroFrota/pull/11). Os checks remotos `backend-mariadb` e `frontend` passaram no head `8ebf44c` (run [43444489769](https://github.com/gabrielh063/agroFrota/actions/runs/43444489769)). A PR #9 e a PR #10 permanecem abertas e não houve merge. O checkout original `release/agrofrota-mvp-final` foi preservado; somente o diretório planejado da worktree foi criado ao lado dele.
 
 Limitações: não houve reboot real do notebook nem teste físico de Safari/iPhone; métricas de memória são pontos instantâneos; warnings de lint/depreciação existentes permanecem; acessibilidade e segurança histórica continuam nos estados parciais anteriores. Nenhum segredo, dump, hash ou dado pessoal consta neste relatório.
