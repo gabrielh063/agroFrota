@@ -2,9 +2,11 @@
 import json
 import logging
 import os
+import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 from sqlalchemy import select
+from sqlalchemy.exc import OperationalError
 
 from config import Config
 from middleware.auth import autenticar
@@ -19,6 +21,17 @@ from services.assistente_operacoes_service import (
 
 assistente_ia_bp = Blueprint("assistente_ia", __name__, url_prefix="/api/assistente")
 logger = logging.getLogger(__name__)
+
+
+@assistente_ia_bp.before_request
+def _correlacionar_requisicao():
+    g.assistant_request_id = uuid.uuid4().hex
+
+
+@assistente_ia_bp.after_request
+def _retornar_correlacao(response):
+    response.headers["X-Request-ID"] = getattr(g, "assistant_request_id", "")
+    return response
 
 
 def _erro(msg, status):
@@ -117,11 +130,18 @@ def mensagem(**kwargs):
         return jsonify({"success": status < 400, **result}), status
     except RuntimeError as exc:
         session.rollback()
-        logger.warning("Central de Operações indisponível (%s).", type(exc).__name__)
+        logger.warning("Central de Operações indisponível request_id=%s exception_type=%s.",
+                       g.assistant_request_id, type(exc).__name__)
+        return _erro("A Central de Operações está temporariamente indisponível. Tente novamente.", 503)
+    except OperationalError as exc:
+        session.rollback()
+        logger.warning("Recursos de dados indisponíveis na Central request_id=%s exception_type=%s.",
+                       g.assistant_request_id, type(exc).__name__)
         return _erro("A Central de Operações está temporariamente indisponível. Tente novamente.", 503)
     except Exception as exc:
         session.rollback()
-        logger.error("Falha ao processar mensagem na Central de Operações (%s).", type(exc).__name__)
+        logger.error("Falha ao processar mensagem na Central de Operações request_id=%s exception_type=%s.",
+                     g.assistant_request_id, type(exc).__name__)
         return _erro("Não consegui processar a mensagem. Nenhuma alteração foi confirmada.", 500)
 
 
