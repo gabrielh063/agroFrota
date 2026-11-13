@@ -1,0 +1,132 @@
+name: agrofrota-infra-01
+
+services:
+  database:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: agrofrota_central
+      MARIADB_USER: agrofrota_runtime
+      MARIADB_ROOT_HOST: localhost
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    secrets:
+      - db_password
+      - db_root_password
+    volumes:
+      - database_data:/var/lib/mysql
+      - ./mariadb/10-tenant.sql:/docker-entrypoint-initdb.d/10-tenant.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [private]
+    security_opt:
+      - no-new-privileges:true
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: deploy/persistent/backend.Dockerfile
+    restart: "no"
+    environment:
+      AGROFROTA_ENV: production
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_USER: agrofrota_runtime
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DB_NAME: agrofrota_central
+      CORS_ORIGINS: ${AGROFROTA_ORIGIN:?Execute setup com a origem HTTPS MagicDNS real}
+      JWT_ACCESS_TOKEN_EXPIRES: "900"
+      HOME: /tmp
+    user: ${AGROFROTA_CONTAINER_UID:-10001}:${AGROFROTA_CONTAINER_GID:-10001}
+    secrets: [db_password]
+    command:
+      - /bin/sh
+      - -ec
+      - >-
+        python -m alembic -c alembic-central.ini upgrade head
+        && AGROFROTA_TENANT_DB=agrofrota_tenant
+        python -m alembic -c alembic-tenant.ini upgrade head
+    depends_on:
+      database:
+        condition: service_healthy
+    networks: [private]
+    security_opt:
+      - no-new-privileges:true
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: deploy/persistent/backend.Dockerfile
+    restart: unless-stopped
+    environment:
+      AGROFROTA_ENV: production
+      AGROFROTA_ENABLE_DEV_ROUTES: "0"
+      AGROFROTA_ENABLE_ASSISTANT: "1"
+      FLASK_DEBUG: "0"
+      SECRET_KEY_FILE: /run/secrets/flask_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_USER: agrofrota_runtime
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DB_NAME: agrofrota_central
+      CORS_ORIGINS: ${AGROFROTA_ORIGIN:?Execute setup com a origem HTTPS MagicDNS real}
+      JWT_ACCESS_TOKEN_EXPIRES: "900"
+      DEMO_CREDENTIALS_FILE: /run/secrets/demo_credentials
+      HOME: /tmp
+    user: ${AGROFROTA_CONTAINER_UID:-10001}:${AGROFROTA_CONTAINER_GID:-10001}
+    secrets:
+      - db_password
+      - flask_secret_key
+      - jwt_secret_key
+      - demo_credentials
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks: [private]
+    security_opt:
+      - no-new-privileges:true
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: deploy/persistent/frontend.Dockerfile
+      args:
+        VITE_API_URL: ""
+        VITE_TENANT_DATABASE: agrofrota_tenant
+    restart: unless-stopped
+    ports:
+      - "${AGROFROTA_HTTP_BIND:-127.0.0.1}:${AGROFROTA_HTTP_PORT:-18088}:8088"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks: [private, host_proxy]
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  database_data:
+    name: ${AGROFROTA_VOLUME_NAME:-agrofrota-infra-01-mariadb}
+
+networks:
+  private:
+    name: ${AGROFROTA_NETWORK_NAME:-agrofrota-infra-01-private}
+    internal: true
+  host_proxy:
+    name: ${AGROFROTA_PROXY_NETWORK_NAME:-agrofrota-infra-01-host-proxy}
+
+secrets:
+  db_password:
+    file: ${AGROFROTA_SECRETS_DIR:?Execute setup primeiro}/db_password
+  db_root_password:
+    file: ${AGROFROTA_SECRETS_DIR:?Execute setup primeiro}/db_root_password
+  flask_secret_key:
+    file: ${AGROFROTA_SECRETS_DIR:?Execute setup primeiro}/flask_secret_key
+  jwt_secret_key:
+    file: ${AGROFROTA_SECRETS_DIR:?Execute setup primeiro}/jwt_secret_key
+  demo_credentials:
+    file: ${AGROFROTA_SECRETS_DIR:?Execute setup primeiro}/demo_credentials.json

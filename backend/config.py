@@ -1,8 +1,22 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
+from sqlalchemy.engine import URL
 
 load_dotenv()
+
+
+def _env_secret(name, default=""):
+    """Read a secret from a protected file when *_FILE is configured."""
+    path = os.getenv(f"{name}_FILE")
+    if path:
+        try:
+            value = Path(path).read_text(encoding="utf-8")
+        except OSError as error:
+            raise RuntimeError(f"Não foi possível ler o arquivo de segredo {name}.") from error
+        return value.rstrip("\r\n")
+    return os.getenv(name, default)
 
 
 class Config:
@@ -10,12 +24,12 @@ class Config:
     Configurações principais da aplicação.
     """
 
-    SECRET_KEY = os.getenv(
+    SECRET_KEY = _env_secret(
         "SECRET_KEY",
         "chave-desenvolvimento"
     )
 
-    JWT_SECRET_KEY = os.getenv(
+    JWT_SECRET_KEY = _env_secret(
         "JWT_SECRET_KEY",
         "chave-jwt-desenvolvimento"
     )
@@ -27,15 +41,14 @@ class Config:
     DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
     DB_PORT = int(os.getenv("DB_PORT", "3306"))
     DB_USER = os.getenv("DB_USER", "root")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+    DB_PASSWORD = _env_secret("DB_PASSWORD", "")
     DB_NAME = os.getenv("DB_NAME", "fazenda_saas")
 
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://"
-        f"{DB_USER}:{DB_PASSWORD}"
-        f"@{DB_HOST}:{DB_PORT}"
-        f"/{DB_NAME}"
-    )
+    SQLALCHEMY_DATABASE_URI = URL.create(
+        "mysql+pymysql", username=DB_USER, password=DB_PASSWORD,
+        host=DB_HOST, port=DB_PORT, database=DB_NAME,
+        query={"charset": "utf8mb4"}
+    ).render_as_string(hide_password=False)
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

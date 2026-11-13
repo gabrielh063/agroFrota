@@ -24,7 +24,8 @@ def _erro(msg, status):
 
 
 def _enabled():
-    return os.getenv("AGROFROTA_ENV", "development").lower() in {"development", "testing"}
+    ambiente = os.getenv("AGROFROTA_ENV", "development").lower()
+    return ambiente in {"development", "testing"} or os.getenv("AGROFROTA_ENABLE_ASSISTANT") == "1"
 
 
 @assistente_ia_bp.get("/conversas")

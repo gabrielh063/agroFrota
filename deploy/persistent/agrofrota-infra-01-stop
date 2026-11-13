@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+project=agrofrota-infra-01
+frontend="${project}-frontend-1"
+backend="${project}-backend-1"
+database="${project}-database-1"
+
+assert_project_container() {
+    name=$1
+    actual=$(/usr/bin/docker inspect --type=container --format '{{ index .Config.Labels "com.docker.compose.project" }}' "$name")
+    if [ "$actual" != "$project" ]; then
+        echo "Recusando container fora do projeto AgroFrota esperado: $name" >&2
+        exit 1
+    fi
+}
+
+stop_if_running() {
+    name=$1
+    running=$(/usr/bin/docker inspect --type=container --format '{{.State.Running}}' "$name")
+    if [ "$running" = true ]; then
+        /usr/bin/docker stop --time 90 "$name" >/dev/null
+    fi
+}
+
+# Validate all names before causing any state change. Stop preserves the
+# MariaDB volume, networks, secrets, and Tailscale Serve configuration.
+assert_project_container "$frontend"
+assert_project_container "$backend"
+assert_project_container "$database"
+
+stop_if_running "$frontend"
+stop_if_running "$backend"
+stop_if_running "$database"
+echo "AgroFrota parado sem remover dados persistentes."
