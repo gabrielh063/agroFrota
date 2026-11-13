@@ -56,14 +56,14 @@ Data: 13/11/2026. Estado: **`AGRO_MVP_100_FINAL_REVIEW_READY`** para revisão da
 
 ## Validação
 
-- `backend/tools/ci.py`: **282 passed**, 79 warnings de depreciação/usos de `datetime.utcnow` em código existente; ambiente MariaDB exclusivo descartável, encerrado pelo runner.
+- `backend/tools/ci.py`: **284 passed**, 79 warnings de depreciação/usos de `datetime.utcnow` em código existente; ambiente MariaDB exclusivo descartável, encerrado pelo runner.
 - Migrações: upgrade inicial central e dois tenants passou na suíte. Downgrade/upgrade direcionado central e ambos os tenants também passou.
 - Frontend: `npm run build` aprovado. `npm run lint` exit 0, com avisos React de hooks/efeitos já presentes em páginas e componentes existentes.
 - Chrome 155: 39 verificações; 25 pares de rota/resolução sem overflow, 14 verificações de convite/cadastro/teclado. Foram exercitados link válido, inválido, expirado, revogado, mismatch corrigido, username duplicado, falha de rede, duplo clique, criação, login e reuso bloqueado.
 - axe-core 4.11.0: seis rotas avaliadas (`/login`, `/cadastro`, `/equipe-permissoes`, `/ordens-servico`, `/calendario`, `/assistente`) com WCAG 2.0/2.1 A/AA; **zero violações reportadas**.
 - Scanner estático do histórico: não houve impressão de e-mails, hashes ou linhas SQL. Nenhum teste ou evidência usou credenciais de produção.
 - `git diff --check`: aprovado antes dos commits finais.
-- CI remota PR #13 no SHA de código/evidências `3761d9bd03adca7914891a1bb4b71d05111a15a8`: `backend-mariadb` e `frontend` concluídos com sucesso, run [43491393900](https://github.com/gabrielh063/agroFrota/actions/runs/43491393900). O branch está atualizado; confira no cabeçalho da PR o check do HEAD documental corrente.
+- CI remota: consulte o [estado atual dos checks na PR #13](https://github.com/gabrielh063/agroFrota/pull/13) para ver o SHA e os resultados do HEAD mais recente, incluindo os testes de rate limiting que também ignoram `X-Forwarded-For`.
 
 ## Operação: revisão, publicação e rollback
 
