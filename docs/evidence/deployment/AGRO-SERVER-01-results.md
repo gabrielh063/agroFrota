@@ -50,7 +50,7 @@ Limites aplicados e reaplicados pelo `ExecStartPost` da unidade:
 
 - MagicDNS confirmado: `techcell.tailac6509.ts.net`.
 - Serve existente em `https://techcell.tailac6509.ts.net` continua apontando para `127.0.0.1:8080`.
-- Endpoint do AgroFrota adicionado em `https://techcell.tailac6509.ts.net:8443`, tailnet-only, proxy para `127.0.0.1:18088`; não foi ativado Funnel nem alterada regra global da tailnet.
+- Endpoint observado em `https://techcell.tailac6509.ts.net:8443`, tailnet-only, proxy para `127.0.0.1:18088`; não foi ativado Funnel nem alterada regra global da tailnet. A primeira consulta mostrava apenas 443; a tentativa sem root foi negada e o mapeamento 8443 apareceu em uma consulta posterior, sem autoria identificável nesta sessão. O estado final foi validado por HTTPS.
 - Healthcheck HTTPS verificado no servidor e em um cliente da tailnet: HTTP 200 com validação TLS.
 - UFW permaneceu ativo; nenhuma regra foi alterada.
 - `immich_server`, `immich_postgres` e `immich_redis` estavam saudáveis antes e depois, sem reinícios durante a implantação. O timer do backup Restic mais recente terminou com `Result=success` às 04:00 -03. Não foi possível executar uma verificação completa do repositório Restic sem sudo.
