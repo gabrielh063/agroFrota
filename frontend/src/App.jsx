@@ -69,7 +69,7 @@ function App() {
 
                 <Route
                     path="/assistente"
-                    element={<RequirePermission anyOf="MAQUINA_VISUALIZAR"><AssistenteIA /></RequirePermission>}
+                    element={<RequirePermission anyOf="OS.VISUALIZAR"><AssistenteIA /></RequirePermission>}
                 />
 
                 <Route
