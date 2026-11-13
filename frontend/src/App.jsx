@@ -19,6 +19,20 @@ import EquipePermissoes from "./pages/EquipePermissoes/EquipePermissoes";
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import RequirePermission from "./routes/RequirePermission";
+import { useAuth } from "./contexts/AuthContext";
+
+function PaginaInicialAutorizada() {
+    const { permissoes = [] } = useAuth();
+    if (permissoes.includes("DASHBOARD.VISUALIZAR")) return <Home />;
+    const caminhos = [
+        ["MAQUINA_VISUALIZAR", "/maquinarios"],
+        ["EQUIPAMENTO_VISUALIZAR", "/equipamentos"],
+        ["OS.VISUALIZAR", "/ordens-servico"],
+        ["USUARIO_VISUALIZAR", "/equipe-permissoes"],
+    ];
+    const primeiro = caminhos.find(([codigo]) => permissoes.includes(codigo));
+    return primeiro ? <Navigate to={primeiro[1]} replace /> : <section className="permission-denied"><h1>Nenhuma página liberada</h1><p>Peça ao administrador para revisar seu perfil de acesso.</p></section>;
+}
 
 function App() {
     return (
@@ -42,9 +56,7 @@ function App() {
 
                 <Route
                     path="/"
-                    element={
-                        <RequirePermission anyOf="DASHBOARD.VISUALIZAR"><Home /></RequirePermission>
-                    }
+                    element={<PaginaInicialAutorizada />}
                 />
 
 
@@ -57,7 +69,7 @@ function App() {
 
                 <Route
                     path="/assistente"
-                    element={<RequirePermission anyOf="MAQUINA_VISUALIZAR"><AssistenteIA /></RequirePermission>}
+                    element={<RequirePermission anyOf="OS.VISUALIZAR"><AssistenteIA /></RequirePermission>}
                 />
 
                 <Route

@@ -15,7 +15,12 @@ services:
       - db_root_password
     volumes:
       - database_data:/var/lib/mysql
-      - ./mariadb/10-tenant.sql:/docker-entrypoint-initdb.d/10-tenant.sql:ro
+      - type: bind
+        source: ./mariadb/10-tenant.sql
+        target: /docker-entrypoint-initdb.d/10-tenant.sql
+        read_only: true
+        bind:
+          create_host_path: false
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s

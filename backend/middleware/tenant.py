@@ -1,8 +1,12 @@
 from functools import wraps
+import json
+import logging
+from time import perf_counter
 
 from flask import jsonify
 from flask_jwt_extended import get_jwt
 from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError, DisconnectionError, InterfaceError, OperationalError, TimeoutError as PoolTimeout
 
 from database.session import (
     criar_sessao_central,
@@ -14,6 +18,35 @@ from models.tenant.perfil import Perfil
 from services.admin_policy import ContextoAdministrativo
 
 
+_logger = logging.getLogger(__name__)
+
+
+def _erro_tecnico(erro):
+    """Return a safe, stable error category without exception details."""
+    if isinstance(erro, PoolTimeout):
+        return "database_pool_timeout"
+    if isinstance(erro, (DisconnectionError, InterfaceError, OperationalError)):
+        return "database_unavailable"
+    if isinstance(erro, DBAPIError):
+        return "database_connection_error" if erro.connection_invalidated else "database_query_error"
+    return "tenant_resolution_error"
+
+
+def _registrar_metricas(etapa, metricas, erro=None):
+    evento = {
+        "event": "tenant_resolution",
+        "stage": etapa,
+        "timings_ms": {nome: round(valor, 2) for nome, valor in metricas.items()},
+        "total_ms": round(metricas.get("request_total", sum(metricas.values())), 2),
+    }
+    if erro is not None:
+        evento["error_category"] = _erro_tecnico(erro)
+        evento["error_type"] = type(erro).__name__
+        _logger.warning(json.dumps(evento, separators=(",", ":")))
+    else:
+        _logger.info(json.dumps(evento, separators=(",", ":")))
+
+
 def resolver_tenant(config):
 
     def decorator(func):
@@ -21,7 +54,11 @@ def resolver_tenant(config):
         @wraps(func)
         def wrapper(*args, **kwargs):
 
+            inicio_requisicao = perf_counter()
             tenant_session = None
+            metricas = {}
+            etapa = "claims"
+            inicio = inicio_requisicao
 
             tenant_id = kwargs.get(
                 "tenant_id"
@@ -53,6 +90,8 @@ def resolver_tenant(config):
                 # BUSCA O TENANT NO BANCO CENTRAL
                 # --------------------------------------
 
+                etapa = "central_connect"
+                inicio = perf_counter()
                 SessionCentral, _ = (
                     criar_sessao_central(
                         config
@@ -64,6 +103,10 @@ def resolver_tenant(config):
                 )
 
                 try:
+                    central_session.connection()
+                    metricas["central_connect"] = (perf_counter() - inicio) * 1000
+                    etapa = "tenant_lookup"
+                    inicio = perf_counter()
                     tenant = (
                         central_session.execute(
                             select(Tenant).where(
@@ -73,6 +116,7 @@ def resolver_tenant(config):
                         )
                         .scalar_one_or_none()
                     )
+                    metricas["tenant_lookup"] = (perf_counter() - inicio) * 1000
 
                 finally:
                     central_session.close()
@@ -99,6 +143,8 @@ def resolver_tenant(config):
                 # ABRE O BANCO DO TENANT
                 # --------------------------------------
 
+                etapa = "tenant_connect"
+                inicio = perf_counter()
                 SessionTenant, _ = (
                     criar_sessao_tenant(
                         config,
@@ -109,6 +155,8 @@ def resolver_tenant(config):
                 tenant_session = (
                     SessionTenant()
                 )
+                tenant_session.connection()
+                metricas["tenant_connect"] = (perf_counter() - inicio) * 1000
 
                 # --------------------------------------
                 # VALIDA O USUÁRIO ATUAL
@@ -122,6 +170,8 @@ def resolver_tenant(config):
                 #
                 # --------------------------------------
 
+                etapa = "user_lookup"
+                inicio = perf_counter()
                 usuario = (
                     tenant_session.execute(
                         select(Usuario).where(
@@ -131,6 +181,7 @@ def resolver_tenant(config):
                     )
                     .scalar_one_or_none()
                 )
+                metricas["user_lookup"] = (perf_counter() - inicio) * 1000
 
                 if usuario is None:
 
@@ -189,12 +240,15 @@ def resolver_tenant(config):
                             "não identificado.",
                     }), 403
 
+                etapa = "profile_lookup"
+                inicio = perf_counter()
                 perfil_ativo = tenant_session.execute(
                     select(Perfil.id).where(
                         Perfil.id == perfil_id_atual,
                         Perfil.ativo.is_(True),
                     )
                 ).scalar_one_or_none()
+                metricas["profile_lookup"] = (perf_counter() - inicio) * 1000
                 if perfil_ativo is None:
                     tenant_session.close()
                     tenant_session = None
@@ -203,20 +257,31 @@ def resolver_tenant(config):
             except Exception as erro:
 
                 if tenant_session is not None:
+                    try:
+                        tenant_session.rollback()
+                    except Exception:
+                        pass
+                    finally:
+                        try:
+                            tenant_session.close()
+                        except Exception:
+                            _logger.warning('{"event":"tenant_session_close","error_category":"session_close_error"}')
+                        tenant_session = None
 
-                    tenant_session.rollback()
-                    tenant_session.close()
+                metricas.setdefault(etapa, (perf_counter() - inicio) * 1000)
+                metricas["request_total"] = (perf_counter() - inicio_requisicao) * 1000
 
-                    tenant_session = None
+                _registrar_metricas(etapa, metricas, erro)
 
-                # Do not expose connection details in logs.
+                # Keep the response generic; never expose connection details.
 
+                indisponivel = _erro_tecnico(erro) in {"database_pool_timeout", "database_unavailable"}
                 return jsonify({
                     "success": False,
                     "message":
-                        "Não foi possível resolver "
-                        "o tenant.",
-                }), 500
+                        "O serviço está temporariamente indisponível. Tente novamente."
+                        if indisponivel else "Não foi possível resolver o tenant.",
+                }), 503 if indisponivel else 500
 
             # ------------------------------------------
             # CONTEXTO DA REQUISIÇÃO
@@ -260,8 +325,12 @@ def resolver_tenant(config):
                 raise
 
             finally:
-
-                tenant_session.close()
+                metricas["request_total"] = (perf_counter() - inicio_requisicao) * 1000
+                _registrar_metricas("resolved", metricas)
+                try:
+                    tenant_session.close()
+                except Exception:
+                    _logger.warning('{"event":"tenant_session_close","error_category":"session_close_error"}')
 
         return wrapper
 
