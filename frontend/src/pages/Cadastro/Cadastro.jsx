@@ -5,7 +5,7 @@ import "./Cadastro.css";
 
 function Cadastro() {
     const navigate = useNavigate();
-    const [token] = useState(() => new URLSearchParams(window.location.search).get("token") || "");
+    const [token] = useState(() => new URLSearchParams(window.location.hash.slice(1)).get("token") || "");
     const [convite, setConvite] = useState(null);
     const [form, setForm] = useState({ username: "", senha: "", confirmarSenha: "" });
     const [erro, setErro] = useState("");

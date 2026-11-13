@@ -137,7 +137,7 @@ function EquipePermissoes() {
                 perfil_id: Number(conviteForm.perfil_id),
             });
             const token = response.data.data.token;
-            setLinkConvite(`${window.location.origin}/cadastro?token=${encodeURIComponent(token)}`);
+            setLinkConvite(`${window.location.origin}/cadastro#token=${encodeURIComponent(token)}`);
             setConviteForm({ nome: "", email: "", perfil_id: "" });
             setMensagem("Convite emitido. Copie e compartilhe o link por um canal privado; ele expira em 72 horas e só pode ser usado uma vez.");
             await carregar();
