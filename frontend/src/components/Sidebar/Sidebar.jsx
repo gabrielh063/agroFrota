@@ -49,7 +49,7 @@ function Sidebar() {
 
     const operacional = [
         ["/", "bi-house-door", "Visão geral", "DASHBOARD.VISUALIZAR"],
-        ["/assistente", "bi-chat-square-text", "Central de Operações", "MAQUINA_VISUALIZAR"],
+        ["/assistente", "bi-chat-square-text", "Central de Operações", "OS.VISUALIZAR"],
         ["/calendario", "bi-calendar3", "Calendário de serviços", "OS.VISUALIZAR"],
         ["/ordens-servico", "bi-clipboard-check", "Ordens de serviço", "OS.VISUALIZAR"],
         ["/maquinarios", "bi-truck-front", "Maquinários", "MAQUINA_VISUALIZAR"],
@@ -94,11 +94,10 @@ function Sidebar() {
                     <span className="sidebar-section-label">OPERAÇÕES</span>
                     {operacional.filter(([, , , permission]) => pode(permission)).map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"} onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}
                 </div>
-                <div className="sidebar-group sidebar-management">
+                {pode("USUARIO_VISUALIZAR") && <div className="sidebar-group sidebar-management">
                     <span className="sidebar-section-label">GESTÃO</span>
-                    <span className="sidebar-link sidebar-disabled" aria-disabled="true" title="Disponível em uma versão futura"><i className="bi bi-bar-chart-line" /><span>Relatórios e indicadores</span><small>Em breve</small></span>
-                    {pode("USUARIO_VISUALIZAR") && <NavLink to="/equipe-permissoes" onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className="bi bi-shield-check" /><span>Equipe e Permissões</span></NavLink>}
-                </div>
+                    <NavLink to="/equipe-permissoes" onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className="bi bi-shield-check" /><span>Equipe e Permissões</span></NavLink>
+                </div>}
                 {import.meta.env.VITE_AGROFROTA_DEMO === "true" && <div className="sidebar-demo"><strong><i /> Ambiente demonstrativo</strong><span>Informações fictícias para apresentação do AgroFrota.</span></div>}
             </nav>
 
