@@ -120,3 +120,9 @@ Evidências sanitizadas: `docs/evidence/final/infra-01/`. O MVP continua **`AGRO
 - Resultado detalhado e capturas: [`docs/evidence/infra-02/AGRO-INFRA-02-results.md`](evidence/infra-02/AGRO-INFRA-02-results.md), `remote-dashboard-admin.png`, `remote-auditor-denied.png` e `remote-assistant-network-error.png`.
 
 O **MVP permanece `AGRO_MVP_FINAL_PARTIAL`** por acessibilidade e decisão independente de segurança histórica. Não houve merge ou exposição pública.
+
+## Complemento AGRO-FINAL-07 — estabilidade, tenant e RBAC
+
+O complemento [`evidence/final/AGRO-FINAL-07-results.md`](evidence/final/AGRO-FINAL-07-results.md) registra instrumentação/correção de pool tenant, desempenho antes/depois, recuperação de sessão após falha transitória, painel administrativo completo, bloqueio de rotas e ações por permissão, checks automatizados e deploy privado com backup e readback. O código da PR empilhada não foi integrado; não houve merge.
+
+O gate de aplicação privada deste incremento ficou `AGRO_FINAL_07_READY`. A classificação global continua **`AGRO_MVP_FINAL_PARTIAL`**: AGRO-FINAL-07 não encerra as pendências históricas de acessibilidade nem de avaliação de segurança dos registros legados. A automação mobile usou Chrome 390×844; não há evidência de Safari físico no iPhone nem de reboot completo do notebook.
