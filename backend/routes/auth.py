@@ -20,6 +20,7 @@ from models.tenant.usuario import Usuario
 from services.token_service import (
     criar_token_usuario,
 )
+from services.rate_limit_service import consumir_limite, limpar_limite
 
 
 auth_bp = Blueprint(
@@ -32,11 +33,23 @@ auth_bp = Blueprint(
 @auth_bp.post("/login")
 def login():
 
+    peer = request.remote_addr or "unknown"  # Do not trust client-supplied forwarding headers.
+    try:
+        allowed, retry_after = consumir_limite(
+            f"login-peer:{peer}", limite=120, janela_segundos=60,
+        )
+    except Exception:
+        return jsonify({"success": False, "message": "Serviço temporariamente indisponível."}), 503
+    if not allowed:
+        return jsonify({"success": False, "message": "Muitas tentativas. Aguarde e tente novamente."}), 429, {
+            "Retry-After": str(retry_after),
+        }
+
     dados = request.get_json(
         silent=True
     )
 
-    if not dados:
+    if not isinstance(dados, dict) or not dados:
 
         return jsonify({
             "success": False,
@@ -58,9 +71,9 @@ def login():
     )
 
     if (
-        not username
-        or not senha
-        or not database_name
+        not isinstance(username, str) or not username.strip() or len(username) > 80
+        or not isinstance(senha, str) or not senha or len(senha) > 128
+        or not isinstance(database_name, str) or not database_name or len(database_name) > 100
     ):
 
         return jsonify({
@@ -70,6 +83,18 @@ def login():
                 "são obrigatórios."
             )
         }), 400
+
+    username_key = f"login-user:{database_name}:{username.strip().casefold()}"
+    try:
+        allowed, retry_after = consumir_limite(
+            username_key, limite=10, janela_segundos=900,
+        )
+    except Exception:
+        return jsonify({"success": False, "message": "Serviço temporariamente indisponível."}), 503
+    if not allowed:
+        return jsonify({"success": False, "message": "Muitas tentativas. Aguarde e tente novamente."}), 429, {
+            "Retry-After": str(retry_after),
+        }
 
     try:
 
@@ -129,6 +154,9 @@ def login():
             username=username,
             senha=senha
         )
+
+        # Successful authentication resets failed-attempt throttling for this account.
+        limpar_limite(username_key)
 
         # -------------------------------------------------
         # 3. GERAR JWT

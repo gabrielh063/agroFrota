@@ -19,7 +19,8 @@ from models.tenant.auditoria import EventoAuditoria
 from models.tenant.cargo import Cargo
 from models.tenant.perfil import Perfil
 from models.tenant.usuario import Usuario
-from services.admin_policy import autorizar, perfil_delegavel
+from services.admin_policy import AdministracaoNegada, ContextoAdministrativo, autorizar, perfil_delegavel
+from services.rate_limit_service import consumir_limite
 from utils.security import gerar_hash_senha, verificar_senha
 
 
@@ -74,13 +75,36 @@ def _erro_convidado():
     return jsonify({"success": False, "message": "Convite inválido, expirado, revogado ou já utilizado."}), 400
 
 
+def _limite(bucket, limite, janela):
+    try:
+        allowed, retry_after = consumir_limite(bucket, limite=limite, janela_segundos=janela)
+    except Exception:
+        return jsonify({"success": False, "message": "Serviço temporariamente indisponível."}), 503
+    if not allowed:
+        return jsonify({"success": False, "message": "Muitas tentativas. Aguarde e tente novamente."}), 429, {
+            "Retry-After": str(retry_after),
+        }
+    return None
+
+
+def _peer():
+    # request.remote_addr is the direct peer; X-Forwarded-For is deliberately ignored.
+    return request.remote_addr or "unknown"
+
+
 @convites_bp.get("/")
 @autenticar()
 @resolver_tenant(Config)
 @exigir_permissao("USUARIO_CRIAR")
 def listar(**kwargs):
     session_factory, _engine = criar_sessao_central(Config)
-    with session_factory() as session:
+    tenant_factory, _tenant_engine = criar_sessao_tenant(Config, kwargs["database_name"])
+    with tenant_factory() as tenant_session, session_factory() as session:
+        try:
+            autorizar(tenant_session, kwargs["database_name"],
+                      kwargs["contexto_administrativo"], "USUARIO_CRIAR")
+        except AdministracaoNegada:
+            return jsonify({"success": False, "message": "Ação não autorizada."}), 403
         rows = session.scalars(select(Convite).where(
             Convite.tenant_id == kwargs["tenant_id"]
         ).order_by(Convite.criado_em.desc()).limit(100)).all()
@@ -103,6 +127,11 @@ def listar(**kwargs):
 @resolver_tenant(Config)
 @exigir_permissao("USUARIO_CRIAR")
 def criar(**kwargs):
+    limited = _limite(
+        f"invite-create:{kwargs['database_name']}:{kwargs['usuario_autenticado_id']}", 30, 3600,
+    )
+    if limited:
+        return limited
     try:
         body = ConviteCriarSchema.model_validate(request.get_json(silent=True) or {})
     except ValidationError as error:
@@ -147,6 +176,10 @@ def criar(**kwargs):
                     "id": invite.id, "token": token,
                     "expira_em": invite.expira_em.isoformat(),
                 }}), 201
+            except AdministracaoNegada:
+                tenant_session.rollback()
+                central_session.rollback()
+                return jsonify({"success": False, "message": "Ação não autorizada."}), 403
             except Exception:
                 tenant_session.rollback()
                 central_session.rollback()
@@ -168,8 +201,11 @@ def revogar(convite_id, **kwargs):
     tenant_factory, _tenant_engine = criar_sessao_tenant(Config, kwargs["database_name"])
     central_factory, _central_engine = criar_sessao_central(Config)
     with tenant_factory() as tenant_session, central_factory() as session:
-        autorizar(tenant_session, kwargs["database_name"],
-                  kwargs["contexto_administrativo"], "USUARIO_CRIAR")
+        try:
+            autorizar(tenant_session, kwargs["database_name"],
+                      kwargs["contexto_administrativo"], "USUARIO_CRIAR")
+        except AdministracaoNegada:
+            return jsonify({"success": False, "message": "Ação não autorizada."}), 403
         invite = session.execute(select(Convite).where(
             Convite.id == convite_id,
             Convite.tenant_id == kwargs["tenant_id"],
@@ -188,7 +224,11 @@ def revogar(convite_id, **kwargs):
 
 @convites_bp.post("/validar")
 def validar():
-    token = (request.get_json(silent=True) or {}).get("token", "")
+    limited = _limite(f"invite-validate-peer:{_peer()}", 120, 60)
+    if limited:
+        return limited
+    body = request.get_json(silent=True)
+    token = body.get("token", "") if isinstance(body, dict) else ""
     if (not isinstance(token, str) or len(token) != _TOKEN_PATTERN_LENGTH
             or not all(ch.isalnum() or ch in "_-" for ch in token)):
         return _erro_convidado()
@@ -207,8 +247,19 @@ def validar():
 
 @convites_bp.post("/registrar")
 def registrar():
+    limited = _limite(f"invite-register-peer:{_peer()}", 20, 900)
+    if limited:
+        return limited
+    request_body = request.get_json(silent=True)
+    if not isinstance(request_body, dict):
+        request_body = {}
+    submitted_token = request_body.get("token")
+    if isinstance(submitted_token, str):
+        limited = _limite(f"invite-register-token:{submitted_token}", 5, 900)
+        if limited:
+            return limited
     try:
-        body = ConviteRegistrarSchema.model_validate(request.get_json(silent=True) or {})
+        body = ConviteRegistrarSchema.model_validate(request_body)
     except ValidationError as error:
         return jsonify({"success": False, "message": "Dados inválidos.",
                         "errors": error.errors(include_input=False, include_url=False)}), 400
@@ -244,6 +295,24 @@ def registrar():
                             return _erro_convidado()
                         tenant_session.rollback()
                     else:
+                        issuer = tenant_session.get(Usuario, invite.criado_por)
+                        if issuer is None:
+                            return _erro_convidado()
+                        # Recheck current authority at acceptance. Build context with
+                        # the current version so a normal logout does not cancel an invite.
+                        issuer_context = ContextoAdministrativo(
+                            tenant.database_name, issuer.id, issuer.session_version,
+                        )
+                        try:
+                            _, issuer_permissions = autorizar(
+                                tenant_session, tenant.database_name, issuer_context, "USUARIO_CRIAR",
+                            )
+                            perfil_delegavel(
+                                tenant_session, invite.perfil_id, issuer_permissions,
+                            )
+                        except AdministracaoNegada:
+                            tenant_session.rollback()
+                            return _erro_convidado()
                         if tenant_session.execute(select(Usuario.id).where(
                             Usuario.username == body.username
                         )).scalar_one_or_none() is not None:
