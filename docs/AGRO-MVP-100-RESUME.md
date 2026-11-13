@@ -56,8 +56,11 @@ Data: 13/11/2026. Estado desta retomada: **`AGRO_MVP_100_PARTIAL`**.
 - `npm run build`: aprovado.
 - `npm run lint`: exit 0; avisos preexistentes de hooks/efeitos e dependências.
 - `git diff --check`: aprovado antes do registro final.
-- CI remota desta nova branch e revisão visual do cadastro ainda dependem da
-  publicação da PR. Nenhuma migração foi aplicada à base de produção.
+- CI remota da PR #13 passou em backend MariaDB e frontend no SHA de código
+  `e10679a6cb91c3d2de47c4b3efbedb53442badd4` (run
+  [43483200529](https://github.com/gabrielh063/agroFrota/actions/runs/43483200529)).
+  A tela `/cadastro` ainda não teve revisão visual em navegador. Nenhuma
+  migração foi aplicada à base de produção.
 
 ## Bloqueios para READY
 
