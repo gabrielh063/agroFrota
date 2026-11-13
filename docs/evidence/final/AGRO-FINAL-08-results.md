@@ -2,7 +2,7 @@
 
 **Data:** 13/11/2026  
 **Base:** PR #11, `def9aafb94effaffd94b0be0be7b9c50d9975d02`  
-**Estado:** em validação de publicação e atualização privada
+**Estado:** `AGRO_FINAL_08_READY`
 
 ## Causa raiz
 
@@ -28,10 +28,17 @@ Readback agregado anterior à atualização: 1 tenant, 7 usuários, 3 máquinas 
 
 - Backend em MariaDB descartável: **267 aprovados**, 74 avisos de depreciação preexistentes.
 - Build frontend: **passou** (`npm --prefix frontend run build`).
-- Escopo das OS por sete perfis e matriz RBAC: incluído na suíte completa; aprovação pós-correção.
-- Calendário e viewport 390×844: pendentes de confirmação pós-deploy.
-- CI GitHub, HTTPS Tailscale e leitura pós-deploy: pendentes.
+- GitHub Actions para o commit `2ba406f92a8215816a79c97441085cc84eb89655`: backend MariaDB e frontend **SUCCESS** ([run 43450159162](https://github.com/gabrielh063/agroFrota/actions/runs/43450159162)). Lint concluiu com avisos conhecidos; exit code 0.
+- HTTPS Tailscale pós-deploy: `/api/health` respondeu HTTP 200 com `status=online`.
+- Smoke autenticado pós-deploy, sem registrar tokens/senhas: sete perfis receberam HTTP 200 em Ordens de Serviço e Calendário. Admin Empresa, Diretoria, Gestor de Frota, Administrativo e Auditor viram 3 OS; Manutenção e Operador viram 1 OS cada. Foram conferidos os IDs de atribuição dos perfis limitados.
+- Consulta concorrente de permissões de todos os sete perfis: **7/7 HTTP 200**.
+- Readback de dados pós-deploy: 1 tenant, 7 usuários, 3 máquinas e 3 OS — mesmas contagens anteriores. O container MariaDB e seu volume não foram recriados; somente o container backend foi atualizado.
+- Chrome headless autenticado em emulação **390×844**: a página carregou 3 linhas, sem erro e sem overflow horizontal da página (largura 390 px). Captura: [`ordens-servico-390x844.png`](agro-final-08/ordens-servico-390x844.png).
+- O Calendário retornou HTTP 200 para os sete perfis após o deploy. Nenhum 500 ocorreu nos cenários pós-deploy reproduzidos.
+- O Safari físico do iPhone não foi novamente controlado após a atualização. A captura do viewport é Chrome headless; o tráfego Safari registrado antes do deploy forneceu a reprodução original da falha.
 
 ## Publicação e instalação privada
 
-Esta correção será publicada na branch `fix/agro-final-07-mobile-tenant-rbac`, na PR #11. Não haverá merge automático.
+Commit `2ba406f92a8215816a79c97441085cc84eb89655` publicado na branch `fix/agro-final-07-mobile-tenant-rbac`, PR #11 ([aberta, sem merge](https://github.com/gabrielh063/agroFrota/pull/11)).
+
+Imagem do backend pós-deploy: `sha256:9e0295242e8f835d6bb89b1f1e767623ade1a2a33112e346f45c0a9763384002`; o SHA-256 do módulo de permissões dentro do container coincide com o commit publicado (`362c369005304f70e8b97e131468f0a5dad44c18dba4b6d2a1d565ccf82b7d79`). Backend ficou `healthy`; imagem frontend e configuração HTTPS/Tailscale não foram alteradas.
