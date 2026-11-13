@@ -105,7 +105,7 @@ Executar em janela aprovada, com dados sintéticos e sem criar demonstrações a
 
 - Nova regressão e testes de convites executados no MariaDB descartável: **10 passed**, 2 avisos de depreciação `datetime.utcnow`; ambiente temporário encerrado após o teste.
 - A primeira tentativa do runner com Python do sistema falhou antes dos testes por falta de Alembic; não alterou banco persistente. O runner foi repetido com venv temporário e isolado.
-- CI verde do HEAD de entrada: backend MariaDB e frontend. A alteração desta revisão requer novo CI no HEAD final, ainda pendente de publicação/execução.
+- CI remoto no commit de correção `de49b0ae8f1c0bd6e455433d131bf632236d7027`: `backend-mariadb` e `frontend` passaram; a PR permaneceu `CLEAN`. O relatório será acompanhado pelo check do commit documental final na [PR #13](https://github.com/gabrielh063/agroFrota/pull/13).
 - `git diff --check` passou após a alteração de código; repetir após fechar este documento.
 - Baseline reportado no checkpoint anterior: 284 testes backend, build frontend e lint exit 0 com avisos; navegador Chrome com 39 verificações, 25 combinações viewport/rota sem overflow e axe-core zero violações em seis rotas. Essas evidências são anteriores a esta revisão e não foram repetidas sem mudança correspondente.
 - Cadastro validado previamente em Chrome com estados válidos/inválidos/expirados/revogados, divergência de senhas, username duplicado, indisponibilidade de rede, duplo clique, sucesso/login e reuso. Capturas sanitizadas existentes; sem token verdadeiro. Não houve nova homologação física em Safari.
