@@ -1,0 +1,47 @@
+{
+  "version": "4.11.0",
+  "standard": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa"
+  ],
+  "routes": [
+    {
+      "route": "/login",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 17
+    },
+    {
+      "route": "/cadastro",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 19
+    },
+    {
+      "route": "/equipe-permissoes",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 23
+    },
+    {
+      "route": "/ordens-servico",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 19
+    },
+    {
+      "route": "/calendario",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 16
+    },
+    {
+      "route": "/assistente",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 19
+    }
+  ]
+}

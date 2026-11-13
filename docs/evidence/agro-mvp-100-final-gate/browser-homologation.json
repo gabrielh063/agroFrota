@@ -1,0 +1,225 @@
+{
+  "date": "2026-11-13T19:09:34.244Z",
+  "environment": "local Chrome + synthetic MariaDB tenants; no production credentials",
+  "browser": "Chrome/155.0.8059.39",
+  "invitation_checks": [
+    {
+      "check": "admin panel invite link can be copied or selected for manual copy",
+      "passed": true
+    },
+    {
+      "check": "invite URL carries token in fragment",
+      "passed": true
+    },
+    {
+      "check": "direct /cadastro without token shows fatal invite error",
+      "passed": true
+    },
+    {
+      "check": "invalid invite is rejected and fragment is removed",
+      "passed": true
+    },
+    {
+      "check": "expired invite is rejected",
+      "passed": true
+    },
+    {
+      "check": "revoked invite is rejected",
+      "passed": true
+    },
+    {
+      "check": "password mismatch is recoverable and retains fields",
+      "passed": true
+    },
+    {
+      "check": "duplicate username is recoverable",
+      "passed": true
+    },
+    {
+      "check": "temporary request failure is recoverable",
+      "passed": true
+    },
+    {
+      "check": "double-click creates account once and shows completion state",
+      "passed": true
+    },
+    {
+      "check": "consumed invitation cannot be reused",
+      "passed": true
+    },
+    {
+      "check": "/login 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 1280x800 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "signup fields follow a visible keyboard focus order",
+      "passed": true
+    }
+  ],
+  "viewport_route_checks": [
+    {
+      "check": "team page 1280x800 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/cadastro 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/equipe-permissoes 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/ordens-servico 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/calendario 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/assistente 375x812 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/cadastro 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/equipe-permissoes 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/ordens-servico 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/calendario 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/assistente 390x844 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/cadastro 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/equipe-permissoes 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/ordens-servico 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/calendario 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/assistente 768x1024 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/login 1280x800 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/cadastro 1280x800 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/equipe-permissoes 1280x800 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/ordens-servico 1280x800 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/calendario 1280x800 no horizontal overflow",
+      "passed": true
+    },
+    {
+      "check": "/assistente 1280x800 no horizontal overflow",
+      "passed": true
+    }
+  ],
+  "contrast_measurement": 16.43221396009498,
+  "axe": [
+    {
+      "route": "/login",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 17
+    },
+    {
+      "route": "/cadastro",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 19
+    },
+    {
+      "route": "/equipe-permissoes",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 23
+    },
+    {
+      "route": "/ordens-servico",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 19
+    },
+    {
+      "route": "/calendario",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 16
+    },
+    {
+      "route": "/assistente",
+      "viewport": "1280x800",
+      "violations": [],
+      "passes": 19
+    }
+  ],
+  "keyboard_checks": [
+    {
+      "check": "signup fields follow a visible keyboard focus order",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "invites-list-1280x800.png",
+    "signup-form-375x812.png",
+    "signup-complete-375x812.png"
+  ],
+  "secrets_recorded": false,
+  "axe_version": "4.11.0"
+}

@@ -1,6 +1,6 @@
 # AGRO-MVP-100 — retomada após reboot do notebook
 
-Data: 13/11/2026. Estado desta retomada: **`AGRO_MVP_100_PARTIAL`**.
+Data: 13/11/2026. Este documento registra o checkpoint intermediário de recuperação e foi substituído pelo relatório de revisão final em [AGRO-MVP-100-FINAL-GATE.md](AGRO-MVP-100-FINAL-GATE.md). Consulte o relatório de revisão final para o status atual da missão.
 
 ## Recuperação
 
