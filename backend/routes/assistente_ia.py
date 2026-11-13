@@ -1,5 +1,6 @@
 """Rotas do assistente local, com identidade e permissões sempre do servidor."""
 import json
+import logging
 import os
 
 from flask import Blueprint, jsonify, request
@@ -17,6 +18,7 @@ from services.assistente_operacoes_service import (
 )
 
 assistente_ia_bp = Blueprint("assistente_ia", __name__, url_prefix="/api/assistente")
+logger = logging.getLogger(__name__)
 
 
 def _erro(msg, status):
@@ -115,9 +117,11 @@ def mensagem(**kwargs):
         return jsonify({"success": status < 400, **result}), status
     except RuntimeError as exc:
         session.rollback()
-        return _erro(str(exc), 503)
-    except Exception:
+        logger.warning("Central de Operações indisponível (%s).", type(exc).__name__)
+        return _erro("A Central de Operações está temporariamente indisponível. Tente novamente.", 503)
+    except Exception as exc:
         session.rollback()
+        logger.error("Falha ao processar mensagem na Central de Operações (%s).", type(exc).__name__)
         return _erro("Não consegui processar a mensagem. Nenhuma alteração foi confirmada.", 500)
 
 
