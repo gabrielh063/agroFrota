@@ -7,6 +7,7 @@ Data: 13/11/2026. **Status: `AGRO_MVP_101_SECURITY_ACTION_REQUIRED`.** Não faze
 - Worktree preservada: `/home/gabriel/Documents/projetos_portifolio/agrofrota-local`.
 - Branch: `feat/agro-mvp-100-resume`.
 - HEAD de entrada verificado: `8fa78c40bf168fca00ad5548264d1b906c647354`, igual ao HEAD remoto da PR #13 no início desta missão.
+- HEAD com este relatório e CI concluída antes desta atualização documental: `12b34b7b3e263d5d16207f233b28bf46a68c9c7e`.
 - PR #13: aberta contra `Main`, `CLEAN`, checks backend MariaDB e frontend aprovados no HEAD de entrada. Nenhum merge realizado. Estado atual: [PR #13](https://github.com/gabrielh063/agroFrota/pull/13).
 - PR #12: aberta, `CLEAN`, checks aprovados; branch e evidências preservadas, sem alterações. [PR #12](https://github.com/gabrielh063/agroFrota/pull/12).
 - Arquivos locais não rastreados, worktrees e backups existentes foram preservados.
@@ -63,7 +64,7 @@ Depois de validar a chave, executar as coletas read-only documentadas em [AGRO-M
 - **Proxy/rate limit:** backend não publica porta de host e recebe tráfego do Nginx pela bridge privada. Portanto os limites por `request.remote_addr` são compartilhados por usuários atrás desse peer: login 120/minuto, validação 120/minuto e registro 20/15 minutos; registro também limita por token. É um risco operacional P2 em pico de onboarding, não uma forma de falsificar IP ou contornar autenticação. Não foi alterado sem evidência de volume incompatível.
 - **Central de IA:** cobertura anterior inclui consulta, histórico, proposta, confirmação/cancelamento, concorrência, rollback, Ollama indisponível, exceção, recursos insuficientes e autorização/tenant. Logs sanitizados preservam identificador de correlação sem conteúdo de conversa/SQL/segredos. A causa específica dos 500 históricos de AGRO-SERVER-01 não pode ser recuperada.
 - **Migrações:** validação anterior registrou upgrade/downgrade e re-upgrade em MariaDB descartável. DDL MariaDB pode não ser transacional; falha de migration exige inspeção e correção forward-only, sem downgrade automático. Nenhuma migration foi aplicada ao banco de produção.
-- **PR/CI:** HEAD de entrada `8fa78c40bf168fca00ad5548264d1b906c647354`; PR #13 `CLEAN`, checks backend MariaDB e frontend verdes no run [43496587674](https://github.com/gabrielh063/agroFrota/actions/runs/43496587674). Mudanças apenas nesta documentação ainda precisarão de CI no HEAD que a incluir.
+- **PR/CI:** os checks backend MariaDB e frontend passaram no HEAD `12b34b7b3e263d5d16207f233b28bf46a68c9c7e`, já incluindo este relatório, no run [43498512701](https://github.com/gabrielh063/agroFrota/actions/runs/43498512701); a PR estava `CLEAN`. Se houver novo commit, aguardar e conferir seus próprios checks antes da integração.
 - **Testes registrados:** 10 testes de convites passaram no MariaDB descartável no checkpoint anterior, incluindo a nova regressão de aceite/revogação. CI de backend e frontend passou no HEAD acima. Os 284 testes completos, build, lint, Chrome e axe-core são evidências do checkpoint anterior, não foram repetidos nesta rodada sem mudança correspondente.
 - A instalação atual, os dados e os serviços do servidor devem continuar intactos até autorização separada.
 
@@ -82,5 +83,5 @@ Depois de validar a chave, executar as coletas read-only documentadas em [AGRO-M
 1. Operador fornecer o fingerprint SSH esperado, obtido no console confiável, para comparação com a chave apresentada.
 2. Após validação, executar correlação privada das contas, decidir/autorizar redefinições e invalidação de sessões e confirmar acesso administrativo.
 3. Verificar recursos, cron/execução automática, último backup, retenção, espaço, restore isolado e `restic check` com a configuração autorizada do Immich.
-4. Atualizar este relatório e a PR com evidências sanitizadas; repetir CI no HEAD que contenha este documento.
+4. A CI no HEAD documentado passou. Se novas evidências forem adicionadas em outro commit, aguardar CI verde nesse novo HEAD.
 5. Aguardar autorização explícita e separada para merge e publicação. **A PR não foi integrada e o servidor não foi atualizado.**
