@@ -128,6 +128,43 @@ def test_convite_e_de_uso_unico_sob_requisicoes_concorrentes(base_url, auth_head
         assert len(users) == 1
 
 
+def test_aceite_concorrente_com_revogacao_tem_resultado_serializado(base_url, auth_headers):
+    profile_id = _perfil(base_url, auth_headers, "OPERADOR")
+    created = _criar_convite(base_url, auth_headers, profile_id)
+    assert created.status_code == 201
+    invite = created.json()["data"]
+    username = f"revoke_race_{uuid.uuid4().hex[:12]}"
+
+    def register():
+        return _registrar(base_url, invite["token"], username)
+
+    def revoke():
+        return requests.patch(
+            f"{base_url}/api/convites/{invite['id']}/revogar",
+            headers=auth_headers, timeout=15,
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        registration, revocation = [future.result() for future in (
+            pool.submit(register), pool.submit(revoke),
+        )]
+
+    assert (registration.status_code, revocation.status_code) in {
+        (201, 409),  # Acceptance committed first; revocation sees consumed invite.
+        (400, 200),  # Revocation committed first; acceptance sees inactive invite.
+    }
+    central_factory, _ = criar_sessao_central(Config)
+    with central_factory() as session:
+        stored = session.get(Convite, invite["id"])
+        assert (stored.consumido_em is not None) != (stored.revogado_em is not None)
+    tenant_factory, _ = criar_sessao_tenant(Config, os.environ["AGROFROTA_TEST_DATABASE"])
+    with tenant_factory() as session:
+        account = session.execute(select(Usuario).where(
+            Usuario.convite_id == invite["id"]
+        )).scalar_one_or_none()
+        assert (account is not None) == (stored.consumido_em is not None)
+
+
 def test_perfil_sem_permissao_nao_emite_convite(base_url, auth_headers):
     operator_id = _perfil(base_url, auth_headers, "OPERADOR")
     username = f"no_invite_{uuid.uuid4().hex[:12]}"

@@ -201,17 +201,20 @@ def revogar(convite_id, **kwargs):
     tenant_factory, _tenant_engine = criar_sessao_tenant(Config, kwargs["database_name"])
     central_factory, _central_engine = criar_sessao_central(Config)
     with tenant_factory() as tenant_session, central_factory() as session:
-        try:
-            autorizar(tenant_session, kwargs["database_name"],
-                      kwargs["contexto_administrativo"], "USUARIO_CRIAR")
-        except AdministracaoNegada:
-            return jsonify({"success": False, "message": "Ação não autorizada."}), 403
+        # Lock the central invitation before taking the tenant AdminLock. The
+        # registration route uses the same central -> tenant lock order; keeping
+        # it consistent prevents a register/revoke deadlock on MariaDB.
         invite = session.execute(select(Convite).where(
             Convite.id == convite_id,
             Convite.tenant_id == kwargs["tenant_id"],
         ).with_for_update()).scalar_one_or_none()
         if invite is None:
             return jsonify({"success": False, "message": "Convite não encontrado."}), 404
+        try:
+            autorizar(tenant_session, kwargs["database_name"],
+                      kwargs["contexto_administrativo"], "USUARIO_CRIAR")
+        except AdministracaoNegada:
+            return jsonify({"success": False, "message": "Ação não autorizada."}), 403
         if invite.consumido_em is not None:
             return jsonify({"success": False, "message": "Convite já utilizado."}), 409
         if invite.revogado_em is None:
