@@ -12,6 +12,7 @@ function ProtectedRoute({
 }) {
     const {
         autenticado,
+        carregandoPermissoes,
     } = useAuth();
 
     if (!autenticado) {
@@ -21,6 +22,10 @@ function ProtectedRoute({
                 replace
             />
         );
+    }
+
+    if (carregandoPermissoes) {
+        return <div className="route-loading" role="status" aria-live="polite">Carregando seu perfil e permissões…</div>;
     }
 
     return children;

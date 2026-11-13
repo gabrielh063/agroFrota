@@ -9,7 +9,8 @@ from middleware.tenant import resolver_tenant
 
 from services.dashboard_service import (
     obter_dashboard_indisponibilidade,
-    obter_capacidade_patio
+    obter_capacidade_patio,
+    obter_atividade_servicos,
 )
 
 
@@ -113,3 +114,20 @@ def dashboard_capacidade(**kwargs):
                 "capacidade do pátio."
             ),
         }), 500
+
+
+@dashboard_bp.get("/atividade")
+@autenticar()
+@resolver_tenant(Config)
+@exigir_permissao("OS.VISUALIZAR")
+def dashboard_atividade(**kwargs):
+    try:
+        meses = max(1, min(int(request.args.get("meses", 12)), 12))
+        atividade = obter_atividade_servicos(
+            kwargs["tenant_session"], kwargs["contexto_administrativo"], meses
+        )
+        return jsonify({"success": True, "atividade": atividade})
+    except (ValueError, TypeError):
+        return jsonify({"success": False, "message": "Período inválido."}), 400
+    except Exception:
+        return jsonify({"success": False, "message": "Erro ao carregar atividade de serviços."}), 500

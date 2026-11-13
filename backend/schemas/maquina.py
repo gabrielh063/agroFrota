@@ -17,6 +17,8 @@ class MaquinaCriarSchema(BaseModel):
         max_length=100
     )
 
+    categoria: str | None = Field(default=None, max_length=60)
+
     ano: int | None = Field(
         default=None,
         ge=1900,
@@ -55,6 +57,8 @@ class MaquinaAtualizarSchema(BaseModel):
         max_length=100
     )
 
+    categoria: str | None = Field(default=None, max_length=60)
+
     ano: int | None = Field(
         default=None,
         ge=1900,
@@ -85,6 +89,7 @@ class MaquinaRespostaSchema(BaseModel):
     identificacao: str
     modelo: str
     fabricante: str
+    categoria: str | None = None
     ano: int | None
     localizacao: str | None
     status: str

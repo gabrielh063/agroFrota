@@ -6,6 +6,7 @@ import {
 
 import {
     useNavigate,
+    Link,
 } from "react-router-dom";
 
 import {
@@ -21,6 +22,7 @@ import {
 } from "../../api/equipamentoService";
 
 import "./OrdensServico.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const STATUS_FINAIS = [
@@ -32,6 +34,7 @@ const STATUS_FINAIS = [
 function OrdensServico() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
 
     const [ordens, setOrdens] =
         useState([]);
@@ -380,7 +383,7 @@ function OrdensServico() {
                 </div>
 
 
-                <button
+                {pode("OS.CRIAR") && <button
                     className="os-new"
                     type="button"
                     onClick={() =>
@@ -392,7 +395,7 @@ function OrdensServico() {
                     <i className="bi bi-plus-lg" />
 
                     Nova OS
-                </button>
+                </button>}
 
             </header>
 
@@ -467,6 +470,7 @@ function OrdensServico() {
 
                     <input
                         type="text"
+                        aria-label="Buscar ordem de serviço"
                         value={busca}
                         onChange={
                             (event) =>
@@ -481,6 +485,7 @@ function OrdensServico() {
 
 
                 <select
+                    aria-label={`${({ TODOS: "Todos os status", ABERTA: "Aberta", EM_ANDAMENTO: "Em andamento", CONCLUIDA: "Concluída", CANCELADA: "Cancelada" })[status]}, filtro de ordens`}
                     value={status}
                     onChange={
                         (event) =>
@@ -512,6 +517,7 @@ function OrdensServico() {
 
 
                 <select
+                    aria-label={`${({ TODAS: "Prioridades", BAIXA: "Baixa", MEDIA: "Média", ALTA: "Alta", URGENTE: "Urgente" })[prioridade]}, filtro de ordens`}
                     value={prioridade}
                     onChange={
                         (event) =>
@@ -543,6 +549,7 @@ function OrdensServico() {
 
 
                 <select
+                    aria-label={`${({ TODOS: "Todos os tipos", SERVICO: "Serviço", MANUTENCAO: "Manutenção" })[tipo]}, filtro de ordens`}
                     value={tipo}
                     onChange={
                         (event) =>
@@ -568,7 +575,7 @@ function OrdensServico() {
 
 
             {erro && (
-                <div className="os-error">
+                <div className="os-error" role="alert">
 
                     <i className="bi bi-exclamation-circle" />
 
@@ -645,7 +652,7 @@ function OrdensServico() {
 
                 ) : (
 
-                    <div className="os-table-wrapper">
+                    <div className="os-table-wrapper" role="region" aria-label="Tabela de ordens de serviço" tabIndex={0}>
 
                         <table className="os-table">
 
@@ -657,7 +664,7 @@ function OrdensServico() {
                                     <th>Prioridade</th>
                                     <th>Status</th>
                                     <th>Prazo</th>
-                                    <th />
+                                    <th scope="col">Ações</th>
                                 </tr>
                             </thead>
 
@@ -677,15 +684,13 @@ function OrdensServico() {
                                                 key={
                                                     ordem.id
                                                 }
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/ordens-servico/${ordem.id}`
-                                                    )
-                                                }
                                             >
 
                                                 <td>
-                                                    <div className="os-info">
+                                                    <Link
+                                                        className="os-info"
+                                                        to={`/ordens-servico/${ordem.id}`}
+                                                    >
 
                                                         <span className="os-number">
                                                             OS #{ordem.numero}
@@ -697,7 +702,7 @@ function OrdensServico() {
                                                             }
                                                         </strong>
 
-                                                    </div>
+                                                    </Link>
                                                 </td>
 
 

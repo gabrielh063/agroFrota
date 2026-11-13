@@ -1,0 +1,456 @@
+.agd-detail-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 1100;
+
+    padding: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(0, 0, 0, .68);
+
+    backdrop-filter:
+        blur(3px);
+}
+
+
+.agd-detail-modal {
+    width: 100%;
+    max-width: 700px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    border-radius: 14px;
+
+    background:
+        #0D140E;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 24px 70px
+        rgba(0,0,0,.35);
+}
+
+
+.agd-detail-header {
+    padding: 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 20px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.07);
+}
+
+
+.agd-detail-number {
+    color:
+        var(--color-text-muted);
+
+    font-family:
+        var(--font-mono);
+
+    font-size: 11px;
+}
+
+
+.agd-detail-header h2 {
+    margin: 4px 0 0;
+
+    color:
+        #EFEFE6;
+
+    font-family:
+        var(--font-display);
+
+    font-size: 21px;
+}
+
+
+.agd-detail-header p {
+    margin: 4px 0 0;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 12px;
+}
+
+
+.agd-detail-header-right {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.agd-close {
+    width: 32px;
+    height: 32px;
+
+    border: 0;
+
+    background: transparent;
+
+    color:
+        var(--color-text-muted);
+}
+
+
+.agd-status {
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.agd-status.agendado {
+    background:
+        rgba(82,168,91,.12);
+
+    color:
+        #69BD72;
+}
+
+
+.agd-status.em_andamento {
+    background:
+        rgba(37,174,167,.15);
+
+    color:
+        #25AEA7;
+}
+
+
+.agd-status.concluido {
+    background:
+        rgba(255,255,255,.07);
+
+    color:
+        #A3A799;
+}
+
+
+.agd-status.cancelado {
+    background:
+        rgba(255,99,103,.12);
+
+    color:
+        #FF6367;
+}
+
+
+.agd-detail-content,
+.agd-edit-form {
+    padding: 20px;
+}
+
+
+.agd-detail-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+}
+
+
+.agd-info {
+    min-height: 80px;
+
+    padding: 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius: 9px;
+
+    background:
+        #080F0A;
+}
+
+
+.agd-info span {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    color:
+        var(--color-text-muted);
+
+    font-size: 11px;
+}
+
+
+.agd-info strong {
+    margin-top: 7px;
+
+    color:
+        #EFEFE6;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+.agd-observacoes {
+    margin-top: 14px;
+
+    padding: 14px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius: 9px;
+
+    background:
+        #080F0A;
+}
+
+
+.agd-observacoes span {
+    color:
+        var(--color-text-muted);
+
+    font-size: 11px;
+}
+
+
+.agd-observacoes p {
+    margin: 7px 0 0;
+
+    color:
+        #D8DBD2;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+.agd-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+.agd-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.agd-field.full {
+    grid-column:
+        1 / -1;
+}
+
+
+.agd-field label {
+    color: #EFEFE6;
+
+    font-size: 13px;
+}
+
+
+.agd-field input,
+.agd-field select,
+.agd-field textarea {
+    width: 100%;
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background:
+        #080F0A;
+
+    color:
+        #EFEFE6;
+
+    font-size: 13px;
+}
+
+
+.agd-field input,
+.agd-field select {
+    height: 40px;
+
+    padding: 0 12px;
+}
+
+
+.agd-field textarea {
+    padding: 11px 12px;
+
+    resize: vertical;
+}
+
+
+.agd-field input:focus,
+.agd-field select:focus,
+.agd-field textarea:focus {
+    border-color:
+        var(--color-primary);
+}
+
+
+.agd-error {
+    margin-top: 16px;
+
+    padding: 10px 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    border:
+        1px solid
+        rgba(255,99,103,.25);
+
+    border-radius: 8px;
+
+    background:
+        rgba(255,99,103,.07);
+
+    color:
+        #FF8588;
+
+    font-size: 12px;
+}
+
+
+.agd-actions {
+    margin-top: 22px;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 9px;
+}
+
+
+.agd-actions button {
+    min-height: 38px;
+
+    padding: 0 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+.agd-secondary {
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    background:
+        transparent;
+
+    color:
+        #EFEFE6;
+}
+
+
+.agd-edit {
+    border:
+        1px solid
+        rgba(82,168,91,.3);
+
+    background:
+        rgba(82,168,91,.08);
+
+    color:
+        var(--color-primary);
+}
+
+
+.agd-save {
+    border: 0;
+
+    background:
+        var(--color-primary);
+
+    color:
+        #071009;
+}
+
+
+.agd-danger {
+    border:
+        1px solid
+        rgba(255,99,103,.3);
+
+    background:
+        rgba(255,99,103,.07);
+
+    color:
+        #FF8588;
+}
+
+
+@media (max-width: 650px) {
+    .agd-detail-grid,
+    .agd-form-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .agd-field.full {
+        grid-column:
+            auto;
+    }
+
+    .agd-actions {
+        flex-direction: column;
+    }
+
+    .agd-actions button {
+        width: 100%;
+    }
+}

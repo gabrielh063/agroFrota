@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from models.tenant.indisponibilidade import Indisponibilidade
 from models.tenant.maquina import Maquina
 from models.tenant.equipamento import Equipamento
+from models.tenant.ordem_servico import OrdemServico
+from services.os_policy import consulta_os
 
 
 def _calcular_horas_sobrepostas(
@@ -298,134 +300,6 @@ def obter_capacidade_patio(
     session: Session,
 ) -> dict:
     """
-    Retorna a capacidade instalada e a situação
-    operacional dos ativos do pátio.
-    """
-
-    maquinas = list(
-        session.scalars(
-            select(Maquina)
-        ).all()
-    )
-
-    equipamentos = list(
-        session.scalars(
-            select(Equipamento)
-        ).all()
-    )
-
-    quantidade_maquinas = len(maquinas)
-    quantidade_equipamentos = len(equipamentos)
-
-    total_ativos = (
-        quantidade_maquinas
-        + quantidade_equipamentos
-    )
-
-    # ---------------------------------------------------------
-    # INDISPONIBILIDADES ATIVAS
-    # ---------------------------------------------------------
-
-    indisponibilidades_ativas = list(
-        session.scalars(
-            select(Indisponibilidade).where(
-                Indisponibilidade.status == "ATIVA"
-            )
-        ).all()
-    )
-
-    maquinas_indisponiveis = {
-        registro.maquina_id
-        for registro in indisponibilidades_ativas
-        if registro.maquina_id is not None
-    }
-
-    equipamentos_indisponiveis = {
-        registro.equipamento_id
-        for registro in indisponibilidades_ativas
-        if registro.equipamento_id is not None
-    }
-
-    # ---------------------------------------------------------
-    # CONTAGEM OPERACIONAL
-    # ---------------------------------------------------------
-
-    indisponivel = (
-        len(maquinas_indisponiveis)
-        + len(equipamentos_indisponiveis)
-    )
-
-    maquinas_manutencao = {
-        registro.maquina_id
-        for registro in indisponibilidades_ativas
-        if (
-            registro.tipo == "MANUTENCAO"
-            and registro.maquina_id is not None
-        )
-    }
-
-    equipamentos_manutencao = {
-        registro.equipamento_id
-        for registro in indisponibilidades_ativas
-        if (
-            registro.tipo == "MANUTENCAO"
-            and registro.equipamento_id is not None
-        )
-    }
-
-    manutencao = (
-        len(maquinas_manutencao)
-        + len(equipamentos_manutencao)
-    )
-
-    operando = max(
-        total_ativos - indisponivel,
-        0,
-    )
-
-    # ---------------------------------------------------------
-    # PERCENTUAIS
-    # ---------------------------------------------------------
-
-    if total_ativos > 0:
-        percentual_operando = round(
-            (operando / total_ativos) * 100,
-            2,
-        )
-
-        percentual_manutencao = round(
-            (manutencao / total_ativos) * 100,
-            2,
-        )
-
-        percentual_indisponivel = round(
-            (indisponivel / total_ativos) * 100,
-            2,
-        )
-    else:
-        percentual_operando = 0.0
-        percentual_manutencao = 0.0
-        percentual_indisponivel = 0.0
-
-    return {
-        "total_ativos": total_ativos,
-        "maquinas": quantidade_maquinas,
-        "equipamentos": quantidade_equipamentos,
-
-        "operando": operando,
-        "manutencao": manutencao,
-        "indisponivel": indisponivel,
-
-        "percentual_operando": percentual_operando,
-        "percentual_manutencao": percentual_manutencao,
-        "percentual_indisponivel": percentual_indisponivel,
-    }
-    
-    
-def obter_capacidade_patio(
-    session: Session,
-) -> dict:
-    """
     Retorna a capacidade instalada atual do pátio.
 
     A classificação dos ativos é exclusiva:
@@ -442,19 +316,9 @@ def obter_capacidade_patio(
     # ATIVOS
     # ---------------------------------------------------------
 
-    maquinas = list(
-        session.scalars(
-            select(Maquina)
-        ).all()
-    )
+    maquinas = list(session.scalars(select(Maquina)).all())
 
-    equipamentos = list(
-        session.scalars(
-            select(Equipamento).where(
-                Equipamento.ativo.is_(True)
-            )
-        ).all()
-    )
+    equipamentos = list(session.scalars(select(Equipamento)).all())
 
     # ---------------------------------------------------------
     # INDISPONIBILIDADES ATIVAS
@@ -468,120 +332,49 @@ def obter_capacidade_patio(
         ).all()
     )
 
-    ids_maquinas_manutencao = set()
-    ids_maquinas_indisponiveis = set()
-
-    ids_equipamentos_manutencao = set()
-    ids_equipamentos_indisponiveis = set()
+    status_por_ativo = {}
 
     for registro in indisponibilidades_ativas:
 
         if registro.maquina_id is not None:
 
-            if registro.tipo == "MANUTENCAO":
-                ids_maquinas_manutencao.add(
-                    registro.maquina_id
-                )
-
-            else:
-                ids_maquinas_indisponiveis.add(
-                    registro.maquina_id
-                )
+            chave = ("maquina", registro.maquina_id)
+            novo = "manutencao" if registro.tipo == "MANUTENCAO" else "indisponivel"
+            if chave not in status_por_ativo or novo == "manutencao":
+                status_por_ativo[chave] = novo
 
         if registro.equipamento_id is not None:
 
-            if registro.tipo == "MANUTENCAO":
-                ids_equipamentos_manutencao.add(
-                    registro.equipamento_id
-                )
-
-            else:
-                ids_equipamentos_indisponiveis.add(
-                    registro.equipamento_id
-                )
-
-    # ---------------------------------------------------------
-    # CLASSIFICAÇÃO DAS MÁQUINAS
-    # ---------------------------------------------------------
-
-    quantidade_maquinas_operando = 0
-    quantidade_maquinas_manutencao = 0
-    quantidade_maquinas_indisponiveis = 0
-
-    for maquina in maquinas:
-
-        if maquina.id in ids_maquinas_manutencao:
-
-            quantidade_maquinas_manutencao += 1
-
-        elif maquina.id in ids_maquinas_indisponiveis:
-
-            quantidade_maquinas_indisponiveis += 1
-
-        elif getattr(maquina, "status", None) == "MANUTENCAO":
-
-            quantidade_maquinas_manutencao += 1
-
-        else:
-
-            quantidade_maquinas_operando += 1
-
-    # ---------------------------------------------------------
-    # CLASSIFICAÇÃO DOS EQUIPAMENTOS
-    # ---------------------------------------------------------
-
-    quantidade_equipamentos_operando = 0
-    quantidade_equipamentos_manutencao = 0
-    quantidade_equipamentos_indisponiveis = 0
-
-    for equipamento in equipamentos:
-
-        if equipamento.id in ids_equipamentos_manutencao:
-
-            quantidade_equipamentos_manutencao += 1
-
-        elif equipamento.id in ids_equipamentos_indisponiveis:
-
-            quantidade_equipamentos_indisponiveis += 1
-
-        elif getattr(equipamento, "status", None) == "MANUTENCAO":
-
-            quantidade_equipamentos_manutencao += 1
-
-        elif getattr(equipamento, "status", None) == "INATIVO":
-
-            quantidade_equipamentos_indisponiveis += 1
-
-        else:
-
-            quantidade_equipamentos_operando += 1
-
-    # ---------------------------------------------------------
-    # TOTAIS
-    # ---------------------------------------------------------
+            chave = ("equipamento", registro.equipamento_id)
+            novo = "manutencao" if registro.tipo == "MANUTENCAO" else "indisponivel"
+            if chave not in status_por_ativo or novo == "manutencao":
+                status_por_ativo[chave] = novo
 
     quantidade_maquinas = len(maquinas)
     quantidade_equipamentos = len(equipamentos)
 
-    total_ativos = (
-        quantidade_maquinas
-        + quantidade_equipamentos
-    )
+    contagens = {"operando": 0, "manutencao": 0, "indisponivel": 0, "inativo": 0}
+    for tipo, ativos in (("maquina", maquinas), ("equipamento", equipamentos)):
+        for ativo in ativos:
+            status = status_por_ativo.get((tipo, ativo.id))
+            if not ativo.ativo or str(ativo.status).upper() in {"INATIVO", "INATIVA", "DESATIVADO"}:
+                status = "inativo"
+            elif status is None:
+                valor = str(ativo.status).upper()
+                if valor in {"MANUTENCAO", "EM_MANUTENCAO"}:
+                    status = "manutencao"
+                elif valor in {"INDISPONIVEL", "PARADO", "PARADA", "INOPERANTE"}:
+                    status = "indisponivel"
+                else:
+                    status = "operando"
+            contagens[status] += 1
 
-    operando = (
-        quantidade_maquinas_operando
-        + quantidade_equipamentos_operando
-    )
-
-    manutencao = (
-        quantidade_maquinas_manutencao
-        + quantidade_equipamentos_manutencao
-    )
-
-    indisponivel = (
-        quantidade_maquinas_indisponiveis
-        + quantidade_equipamentos_indisponiveis
-    )
+    total_ativos = quantidade_maquinas + quantidade_equipamentos
+    operando = contagens["operando"]
+    manutencao = contagens["manutencao"]
+    indisponivel = contagens["indisponivel"]
+    inativo = contagens["inativo"]
+    base_operacional = total_ativos - inativo
 
     # ---------------------------------------------------------
     # PERCENTUAIS
@@ -589,11 +382,11 @@ def obter_capacidade_patio(
 
     def percentual(valor: int) -> float:
 
-        if total_ativos == 0:
+        if base_operacional == 0:
             return 0.0
 
         return round(
-            (valor / total_ativos) * 100,
+            (valor / base_operacional) * 100,
             2,
         )
 
@@ -603,6 +396,7 @@ def obter_capacidade_patio(
 
     return {
         "total_ativos": total_ativos,
+        "base_operacional": base_operacional,
 
         "maquinas": quantidade_maquinas,
 
@@ -613,6 +407,7 @@ def obter_capacidade_patio(
         "manutencao": manutencao,
 
         "indisponivel": indisponivel,
+        "inativo": inativo,
 
         "percentual_operando": percentual(
             operando
@@ -626,3 +421,29 @@ def obter_capacidade_patio(
             indisponivel
         ),
     }
+
+
+def obter_atividade_servicos(session: Session, contexto, meses: int = 12) -> list[dict]:
+    """Retorna OS criadas por mês, no escopo que o usuário pode visualizar."""
+    from datetime import datetime
+
+    agora = datetime.utcnow()
+    inicio = datetime(agora.year, agora.month, 1)
+    for _ in range(meses - 1):
+        inicio = inicio.replace(day=1) - timedelta(days=1)
+        inicio = inicio.replace(day=1)
+    consulta = consulta_os(session, contexto, "OS.VISUALIZAR", select(OrdemServico))
+    ordens = session.execute(consulta.where(OrdemServico.criado_em >= inicio)).scalars().unique().all()
+    contagens = {}
+    for ordem in ordens:
+        chave = (ordem.criado_em.year, ordem.criado_em.month)
+        contagens[chave] = contagens.get(chave, 0) + 1
+    resultado = []
+    cursor = datetime(agora.year, agora.month, 1)
+    for _ in range(meses):
+        resultado.append({"ano": cursor.year, "mes": cursor.month,
+                          "quantidade": contagens.get((cursor.year, cursor.month), 0)})
+        cursor = cursor.replace(day=1) - timedelta(days=1)
+        cursor = cursor.replace(day=1)
+    resultado.reverse()
+    return resultado

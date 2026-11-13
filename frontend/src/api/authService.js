@@ -19,3 +19,12 @@ export async function login({
 
     return resposta.data;
 }
+
+export async function logout() {
+    await api.post("/api/auth/logout");
+}
+
+export async function obterSessaoAtual() {
+    const resposta = await api.get("/api/auth/me");
+    return resposta.data.data;
+}

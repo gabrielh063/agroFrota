@@ -37,7 +37,8 @@ def listar_permissoes_route(**kwargs):
 
     permissoes = listar_permissoes(
         config=Config,
-        database_name=database_name
+        database_name=database_name,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     return jsonify({
@@ -70,12 +71,13 @@ def criar_permissao_route(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
 
         permissao = criar_permissao(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             codigo=dados.codigo,
@@ -120,12 +122,13 @@ def atualizar_permissao_route(
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
 
         permissao = atualizar_permissao(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             permissao_id=permissao_id,

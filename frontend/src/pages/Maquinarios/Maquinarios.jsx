@@ -16,9 +16,14 @@ import MaquinaFormModal
     from "../../components/MaquinaFormModal/MaquinaFormModal";
 
 import "./Maquinarios.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function Maquinarios() {
+    const { pode } = useAuth();
+    const podeCriar = pode("MAQUINA_CRIAR");
+    const podeEditar = pode("MAQUINA_EDITAR");
+    const podeDesativar = pode("MAQUINA_DESATIVAR");
     const [maquinas, setMaquinas] =
         useState([]);
 
@@ -366,25 +371,27 @@ function Maquinarios() {
         }
     }
 
+    const maquinasAtivas = maquinas.filter((maquina) => maquina.ativo);
+    const maquinasOperando = maquinasAtivas.filter((maquina) => maquina.status === "OPERANDO").length;
+    const maquinasAtencao = maquinasAtivas.filter((maquina) => ["MANUTENCAO", "PARADA"].includes(maquina.status)).length;
+
 
     return (
         <div className="maquinarios-page">
 
             <header className="maquinarios-header">
 
-                <div>
-                    <h1>
-                        Maquinários
-                    </h1>
-
-                    <p>
-                        Gerencie os maquinários
-                        cadastrados na frota.
-                    </p>
+                <div className="maquinarios-heading-copy">
+                    <span className="maquinarios-eyebrow"><i className="bi bi-truck-front" /> GESTÃO DE ATIVOS</span>
+                    <div className="maquinarios-title-row">
+                        <h1>Maquinários</h1>
+                        <span className="maquinarios-total"><strong>{carregando ? "—" : maquinas.length}</strong> cadastrados</span>
+                    </div>
+                    <p>Consulte a frota, acompanhe a condição dos ativos e mantenha os cadastros atualizados.</p>
                 </div>
 
 
-                <button
+                {podeCriar && <button
                     className="maquinarios-new"
                     type="button"
                     onClick={abrirCadastro}
@@ -392,9 +399,15 @@ function Maquinarios() {
                     <i className="bi bi-plus-lg" />
 
                     Novo maquinário
-                </button>
+                </button>}
 
             </header>
+
+            {!carregando && !erro && <section className="maquinarios-summary" aria-label="Resumo da frota">
+                <div className="maquinarios-summary-item"><span className="summary-icon"><i className="bi bi-truck-front" /></span><span><small>Ativos na frota</small><strong>{maquinasAtivas.length}</strong></span></div>
+                <div className="maquinarios-summary-item"><span className="summary-icon summary-operando"><i className="bi bi-check2-circle" /></span><span><small>Em operação</small><strong>{maquinasOperando}</strong></span></div>
+                <div className="maquinarios-summary-item"><span className="summary-icon summary-atencao"><i className="bi bi-wrench-adjustable" /></span><span><small>Precisam de atenção</small><strong>{maquinasAtencao}</strong></span></div>
+            </section>}
 
 
             {mensagem && (
@@ -408,7 +421,7 @@ function Maquinarios() {
             )}
 
 
-            <section className="maquinarios-filters">
+            <section className="maquinarios-filters" aria-label="Filtros de maquinários">
 
                 <div className="maquinarios-search">
 
@@ -416,6 +429,7 @@ function Maquinarios() {
 
                     <input
                         type="text"
+                        aria-label="Buscar maquinários"
                         placeholder="Buscar por identificação, fabricante, modelo..."
                         value={busca}
                         onChange={
@@ -429,7 +443,8 @@ function Maquinarios() {
                 </div>
 
 
-                <select
+                <label className="maquinarios-select"><span>Status operacional</span><select
+                    aria-label="Filtrar por status operacional"
                     value={status}
                     onChange={
                         (event) =>
@@ -457,10 +472,11 @@ function Maquinarios() {
                         )
                     )}
 
-                </select>
+                </select></label>
 
 
-                <select
+                <label className="maquinarios-select"><span>Situação do cadastro</span><select
+                    aria-label="Filtrar por situação do cadastro"
                     value={situacao}
                     onChange={
                         (event) =>
@@ -480,7 +496,7 @@ function Maquinarios() {
                     <option value="TODAS">
                         Todos
                     </option>
-                </select>
+                </select></label>
 
             </section>
 
@@ -569,13 +585,13 @@ function Maquinarios() {
 
                             <thead>
                                 <tr>
-                                    <th>Maquinário</th>
-                                    <th>Ano</th>
-                                    <th>Localização</th>
-                                    <th>Status</th>
-                                    <th>Telemetria</th>
-                                    <th>Situação</th>
-                                    <th />
+                                    <th scope="col">Maquinário</th>
+                                    <th scope="col">Ano</th>
+                                    <th scope="col">Localização</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Telemetria</th>
+                                    <th scope="col">Cadastro</th>
+                                    <th scope="col"><span className="visually-hidden">Ações</span></th>
                                 </tr>
                             </thead>
 
@@ -591,7 +607,7 @@ function Maquinarios() {
                                             }
                                         >
 
-                                            <td>
+                                            <td data-label="Maquinário">
                                                 <div className="maquina-identificacao">
 
                                                     <div className="maquina-icon">
@@ -605,7 +621,7 @@ function Maquinarios() {
                                                             }
                                                         </strong>
 
-                                                        <span>
+                                                        <span className="maquina-modelo">
                                                             {
                                                                 maquina.fabricante
                                                             }{" "}
@@ -613,13 +629,16 @@ function Maquinarios() {
                                                                 maquina.modelo
                                                             }
                                                         </span>
+                                                        <small className={`maquina-categoria ${maquina.categoria ? "" : "sem-categoria"}`}>
+                                                            <i className="bi bi-tag" /> {maquina.categoria || "Categoria não definida"}
+                                                        </small>
                                                     </div>
 
                                                 </div>
                                             </td>
 
 
-                                            <td>
+                                            <td data-label="Ano">
                                                 {
                                                     maquina.ano
                                                     || "-"
@@ -627,7 +646,7 @@ function Maquinarios() {
                                             </td>
 
 
-                                            <td>
+                                            <td data-label="Localização">
                                                 {
                                                     maquina.localizacao
                                                     || "-"
@@ -635,7 +654,7 @@ function Maquinarios() {
                                             </td>
 
 
-                                            <td>
+                                            <td data-label="Status">
                                                 <span
                                                     className={
                                                         `maquina-status ${
@@ -654,7 +673,7 @@ function Maquinarios() {
                                             </td>
 
 
-                                            <td>
+                                            <td data-label="Telemetria">
                                                 <span
                                                     className={
                                                         maquina.controla_telemetria
@@ -679,7 +698,7 @@ function Maquinarios() {
                                             </td>
 
 
-                                            <td>
+                                            <td data-label="Cadastro">
                                                 <span
                                                     className={
                                                         maquina.ativo
@@ -698,10 +717,12 @@ function Maquinarios() {
 
                                             <td className="actions-cell">
 
-                                                <button
+                                                {(podeEditar || podeDesativar) && <button
                                                     className="maquina-actions"
                                                     type="button"
-                                                    title="Ações"
+                                                    aria-label={`Ações de ${maquina.identificacao}`}
+                                                    aria-haspopup="menu"
+                                                    aria-expanded={menuAberto === maquina.id}
                                                     onClick={() =>
                                                         setMenuAberto(
                                                             menuAberto
@@ -712,17 +733,18 @@ function Maquinarios() {
                                                     }
                                                 >
                                                     <i className="bi bi-three-dots" />
-                                                </button>
+                                                </button>}
 
 
                                                 {
                                                     menuAberto
                                                     === maquina.id
                                                     && (
-                                                        <div className="maquina-action-menu">
+                                                        <div className="maquina-action-menu" role="menu">
 
-                                                            <button
+                                                            {podeEditar && <button
                                                                 type="button"
+                                                                role="menuitem"
                                                                 onClick={() =>
                                                                     abrirEdicao(
                                                                         maquina
@@ -732,11 +754,12 @@ function Maquinarios() {
                                                                 <i className="bi bi-pencil" />
 
                                                                 Editar
-                                                            </button>
+                                                            </button>}
 
 
-                                                            <button
+                                                            {podeDesativar && <button
                                                                 type="button"
+                                                                role="menuitem"
                                                                 className={
                                                                     maquina.ativo
                                                                         ? "danger"
@@ -761,7 +784,7 @@ function Maquinarios() {
                                                                         ? "Desativar"
                                                                         : "Ativar"
                                                                 }
-                                                            </button>
+                                                            </button>}
 
                                                         </div>
                                                     )

@@ -1,8 +1,11 @@
+from services.auditoria_service import registrar_evento
+from services.ativo_policy import autorizar_ativo
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
 
 from models.tenant.equipamento import Equipamento
+from services.operacao_lock import bloquear_operacoes, ha_agendamento_aberto
 
 
 STATUS_VALIDOS = {
@@ -23,7 +26,8 @@ def criar_equipamento(
     modelo: str | None = None,
     ano: int | None = None,
     localizacao: str | None = None,
-    status: str = "DISPONIVEL"
+    status: str = "DISPONIVEL",
+    *, contexto=None
 ) -> Equipamento:
 
     if status not in STATUS_VALIDOS:
@@ -39,6 +43,7 @@ def criar_equipamento(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'EQUIPAMENTO_CRIAR', escrita=True)
 
         equipamento_existente = session.execute(
             select(Equipamento).where(
@@ -64,6 +69,7 @@ def criar_equipamento(
         )
 
         session.add(equipamento)
+        registrar_evento(session, contexto, "criar_equipamento")
         session.commit()
         session.refresh(equipamento)
 
@@ -80,7 +86,8 @@ def criar_equipamento(
 def buscar_equipamento(
     config,
     database_name: str,
-    equipamento_id: int
+    equipamento_id: int,
+    *, contexto=None
 ) -> Equipamento | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -91,6 +98,7 @@ def buscar_equipamento(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'EQUIPAMENTO_VISUALIZAR', escrita=False)
 
         equipamento = session.execute(
             select(Equipamento).where(
@@ -116,7 +124,8 @@ def atualizar_equipamento(
     ano: int | None = None,
     localizacao: str | None = None,
     status: str | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    *, contexto=None
 ) -> Equipamento:
 
     if status is not None and status not in STATUS_VALIDOS:
@@ -132,6 +141,10 @@ def atualizar_equipamento(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'EQUIPAMENTO_EDITAR', escrita=True)
+        if ativo is not None:
+            autorizar_ativo(session, contexto, 'EQUIPAMENTO_DESATIVAR')
+        bloquear_operacoes(session)
 
         equipamento = session.execute(
             select(Equipamento).where(
@@ -143,6 +156,13 @@ def atualizar_equipamento(
             raise ValueError(
                 "Equipamento não encontrado."
             )
+
+        indisponivel = (
+            (ativo is False and equipamento.ativo)
+            or (status is not None and status != equipamento.status and status != "DISPONIVEL")
+        )
+        if indisponivel and ha_agendamento_aberto(session, equipamento_id=equipamento.id):
+            raise ValueError("Reagende ou cancele os serviços pendentes antes de indisponibilizar este equipamento.")
 
         if identificacao is not None:
 
@@ -184,6 +204,7 @@ def atualizar_equipamento(
         if ativo is not None:
             equipamento.ativo = ativo
 
+        registrar_evento(session, contexto, "atualizar_equipamento")
         session.commit()
         session.refresh(equipamento)
 
@@ -200,7 +221,8 @@ def atualizar_equipamento(
 def listar_equipamentos(
     config,
     database_name: str,
-    incluir_inativos: bool = False
+    incluir_inativos: bool = False,
+    *, contexto=None
 ) -> list[Equipamento]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -211,6 +233,7 @@ def listar_equipamentos(
     session = SessionLocal()
 
     try:
+        autorizar_ativo(session, contexto, 'EQUIPAMENTO_VISUALIZAR', escrita=False)
 
         consulta = select(Equipamento).order_by(
             Equipamento.id

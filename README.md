@@ -1,5 +1,15 @@
 # AgroFrota
 
+**Estado atual: PARCIAL, sem homologação privada.** A candidata de integração,
+evidências e pendências estão em [docs/MISSAO_FINAL.md](docs/MISSAO_FINAL.md).
+O checklist abaixo é histórico e não comprova os fluxos completos.
+
+A entrega acadêmica do Vault, Assistente IA e Dashboard está descrita em
+[docs/AGRO_IA_DASH.md](docs/AGRO_IA_DASH.md). A captura de referência do dashboard
+está em `docs/evidence/dashboard-demo-1600x900.png`.
+O fluxo conversacional de criação de OS e agendamento está em
+[docs/AGRO_IA_02.md](docs/AGRO_IA_02.md).
+
 Sistema SaaS de gestão para propriedades rurais, com foco no controle de máquinas, equipamentos, manutenção, ordens de serviço, indisponibilidade e gestão operacional.
 
 O projeto está sendo desenvolvido de forma modular, priorizando primeiro a estrutura do backend e a validação das regras de negócio antes da construção do frontend.

@@ -1,0 +1,18 @@
+{
+  "suite": "python backend/tools/ci.py",
+  "result": "PASS",
+  "passed": 250,
+  "warnings": 74,
+  "roleTest": "backend/tests/test_demo_perfis.py::test_sete_perfis_autorizacoes_efetivas_e_escopo",
+  "assertions": {
+    "effectivePermissionsAndEndpointAllowDenyForSevenProfiles": true,
+    "machineCreateAndEditAuthorization": true,
+    "userCreationAndEditAuthorization": true,
+    "auditReadPermissionAndUserCreationEvent": true,
+    "operatorAndMaintenanceAssignedWorkOrderScope": true,
+    "profileChangeRevokesOldSession": true,
+    "newLoginUsesUpdatedProfile": true,
+    "crossTenantIsolationSuiteIncluded": "backend/tests/test_multitenant.py"
+  },
+  "secretsIncluded": false
+}

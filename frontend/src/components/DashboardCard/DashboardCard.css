@@ -1,148 +1,36 @@
 .dashboard-card {
-    min-height: 126px;
-
-    padding: 20px;
-
+    position: relative;
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-
-    gap: 16px;
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.08);
-
-    border-radius:
-        12px;
-
-    background:
-        #0D140E;
-
-    box-shadow:
-        0 8px 25px
-        rgba(0, 0, 0, 0.12);
-
-    transition:
-        border-color 0.2s,
-        transform 0.2s;
-}
-
-
-.dashboard-card:hover {
-    transform:
-        translateY(-2px);
-
-    border-color:
-        rgba(255, 255, 255, 0.13);
-}
-
-
-.dashboard-card-content {
     min-width: 0;
-
-    display: flex;
+    min-height: 166px;
     flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+    overflow: hidden;
+    padding: 19px 21px 17px;
+    border: 1px solid #2b3d30;
+    border-radius: 15px;
+    background: linear-gradient(155deg, #15231a 0%, #101a13 75%);
+    box-shadow: 0 10px 26px rgb(0 0 0 / 15%);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
 }
-
-
-.dashboard-card-title {
-    color:
-        var(--color-text-muted);
-
-    font-size:
-        14px;
-
-    line-height:
-        20px;
-}
-
-
-.dashboard-card-value {
-    margin-top:
-        4px;
-
-    font-family:
-        var(--font-display);
-
-    color:
-        #EFEFE6;
-
-    font-size:
-        30px;
-
-    line-height:
-        40px;
-
-    font-weight:
-        600;
-}
-
-
-.dashboard-card-description {
-    margin-top:
-        4px;
-
-    color:
-        var(--color-text-muted);
-
-    font-size:
-        12px;
-
-    line-height:
-        16px;
-}
-
-
-.dashboard-card-icon {
-    width: 40px;
-    height: 40px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius:
-        10px;
-
-    background:
-        rgba(82, 168, 91, 0.12);
-
-    color:
-        var(--color-primary);
-
-    font-size:
-        20px;
-}
-
-
-.dashboard-card-operando
-.dashboard-card-icon {
-    background:
-        rgba(82, 168, 91, 0.12);
-
-    color:
-        #52A85B;
-}
-
-
-.dashboard-card-manutencao
-.dashboard-card-icon {
-    background:
-        rgba(225, 143, 55, 0.15);
-
-    color:
-        #E18F37;
-}
-
-
-.dashboard-card-os
-.dashboard-card-icon {
-    background:
-        rgba(37, 174, 167, 0.15);
-
-    color:
-        #25AEA7;
+.dashboard-card::before { position:absolute; inset:0 auto 0 0; width:3px; background:#58b86e; content:""; }
+.dashboard-card:hover { transform: translateY(-2px); border-color: #45654c; background: linear-gradient(155deg, #192a1e 0%, #111c14 75%); }
+.dashboard-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.dashboard-card-title { color:#b5c4b7; font-size:13px; font-weight:600; letter-spacing:.05px; }
+.dashboard-card-value { color:#f2f7f1; font-size:38px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1; letter-spacing:-1.2px; }
+.dashboard-card-description { display:flex; min-width:0; align-items:center; gap:3px; color:#91a293; font-size:11px; line-height:1.35; }
+.dashboard-card-description i { flex:0 0 auto; color:#65c47a; font-size:19px; }
+.dashboard-card-icon { display:grid; width:38px; height:38px; flex:0 0 auto; place-items:center; border:1px solid #31543a; border-radius:11px; background:#1b3221; color:#8cda99; font-size:17px; }
+.dashboard-card-manutencao::before { background:#d5a24d; }
+.dashboard-card-manutencao .dashboard-card-icon { border-color:#56452b; background:#30281a; color:#e8b866; }
+.dashboard-card-os::before { background:#5daab2; }
+.dashboard-card-os .dashboard-card-icon { border-color:#304c4d; background:#1b3030; color:#83c5c7; }
+.dashboard-card-operando::before { background:#56b76e; }
+@media (max-width: 600px) {
+    .dashboard-card { min-height: 134px; padding: 14px 14px 13px; border-radius: 12px; }
+    .dashboard-card-title { font-size: 11px; }
+    .dashboard-card-value { font-size: 31px; }
+    .dashboard-card-icon { width:32px; height:32px; border-radius:9px; font-size:15px; }
+    .dashboard-card-description { font-size:10px; }
 }

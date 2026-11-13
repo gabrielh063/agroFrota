@@ -52,6 +52,7 @@ def listar_equipamentos_route(**kwargs):
 
     equipamentos = listar_equipamentos(
         config=Config,
+        contexto=kwargs["contexto_administrativo"],
         database_name=database_name,
         incluir_inativos=incluir_inativos
     )
@@ -109,6 +110,7 @@ def criar_equipamento_route(**kwargs):
 
         equipamento = criar_equipamento(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             identificacao=dados_validos.identificacao,
             nome=dados_validos.nome,
@@ -181,6 +183,7 @@ def atualizar_equipamento_route(
 
         equipamento = atualizar_equipamento(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             equipamento_id=equipamento_id,
             identificacao=dados_validos.identificacao,
@@ -240,6 +243,7 @@ def desativar_equipamento_route(
 
         equipamento = atualizar_equipamento(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             equipamento_id=equipamento_id,
             ativo=False
@@ -284,6 +288,7 @@ def ativar_equipamento_route(
 
         equipamento = atualizar_equipamento(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             equipamento_id=equipamento_id,
             ativo=True

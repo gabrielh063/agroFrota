@@ -45,7 +45,8 @@ def listar(**kwargs):
     usuarios = listar_usuarios(
         config=Config,
         database_name=database_name,
-        apenas_ativos=apenas_ativos
+        apenas_ativos=apenas_ativos,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     data = [
@@ -80,11 +81,12 @@ def criar(**kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
         usuario = criar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             nome=dados_validos.nome,
@@ -123,7 +125,8 @@ def buscar(usuario_id, **kwargs):
     usuario = buscar_usuario(
         config=Config,
         database_name=database_name,
-        usuario_id=usuario_id
+        usuario_id=usuario_id,
+        contexto=kwargs["contexto_administrativo"]
     )
 
     if usuario is None:
@@ -163,11 +166,12 @@ def atualizar(usuario_id, **kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
         usuario = atualizar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             usuario_id=usuario_id,
@@ -205,6 +209,7 @@ def desativar(usuario_id, **kwargs):
 
     try:
         usuario = atualizar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             usuario_id=usuario_id,
@@ -237,6 +242,7 @@ def ativar(usuario_id, **kwargs):
 
     try:
         usuario = atualizar_usuario(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             usuario_id=usuario_id,
@@ -286,7 +292,7 @@ def alterar_senha(usuario_id, **kwargs):
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
@@ -296,7 +302,8 @@ def alterar_senha(usuario_id, **kwargs):
             database_name=database_name,
             usuario_id=usuario_id,
             senha_atual=dados_validos.senha_atual,
-            nova_senha=dados_validos.nova_senha
+            nova_senha=dados_validos.nova_senha,
+            contexto=kwargs["contexto_administrativo"]
         )
 
         data = UsuarioRespostaSchema.model_validate(

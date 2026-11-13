@@ -47,7 +47,8 @@ def listar_permissoes_perfil_route(
         permissoes = listar_permissoes_perfil(
             config=Config,
             database_name=database_name,
-            perfil_id=perfil_id
+            perfil_id=perfil_id,
+            contexto=kwargs["contexto_administrativo"]
         )
 
     except ValueError as erro:
@@ -92,12 +93,13 @@ def adicionar_permissao_perfil_route(
         return jsonify({
             "success": False,
             "message": "Dados inválidos.",
-            "errors": erro.errors()
+            "errors": erro.errors(include_input=False, include_url=False)
         }), 400
 
     try:
 
         perfil = adicionar_permissao_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,
@@ -155,6 +157,7 @@ def remover_permissao_perfil_route(
     try:
 
         perfil = remover_permissao_perfil(
+            contexto=kwargs["contexto_administrativo"],
             config=Config,
             database_name=database_name,
             perfil_id=perfil_id,

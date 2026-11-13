@@ -31,6 +31,7 @@ import {
  * utilizado na criação da OS.
  */
 import "../NovaOrdemServico/NovaOrdemServico.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function dataParaInput(valor) {
@@ -54,6 +55,8 @@ function dataParaInput(valor) {
 function EditarOrdemServico() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
+    const podeAtribuirUsuarios = pode("USUARIO_VISUALIZAR");
 
     const {
         id,
@@ -114,9 +117,7 @@ function EditarOrdemServico() {
                     incluirInativos: true,
                 }),
 
-                listarUsuarios({
-                    apenasAtivos: false,
-                }),
+                podeAtribuirUsuarios ? listarUsuarios({ apenasAtivos: false }) : Promise.resolve({ data: [] }),
             ]);
 
 
@@ -410,7 +411,7 @@ function EditarOrdemServico() {
     ) {
         event.preventDefault();
 
-        if (!form.ativoId) {
+        if (podeAtribuirUsuarios && !form.ativoId) {
             setErro(
                 "Selecione uma máquina ou equipamento."
             );
@@ -477,6 +478,7 @@ function EditarOrdemServico() {
          * ATIVO
          */
 
+        if (podeAtribuirUsuarios) {
         const tipoAtivoOriginal =
             ordem.maquina_id
                 ? "MAQUINA"
@@ -569,6 +571,7 @@ function EditarOrdemServico() {
         ) {
             dados.responsavel_id =
                 responsavelNovo;
+        }
         }
 
 
@@ -799,11 +802,12 @@ function EditarOrdemServico() {
 
                             <div className="nova-os-field">
 
-                                <label>
+                                <label htmlFor="editar-tipo">
                                     Tipo *
                                 </label>
 
                                 <select
+                                    id="editar-tipo"
                                     value={
                                         form.tipo
                                     }
@@ -829,11 +833,12 @@ function EditarOrdemServico() {
 
                             <div className="nova-os-field">
 
-                                <label>
+                                <label htmlFor="editar-prioridade">
                                     Prioridade *
                                 </label>
 
                                 <select
+                                    id="editar-prioridade"
                                     value={
                                         form.prioridade
                                     }
@@ -867,11 +872,12 @@ function EditarOrdemServico() {
 
                             <div className="nova-os-field full">
 
-                                <label>
+                                <label htmlFor="editar-titulo">
                                     Título *
                                 </label>
 
                                 <input
+                                    id="editar-titulo"
                                     type="text"
                                     required
                                     maxLength={150}
@@ -892,11 +898,12 @@ function EditarOrdemServico() {
 
                             <div className="nova-os-field full">
 
-                                <label>
+                                <label htmlFor="editar-descricao">
                                     Descrição
                                 </label>
 
                                 <textarea
+                                    id="editar-descricao"
                                     rows={4}
                                     value={
                                         form.descricao
@@ -919,7 +926,7 @@ function EditarOrdemServico() {
                 </section>
 
 
-                <section className="nova-os-card">
+                {podeAtribuirUsuarios && <section className="nova-os-card">
 
                     <div className="nova-os-card-header">
 
@@ -985,7 +992,7 @@ function EditarOrdemServico() {
 
                         <div className="nova-os-field">
 
-                            <label>
+                            <label htmlFor="editar-ativo">
                                 {
                                     form.tipoAtivo
                                     === "MAQUINA"
@@ -995,6 +1002,7 @@ function EditarOrdemServico() {
                             </label>
 
                             <select
+                                id="editar-ativo"
                                 required
                                 value={
                                     form.ativoId
@@ -1041,7 +1049,7 @@ function EditarOrdemServico() {
 
                     </div>
 
-                </section>
+                </section>}
 
 
                 <section className="nova-os-card">
@@ -1066,13 +1074,14 @@ function EditarOrdemServico() {
 
                         <div className="nova-os-grid">
 
-                            <div className="nova-os-field">
+                            {podeAtribuirUsuarios && <div className="nova-os-field">
 
-                                <label>
+                                <label htmlFor="editar-operador">
                                     Operador
                                 </label>
 
                                 <select
+                                    id="editar-operador"
                                     value={
                                         form.operadorId
                                     }
@@ -1114,16 +1123,17 @@ function EditarOrdemServico() {
 
                                 </select>
 
-                            </div>
+                            </div>}
 
 
-                            <div className="nova-os-field">
+                            {podeAtribuirUsuarios && <div className="nova-os-field">
 
-                                <label>
+                                <label htmlFor="editar-responsavel">
                                     Responsável
                                 </label>
 
                                 <select
+                                    id="editar-responsavel"
                                     value={
                                         form.responsavelId
                                     }
@@ -1165,16 +1175,17 @@ function EditarOrdemServico() {
 
                                 </select>
 
-                            </div>
+                            </div>}
 
 
                             <div className="nova-os-field full">
 
-                                <label>
+                                <label htmlFor="editar-prazo">
                                     Prazo
                                 </label>
 
                                 <input
+                                    id="editar-prazo"
                                     type="datetime-local"
                                     value={
                                         form.prazo

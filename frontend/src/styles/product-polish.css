@@ -1,0 +1,58 @@
+/* Product-wide component alignment for existing AgroFrota screens. */
+.app-content { min-width: 0; min-height: 100vh; margin-left: var(--sidebar-width); padding: 30px 34px 40px; background: var(--bg-app); }
+.os-page, .equipamentos-page, .calendario-page { max-width: 1480px; }
+.os-header, .equipamentos-header, .calendario-header { min-height: 76px; gap: 20px; }
+.os-header h1, .equipamentos-header h1, .calendario-header h1 { color: var(--text-primary); font-size: 27px; letter-spacing: -.5px; }
+.os-header p, .equipamentos-header p, .calendario-header p { color: var(--text-secondary); font-size: 13px; }
+.os-new, .equipamentos-new, .calendario-new { min-height: 40px; justify-content: center; gap: 8px; padding: 0 15px; border-radius: 9px; font-size: 12px; font-weight: 700; transition: background .16s ease, transform .16s ease; }
+.os-new:hover, .equipamentos-new:hover, .calendario-new:hover { transform: translateY(-1px); background: var(--accent-hover); }
+.os-summary > div, .os-card, .equipamentos-card, .calendar-card, .calendar-upcoming { border-color: var(--border-subtle); border-radius: var(--radius-card); background: linear-gradient(145deg, #111b14, #0e1610); box-shadow: var(--shadow-panel); }
+.os-summary > div { padding: 16px 18px; }
+.os-filters input, .os-filters select, .equipamentos-filters input, .equipamentos-filters select, .form-control, .form-select { border-color: #344337; border-radius: 9px; background-color: #111a13; color: var(--text-primary); }
+.os-filters input::placeholder, .equipamentos-filters input::placeholder { color: #829587; }
+.os-filters input:focus, .os-filters select:focus, .equipamentos-filters input:focus, .equipamentos-filters select:focus, .form-control:focus, .form-select:focus { border-color: #5a9665; background-color: #111a13; color: var(--text-primary); box-shadow: 0 0 0 3px rgb(86 183 110 / 12%); }
+.os-table th, .equipamentos-table th { color: #829587; letter-spacing: .45px; }
+.os-table td, .equipamentos-table td { color: #d2ddd3; }
+.os-table tbody tr:hover, .equipamentos-table tbody tr:hover { background: rgb(255 255 255 / 2%); }
+.os-table-wrapper, .equipamentos-table-wrapper { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.calendar-toolbar, .calendar-upcoming-header { border-color: var(--border-subtle); }
+.calendar-day { min-height: 112px; }
+.calendar-day:hover { background: rgb(255 255 255 / 2%); }
+.calendar-navigation button:hover, .calendar-today:hover { border-color: #45624b; background: #17251a; color: var(--text-primary); }
+.login-brand { background: radial-gradient(ellipse at 80% 75%, rgb(48 105 57 / 20%), transparent 50%), #09120c; }
+.login-form-area { background: #0b110e; }
+.login-form-container { padding: 32px; border: 1px solid var(--border-subtle); border-radius: 16px; background: #101a13; box-shadow: var(--shadow-panel); }
+.login-header h2 { color: var(--text-primary); }
+.login-header p, .login-form .form-field label { color: var(--text-secondary); }
+.login-form input { min-height: 44px; border-color: #344337; border-radius: 9px; background: #0c140e; color: var(--text-primary); }
+.login-form input::placeholder { color: #829587; }
+.login-form input:focus { border-color: #5a9665; box-shadow: 0 0 0 3px rgb(86 183 110 / 12%); }
+.login-form button[type="submit"] { min-height: 44px; border-radius: 9px; background: var(--accent-primary); font-weight: 700; transition: background .15s ease; }
+.login-form button[type="submit"]:hover:not(:disabled) { background: var(--accent-hover); }
+
+@media (max-width: 1100px) {
+    .app-content { padding-inline: 24px; }
+    .os-filters { grid-template-columns: minmax(180px, 1fr) repeat(3, minmax(120px, .6fr)); }
+    .equipamentos-filters { grid-template-columns: minmax(180px, 1fr) minmax(140px, .7fr) minmax(120px, .6fr); }
+}
+@media (max-width: 900px) {
+    .app-content { margin-left: 0; padding: 22px 22px 32px; }
+}
+@media (max-width: 700px) {
+    .app-content { padding: 19px 16px 28px; }
+    .os-header, .equipamentos-header, .calendario-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+    .os-header h1, .equipamentos-header h1, .calendario-header h1 { font-size: 24px; }
+    .os-new, .equipamentos-new, .calendario-new { width: 100%; }
+    .os-filters, .equipamentos-filters { grid-template-columns: 1fr 1fr; gap: 9px; }
+    .os-search, .equipamentos-search { grid-column: 1 / -1; }
+    .os-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .os-summary > div { min-height: 74px; }
+    .os-card-header, .equipamentos-card-header { gap: 12px; padding-inline: 14px; }
+    .calendar-day { min-height: 82px; padding: 5px; }
+    .calendar-weekday { padding: 8px 3px; font-size: 9px; }
+}
+@media (max-width: 420px) {
+    .app-content { padding-inline: 12px; }
+    .login-form-container { padding: 23px 19px; }
+    .os-summary > div { padding: 12px; }
+}

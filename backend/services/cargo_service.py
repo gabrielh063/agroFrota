@@ -1,3 +1,5 @@
+from services.auditoria_service import registrar_evento
+from services.admin_policy import autorizar, perfil_delegavel, preservar_administrador, AdministracaoNegada
 from sqlalchemy import select
 
 from database.session import criar_sessao_tenant
@@ -9,7 +11,8 @@ def criar_cargo(
     config,
     database_name: str,
     nome: str,
-    descricao: str | None = None
+    descricao: str | None = None,
+    contexto=None
 ) -> Cargo:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -21,6 +24,7 @@ def criar_cargo(
 
     try:
 
+        autorizar(session, database_name, contexto, "CARGO_CRIAR")
         cargo_existente = session.execute(
             select(Cargo).where(
                 Cargo.nome == nome
@@ -39,6 +43,7 @@ def criar_cargo(
         )
 
         session.add(cargo)
+        registrar_evento(session, contexto, "criar_cargo")
         session.commit()
         session.refresh(cargo)
 
@@ -55,7 +60,8 @@ def criar_cargo(
 def buscar_cargo(
     config,
     database_name: str,
-    cargo_id: int
+    cargo_id: int,
+    contexto=None
 ) -> Cargo | None:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -66,6 +72,10 @@ def buscar_cargo(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "CARGO_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         cargo = session.execute(
             select(Cargo).where(
@@ -85,7 +95,8 @@ def atualizar_cargo(
     cargo_id: int,
     nome: str | None = None,
     descricao: str | None = None,
-    ativo: bool | None = None
+    ativo: bool | None = None,
+    contexto=None
 ) -> Cargo:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -97,6 +108,7 @@ def atualizar_cargo(
 
     try:
 
+        autorizar(session, database_name, contexto, "CARGO_EDITAR")
         cargo = session.execute(
             select(Cargo).where(
                 Cargo.id == cargo_id
@@ -130,6 +142,7 @@ def atualizar_cargo(
         if ativo is not None:
             cargo.ativo = ativo
 
+        registrar_evento(session, contexto, "atualizar_cargo")
         session.commit()
         session.refresh(cargo)
 
@@ -146,7 +159,8 @@ def atualizar_cargo(
 def listar_cargos(
     config,
     database_name: str,
-    incluir_inativos: bool = False
+    incluir_inativos: bool = False,
+    contexto=None
 ) -> list[Cargo]:
 
     SessionLocal, _ = criar_sessao_tenant(
@@ -157,6 +171,10 @@ def listar_cargos(
     session = SessionLocal()
 
     try:
+        from services.escopo import escopo_atual
+        from services.matriz_acesso import EMPRESA
+        if escopo_atual(session, contexto, "CARGO_VISUALIZAR") != EMPRESA:
+            raise AdministracaoNegada("Escopo administrativo insuficiente.")
 
         consulta = select(Cargo).order_by(
             Cargo.id

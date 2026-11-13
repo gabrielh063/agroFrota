@@ -5,6 +5,7 @@ from sqlalchemy import select
 from database.session import criar_sessao_tenant
 
 from models.tenant.usuario import Usuario
+from models.tenant.perfil import Perfil
 
 from utils.security import verificar_senha
 
@@ -40,6 +41,14 @@ def autenticar_usuario(
             raise ValueError(
                 "Usuário está inativo."
             )
+
+        perfil_ativo = session.execute(
+            select(Perfil.id).where(
+                Perfil.id == usuario.perfil_id, Perfil.ativo.is_(True)
+            )
+        ).scalar_one_or_none()
+        if perfil_ativo is None:
+            raise ValueError("Perfil inativo ou inexistente.")
 
         if not verificar_senha(
             senha,

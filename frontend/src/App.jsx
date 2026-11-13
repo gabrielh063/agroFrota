@@ -13,13 +13,12 @@ import NovaOrdemServico from "./pages/NovaOrdemServico/NovaOrdemServico";
 import DetalhesOrdemServico from "./pages/DetalhesOrdemServico/DetalhesOrdemServico";
 import EditarOrdemServico from "./pages/EditarOrdemServico/EditarOrdemServico";
 import Calendario from "./pages/Calendario/Calendario";
+import AssistenteIA from "./pages/AssistenteIA/AssistenteIA";
+import EquipePermissoes from "./pages/EquipePermissoes/EquipePermissoes";
 
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
-import PagePlaceholder
-    from "./components/PagePlaceholder/PagePlaceholder";
-
+import RequirePermission from "./routes/RequirePermission";
 
 function App() {
     return (
@@ -44,7 +43,7 @@ function App() {
                 <Route
                     path="/"
                     element={
-                        <Home />
+                        <RequirePermission anyOf="DASHBOARD.VISUALIZAR"><Home /></RequirePermission>
                     }
                 />
 
@@ -52,14 +51,19 @@ function App() {
                 <Route
                     path="/calendario"
                     element={
-                        <Calendario />
+                        <RequirePermission anyOf="OS.VISUALIZAR"><Calendario /></RequirePermission>
                     }
+                />
+
+                <Route
+                    path="/assistente"
+                    element={<RequirePermission anyOf="MAQUINA_VISUALIZAR"><AssistenteIA /></RequirePermission>}
                 />
 
                 <Route
                     path="/ordens-servico"
                     element={
-                        <OrdensServico />
+                        <RequirePermission anyOf="OS.VISUALIZAR"><OrdensServico /></RequirePermission>
                     }
                 />
 
@@ -67,28 +71,28 @@ function App() {
                 <Route
                     path="/ordens-servico/nova"
                     element={
-                        <NovaOrdemServico />
+                        <RequirePermission anyOf="OS.CRIAR"><NovaOrdemServico /></RequirePermission>
                     }
                 />
                 
                 <Route
                     path="/ordens-servico/:id/editar"
                     element={
-                        <EditarOrdemServico />
+                        <RequirePermission anyOf="OS.EDITAR"><EditarOrdemServico /></RequirePermission>
                     }
                 />
 
                 <Route
                     path="/ordens-servico/:id"
                     element={
-                        <DetalhesOrdemServico />
+                        <RequirePermission anyOf="OS.VISUALIZAR"><DetalhesOrdemServico /></RequirePermission>
                     }
                 />
 
                 <Route
                     path="/maquinarios"
                     element={
-                        <Maquinarios />
+                        <RequirePermission anyOf="MAQUINA_VISUALIZAR"><Maquinarios /></RequirePermission>
                     }
                 />
 
@@ -96,8 +100,13 @@ function App() {
                 <Route
                     path="/equipamentos"
                     element={
-                        <Equipamentos />
+                        <RequirePermission anyOf="EQUIPAMENTO_VISUALIZAR"><Equipamentos /></RequirePermission>
                     }
+                />
+
+                <Route
+                    path="/equipe-permissoes"
+                    element={<RequirePermission anyOf="USUARIO_VISUALIZAR"><EquipePermissoes /></RequirePermission>}
                 />
 
             </Route>

@@ -198,13 +198,14 @@ function EquipamentoFormModal({
                     <div className="equipamento-form-grid">
 
                         <div className="equipamento-form-field">
-                            <label>
+                            <label htmlFor="equipamento-identificacao">
                                 Identificação *
                             </label>
 
                             <input
                                 required
                                 maxLength={100}
+                                id="equipamento-identificacao"
                                 value={form.identificacao}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -218,13 +219,14 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field">
-                            <label>
+                            <label htmlFor="equipamento-nome">
                                 Nome *
                             </label>
 
                             <input
                                 required
                                 maxLength={150}
+                                id="equipamento-nome"
                                 value={form.nome}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -238,13 +240,14 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field full">
-                            <label>
+                            <label htmlFor="equipamento-tipo">
                                 Tipo *
                             </label>
 
                             <input
                                 required
                                 maxLength={100}
+                                id="equipamento-tipo"
                                 value={form.tipo}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -258,12 +261,13 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field">
-                            <label>
+                            <label htmlFor="equipamento-fabricante">
                                 Fabricante
                             </label>
 
                             <input
                                 maxLength={100}
+                                id="equipamento-fabricante"
                                 value={form.fabricante}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -277,12 +281,13 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field">
-                            <label>
+                            <label htmlFor="equipamento-modelo">
                                 Modelo
                             </label>
 
                             <input
                                 maxLength={150}
+                                id="equipamento-modelo"
                                 value={form.modelo}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -296,7 +301,7 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field">
-                            <label>
+                            <label htmlFor="equipamento-ano">
                                 Ano
                             </label>
 
@@ -304,6 +309,7 @@ function EquipamentoFormModal({
                                 type="number"
                                 min="1900"
                                 max="2100"
+                                id="equipamento-ano"
                                 value={form.ano}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -317,11 +323,12 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field">
-                            <label>
+                            <label htmlFor="equipamento-status">
                                 Status
                             </label>
 
                             <select
+                                id="equipamento-status"
                                 value={form.status}
                                 onChange={(event) =>
                                     atualizarCampo(
@@ -350,12 +357,13 @@ function EquipamentoFormModal({
 
 
                         <div className="equipamento-form-field full">
-                            <label>
+                            <label htmlFor="equipamento-localizacao">
                                 Localização
                             </label>
 
                             <input
                                 maxLength={150}
+                                id="equipamento-localizacao"
                                 value={form.localizacao}
                                 onChange={(event) =>
                                     atualizarCampo(

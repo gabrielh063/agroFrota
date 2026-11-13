@@ -5,9 +5,12 @@ from models.tenant.permissao import Permissao
 from models.tenant.perfil import Perfil
 from models.tenant.cargo import Cargo
 from models.tenant.usuario import Usuario
-from services.usuario_service import criar_usuario
+from models.tenant.admin_lock import AdminLock
+from utils.security import gerar_hash_senha
 
 PERMISSOES_PADRAO = [
+    {"codigo": "AUDITORIA.VISUALIZAR", "descricao": "Permite consultar a trilha de auditoria."},
+    {"codigo": "USUARIO_PROPRIO_VISUALIZAR", "descricao": "Permite consultar o próprio registro."},
     {
         "codigo": "USUARIO_CRIAR",
         "descricao": "Permite criar usuários.",
@@ -142,74 +145,9 @@ PERMISSOES_PADRAO = [
     },
 ]
 
-PERFIS_PADRAO = {
-    "GERENTE": [
-        "USUARIO_CRIAR",
-        "USUARIO_VISUALIZAR",
-        "USUARIO_EDITAR",
-        "USUARIO_DESATIVAR",
-        "CARGO_CRIAR",
-        "CARGO_VISUALIZAR",
-        "CARGO_EDITAR",
-        "PERFIL_CRIAR",
-        "PERFIL_VISUALIZAR",
-        "PERFIL_EDITAR",
-        "PERFIL_PERMISSAO_GERENCIAR",
-        "MAQUINA_CRIAR",
-        "MAQUINA_VISUALIZAR",
-        "MAQUINA_EDITAR",
-        "MAQUINA_DESATIVAR",
-        "EQUIPAMENTO_CRIAR",
-        "EQUIPAMENTO_VISUALIZAR",
-        "EQUIPAMENTO_EDITAR",
-        "EQUIPAMENTO_DESATIVAR",
-        "OS.CRIAR",
-        "OS.VISUALIZAR",
-        "OS.EDITAR",
-        "OS.CANCELAR",
-        "OS.CONCLUIR",
-        "MANUTENCAO.CRIAR",
-        "MANUTENCAO.VISUALIZAR",
-        "MANUTENCAO.CANCELAR",
-        "MANUTENCAO.EDITAR",
-        "MANUTENCAO.CONCLUIR",
-        "INDISPONIBILIDADE.CRIAR",
-        "INDISPONIBILIDADE.VISUALIZAR",
-        "INDISPONIBILIDADE.EDITAR",
-        "DASHBOARD.VISUALIZAR",
-    ],
+from services.matriz_acesso import MATRIZ
 
-    "MANUTENCAO": [
-        "USUARIO_VISUALIZAR",
-        "MAQUINA_VISUALIZAR",
-        "MAQUINA_EDITAR",
-        "EQUIPAMENTO_VISUALIZAR",
-        "EQUIPAMENTO_EDITAR",
-        "OS.CRIAR",
-        "OS.VISUALIZAR",
-        "OS.EDITAR",
-        "OS.CONCLUIR",
-        "MANUTENCAO.CRIAR",
-        "MANUTENCAO.VISUALIZAR",
-        "MANUTENCAO.EDITAR",
-        "MANUTENCAO.CONCLUIR",
-        "MANUTENCAO.CANCELAR",
-        "INDISPONIBILIDADE.CRIAR",
-        "INDISPONIBILIDADE.VISUALIZAR",
-        "INDISPONIBILIDADE.EDITAR",
-        "DASHBOARD.VISUALIZAR",
-    ],
-
-    "OPERADOR": [
-        "MAQUINA_VISUALIZAR",
-        "EQUIPAMENTO_VISUALIZAR",
-        "OS.CRIAR",
-        "OS.VISUALIZAR",
-        "MANUTENCAO.VISUALIZAR",
-        "INDISPONIBILIDADE.CRIAR",
-        "INDISPONIBILIDADE.VISUALIZAR",
-    ],
-}
+PERFIS_PADRAO = {nome: list(acoes) for nome, acoes in MATRIZ.items()}
 
 
 def criar_permissoes_padrao(config, database_name):
@@ -275,13 +213,18 @@ def criar_perfis_padrao(config, database_name):
                 perfil = Perfil(
                     nome=nome_perfil,
                     descricao=f"Perfil padrão de {nome_perfil.lower()}.",
-                    ativo=True
+                    ativo=True,
+                    politica_escopo=nome_perfil
                 )
 
                 session.add(perfil)
                 session.flush()
 
                 perfis_criados.append(perfil)
+
+            else:
+                # Existing profiles are tenant-owned; never silently grant permissions.
+                continue
 
             codigos_existentes = {
                 permissao.codigo
@@ -326,15 +269,19 @@ def criar_usuario_gerente_padrao(
     session = SessionLocal()
 
     try:
+        # This path is solely for first-user provisioning.
+        session.execute(select(AdminLock.id).where(AdminLock.id == 1).with_for_update()).scalar_one()
+        if session.execute(select(Usuario.id).limit(1)).first() is not None:
+            raise ValueError("Provisionamento inicial exige empresa sem usuários.")
         perfil = session.execute(
             select(Perfil).where(
-                Perfil.nome == "GERENTE"
+                Perfil.nome == "ADMIN_EMPRESA"
             )
         ).scalar_one_or_none()
 
         if perfil is None:
             raise ValueError(
-                "Perfil GERENTE não encontrado."
+                "Perfil ADMIN_EMPRESA não encontrado."
             )
 
         cargo = session.execute(
@@ -351,21 +298,18 @@ def criar_usuario_gerente_padrao(
             )
 
             session.add(cargo)
-            session.commit()
-            session.refresh(cargo)
+            session.flush()
 
+        # Provisioning is separate from authenticated administration and only
+        # initializes an empty tenant; it cannot add further administrators.
+        usuario = Usuario(nome=nome, username=username, email=email,
+                          senha_hash=gerar_hash_senha(senha), perfil_id=perfil.id,
+                          cargo_id=cargo.id, ativo=True)
+        session.add(usuario)
+        session.commit()
+        session.refresh(usuario)
         session.close()
-
-        return criar_usuario(
-            config=config,
-            database_name=database_name,
-            nome=nome,
-            username=username,
-            senha=senha,
-            perfil_id=perfil.id,
-            cargo_id=cargo.id,
-            email=email
-        )
+        return usuario
 
     except Exception:
         session.rollback()

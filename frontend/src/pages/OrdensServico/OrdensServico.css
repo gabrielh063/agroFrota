@@ -301,7 +301,7 @@
 
 
 .os-table tbody tr {
-    cursor: pointer;
+    cursor: default;
 }
 
 
@@ -315,6 +315,15 @@
 .os-asset {
     display: flex;
     flex-direction: column;
+}
+
+.os-info {
+    color: inherit;
+    text-decoration: none;
+}
+
+.os-info:hover strong {
+    text-decoration: underline;
 }
 
 

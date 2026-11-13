@@ -25,15 +25,12 @@
 @media (
     max-width: 900px
 ) {
-    .sidebar {
-        display: none;
-    }
-
     .app-content {
         margin-left:
             0;
 
-        padding:
-            24px;
+        padding: 18px 18px 26px;
     }
 }
+
+@media(max-width:600px) { .app-content { padding:14px 12px 22px; } }

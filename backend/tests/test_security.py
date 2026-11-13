@@ -1,3 +1,4 @@
+import os
 import requests
 
 
@@ -34,7 +35,7 @@ def test_sql_injection_login(
                 "' OR 1=1 --",
 
             "database_name":
-                "tenant_000004",
+                os.environ["AGROFROTA_TEST_DATABASE"],
         },
         timeout=10,
     )
@@ -48,8 +49,8 @@ def test_database_inexistente(
     resposta = requests.post(
         f"{base_url}/api/auth/login",
         json={
-            "username": "admin",
-            "senha": "Admin@123",
+            "username": "usuario-inexistente",
+            "senha": "senha-invalida",
             "database_name": "tenant_999999",
         },
         timeout=10,

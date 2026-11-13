@@ -1,0 +1,143 @@
+{
+  "browser": "Chrome headless com tela 1600x900",
+  "logins": 7,
+  "profiles": [
+    {
+      "profile": "ADMIN_EMPRESA",
+      "currentRole": "Administrador/Gerente",
+      "menu": [
+        "Visão geral",
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos",
+        "Equipe e Permissões"
+      ],
+      "newOs": false,
+      "newMachine": false,
+      "newEquipment": false,
+      "editButtons": 7,
+      "osRows": 0,
+      "teamRows": 7,
+      "denied": false
+    },
+    {
+      "profile": "DIRETORIA",
+      "currentRole": "Diretoria",
+      "menu": [
+        "Visão geral",
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos",
+        "Equipe e Permissões"
+      ],
+      "newOs": false,
+      "newMachine": false,
+      "newEquipment": false,
+      "editButtons": 0,
+      "osRows": 6,
+      "teamRows": 0,
+      "denied": false
+    },
+    {
+      "profile": "GESTOR_FROTA",
+      "currentRole": "Gestor de Frota",
+      "menu": [
+        "Visão geral",
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos",
+        "Equipe e Permissões"
+      ],
+      "newOs": false,
+      "newMachine": true,
+      "newEquipment": false,
+      "editButtons": 2,
+      "osRows": 0,
+      "teamRows": 0,
+      "denied": false
+    },
+    {
+      "profile": "ADMINISTRATIVO",
+      "currentRole": "Administrativo",
+      "menu": [
+        "Visão geral",
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos",
+        "Equipe e Permissões"
+      ],
+      "newOs": false,
+      "newMachine": false,
+      "newEquipment": false,
+      "editButtons": 0,
+      "osRows": 0,
+      "teamRows": 0,
+      "denied": false
+    },
+    {
+      "profile": "MANUTENCAO",
+      "currentRole": "Manutenção",
+      "menu": [
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos"
+      ],
+      "newOs": false,
+      "newMachine": false,
+      "newEquipment": false,
+      "editButtons": 0,
+      "osRows": 1,
+      "teamRows": 0,
+      "denied": false
+    },
+    {
+      "profile": "OPERADOR",
+      "currentRole": "Operador",
+      "menu": [
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos"
+      ],
+      "newOs": true,
+      "newMachine": false,
+      "newEquipment": false,
+      "editButtons": 0,
+      "osRows": 1,
+      "teamRows": 0,
+      "denied": false
+    },
+    {
+      "profile": "AUDITOR",
+      "currentRole": "Auditor",
+      "menu": [
+        "Visão geral",
+        "Central de Operações",
+        "Calendário de serviços",
+        "Ordens de serviço",
+        "Maquinários",
+        "Equipamentos",
+        "Equipe e Permissões"
+      ],
+      "newOs": false,
+      "newMachine": false,
+      "newEquipment": false,
+      "editButtons": 0,
+      "osRows": 6,
+      "teamRows": 0,
+      "denied": false,
+      "directCreateRouteDenied": true
+    }
+  ]
+}

@@ -41,6 +41,7 @@ def criar(**kwargs):
 
         ordem = criar_ordem_servico(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=kwargs["database_name"],
             **dados.model_dump()
         )
@@ -80,6 +81,7 @@ def listar(**kwargs):
 
     ordens = listar_ordens_servico(
         config=Config,
+        contexto=kwargs["contexto_administrativo"],
         database_name=kwargs["database_name"],
         apenas_ativas=apenas_ativas
     )
@@ -103,6 +105,7 @@ def listar(**kwargs):
 def buscar(ordem_servico_id, **kwargs):
     ordem = buscar_ordem_servico(
         config=Config,
+        contexto=kwargs["contexto_administrativo"],
         database_name=kwargs["database_name"],
         ordem_servico_id=ordem_servico_id
     )
@@ -133,6 +136,7 @@ def atualizar(ordem_servico_id, **kwargs):
 
         ordem = atualizar_ordem_servico(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=kwargs["database_name"],
             ordem_servico_id=ordem_servico_id,
             **dados.model_dump(exclude_unset=True)
@@ -169,6 +173,7 @@ def concluir(ordem_servico_id, **kwargs):
     try:
         ordem = concluir_ordem_servico(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=kwargs["database_name"],
             ordem_servico_id=ordem_servico_id
         )
@@ -196,6 +201,7 @@ def cancelar(ordem_servico_id, **kwargs):
     try:
         ordem = cancelar_ordem_servico(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=kwargs["database_name"],
             ordem_servico_id=ordem_servico_id
         )

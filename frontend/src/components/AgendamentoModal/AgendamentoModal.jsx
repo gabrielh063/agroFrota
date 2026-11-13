@@ -1,5 +1,6 @@
 import {
     useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -15,6 +16,15 @@ function AgendamentoModal({
     onClose,
     onSubmit,
 }) {
+    const dialogRef = useRef(null);
+    const closeRef = useRef(onClose);
+    const savingRef = useRef(salvando);
+
+    useEffect(() => {
+        closeRef.current = onClose;
+        savingRef.current = salvando;
+    }, [onClose, salvando]);
+
     const [form, setForm] =
         useState({
             ordemServicoId: "",
@@ -38,6 +48,52 @@ function AgendamentoModal({
             observacoes: "",
         });
 
+    }, [aberto]);
+
+    useEffect(() => {
+        if (!aberto) {
+            return;
+        }
+
+        const dialog = dialogRef.current;
+        const previous = document.activeElement;
+        const focusable = () => [...dialog.querySelectorAll(
+            'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+        )];
+
+        requestAnimationFrame(() => focusable()[0]?.focus());
+
+        function handleKeyDown(event) {
+            if (event.key === "Escape" && !savingRef.current) {
+                event.preventDefault();
+                closeRef.current();
+                return;
+            }
+
+            if (event.key !== "Tab") {
+                return;
+            }
+
+            const items = focusable();
+            const first = items[0];
+            const last = items[items.length - 1];
+
+            if (!first || !last) {
+                event.preventDefault();
+            } else if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            previous?.focus?.();
+        };
     }, [aberto]);
 
 
@@ -113,12 +169,19 @@ function AgendamentoModal({
             }}
         >
 
-            <div className="agendamento-modal">
+            <div
+                className="agendamento-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="agendamento-modal-title"
+                ref={dialogRef}
+                tabIndex={-1}
+            >
 
                 <header className="agendamento-modal-header">
 
                     <div>
-                        <h2>
+                        <h2 id="agendamento-modal-title">
                             Agendar serviço
                         </h2>
 
@@ -131,6 +194,7 @@ function AgendamentoModal({
 
                     <button
                         type="button"
+                        aria-label="Fechar agendamento"
                         onClick={onClose}
                         disabled={salvando}
                     >
@@ -147,11 +211,12 @@ function AgendamentoModal({
 
                     <div className="agendamento-field full">
 
-                        <label>
+                        <label htmlFor="agendamento-os">
                             Ordem de serviço *
                         </label>
 
                         <select
+                            id="agendamento-os"
                             required
                             value={
                                 form.ordemServicoId
@@ -189,11 +254,12 @@ function AgendamentoModal({
 
                         <div className="agendamento-field">
 
-                            <label>
+                            <label htmlFor="agendamento-inicio">
                                 Início *
                             </label>
 
                             <input
+                                id="agendamento-inicio"
                                 type="datetime-local"
                                 required
                                 value={
@@ -212,11 +278,12 @@ function AgendamentoModal({
 
                         <div className="agendamento-field">
 
-                            <label>
+                            <label htmlFor="agendamento-fim">
                                 Fim *
                             </label>
 
                             <input
+                                id="agendamento-fim"
                                 type="datetime-local"
                                 required
                                 value={
@@ -237,11 +304,12 @@ function AgendamentoModal({
 
                     <div className="agendamento-field full">
 
-                        <label>
+                        <label htmlFor="agendamento-responsavel">
                             Responsável
                         </label>
 
                         <select
+                            id="agendamento-responsavel"
                             value={
                                 form.responsavelId
                             }
@@ -278,11 +346,12 @@ function AgendamentoModal({
 
                     <div className="agendamento-field full">
 
-                        <label>
+                        <label htmlFor="agendamento-observacoes">
                             Observações
                         </label>
 
                         <textarea
+                            id="agendamento-observacoes"
                             rows={4}
                             value={
                                 form.observacoes
@@ -300,7 +369,7 @@ function AgendamentoModal({
 
 
                     {erro && (
-                        <div className="agendamento-error">
+                        <div className="agendamento-error" role="alert">
 
                             <i className="bi bi-exclamation-circle" />
 

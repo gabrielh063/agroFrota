@@ -49,6 +49,7 @@ def listar_maquinas_route(**kwargs):
 
     maquinas = listar_maquinas(
         config=Config,
+        contexto=kwargs["contexto_administrativo"],
         database_name=database_name,
         incluir_inativas=incluir_inativas
     )
@@ -61,6 +62,7 @@ def listar_maquinas_route(**kwargs):
                 "identificacao": maquina.identificacao,
                 "modelo": maquina.modelo,
                 "fabricante": maquina.fabricante,
+                "categoria": maquina.categoria,
                 "ano": maquina.ano,
                 "localizacao": maquina.localizacao,
                 "status": maquina.status,
@@ -106,10 +108,12 @@ def criar_maquina_route(**kwargs):
 
         maquina = criar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             identificacao=dados_validos.identificacao,
             modelo=dados_validos.modelo,
             fabricante=dados_validos.fabricante,
+            categoria=dados_validos.categoria,
             ano=dados_validos.ano,
             localizacao=dados_validos.localizacao,
             status=dados_validos.status,
@@ -131,6 +135,7 @@ def criar_maquina_route(**kwargs):
             "identificacao": maquina.identificacao,
             "modelo": maquina.modelo,
             "fabricante": maquina.fabricante,
+            "categoria": maquina.categoria,
             "ano": maquina.ano,
             "localizacao": maquina.localizacao,
             "status": maquina.status,
@@ -176,11 +181,13 @@ def atualizar_maquina_route(
 
         maquina = atualizar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             maquina_id=maquina_id,
             identificacao=dados_validos.identificacao,
             modelo=dados_validos.modelo,
             fabricante=dados_validos.fabricante,
+            categoria=dados_validos.categoria,
             ano=dados_validos.ano,
             localizacao=dados_validos.localizacao,
             status=dados_validos.status,
@@ -210,6 +217,8 @@ def atualizar_maquina_route(
             "identificacao": maquina.identificacao,
             "modelo": maquina.modelo,
             "fabricante": maquina.fabricante,
+            "categoria": maquina.categoria,
+            "categoria": maquina.categoria,
             "ano": maquina.ano,
             "localizacao": maquina.localizacao,
             "status": maquina.status,
@@ -233,6 +242,7 @@ def desativar_maquina_route(
 
         maquina = atualizar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             maquina_id=maquina_id,
             ativo=False
@@ -277,6 +287,7 @@ def ativar_maquina_route(
 
         maquina = atualizar_maquina(
             config=Config,
+        contexto=kwargs["contexto_administrativo"],
             database_name=database_name,
             maquina_id=maquina_id,
             ativo=True

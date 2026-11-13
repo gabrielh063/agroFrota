@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 
 import {
+    atualizarAgendamento,
+    cancelarAgendamento,
     criarAgendamento,
     listarAgendamentos,
 } from "../../api/calendarioService";
@@ -24,7 +26,11 @@ import {
 import AgendamentoModal
     from "../../components/AgendamentoModal/AgendamentoModal";
 
+import AgendamentoDetalhesModal
+    from "../../components/AgendamentoDetalhesModal/AgendamentoDetalhesModal";
+
 import "./Calendario.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const MESES = [
@@ -57,6 +63,8 @@ const DIAS_SEMANA = [
 function Calendario() {
     const navigate =
         useNavigate();
+    const { pode } = useAuth();
+    const podeVerUsuarios = pode("USUARIO_VISUALIZAR");
 
     const hoje =
         new Date();
@@ -98,6 +106,21 @@ function Calendario() {
         setErroFormulario,
     ] = useState("");
 
+    const [
+        agendamentoSelecionado,
+        setAgendamentoSelecionado,
+    ] = useState(null);
+
+    const [
+        salvandoDetalhes,
+        setSalvandoDetalhes,
+    ] = useState(false);
+
+    const [
+        erroDetalhes,
+        setErroDetalhes,
+    ] = useState("");
+
 
     useEffect(() => {
         carregarDados();
@@ -118,9 +141,7 @@ function Calendario() {
 
                 listarOrdensServico(),
 
-                listarUsuarios({
-                    apenasAtivos: true,
-                }),
+                podeVerUsuarios ? listarUsuarios({ apenasAtivos: false }) : Promise.resolve({ data: [] }),
             ]);
 
 
@@ -177,6 +198,15 @@ function Calendario() {
         }, [ordens]);
 
 
+    const usuariosAtivos =
+        useMemo(() => {
+            return usuarios.filter(
+                (usuario) =>
+                    usuario.ativo
+            );
+        }, [usuarios]);
+
+
     function buscarOrdem(
         ordemServicoId
     ) {
@@ -228,6 +258,121 @@ function Calendario() {
 
         } finally {
             setSalvando(false);
+        }
+    }
+
+
+    function abrirAgendamento(
+        agendamento
+    ) {
+        setErroDetalhes("");
+
+        setAgendamentoSelecionado(
+            agendamento
+        );
+    }
+
+
+    function fecharDetalhes() {
+        if (salvandoDetalhes) {
+            return;
+        }
+
+        setAgendamentoSelecionado(
+            null
+        );
+
+        setErroDetalhes("");
+    }
+
+
+    async function salvarEdicaoAgendamento(
+        agendamentoId,
+        dados
+    ) {
+        if (
+            Object.keys(dados).length
+            === 0
+        ) {
+            fecharDetalhes();
+            return;
+        }
+
+        try {
+            setSalvandoDetalhes(true);
+            setErroDetalhes("");
+
+            await atualizarAgendamento(
+                agendamentoId,
+                dados
+            );
+
+            await carregarDados();
+
+            setAgendamentoSelecionado(
+                null
+            );
+
+        } catch (error) {
+            console.error(
+                "Erro ao atualizar agendamento:",
+                error
+            );
+
+            setErroDetalhes(
+                error.response?.data?.message
+                ||
+                "Não foi possível atualizar o agendamento."
+            );
+
+        } finally {
+            setSalvandoDetalhes(false);
+        }
+    }
+
+
+    async function cancelarAgendamentoSelecionado() {
+        if (!agendamentoSelecionado) {
+            return;
+        }
+
+        const confirmar =
+            window.confirm(
+                "Deseja realmente cancelar este agendamento?"
+            );
+
+        if (!confirmar) {
+            return;
+        }
+
+        try {
+            setSalvandoDetalhes(true);
+            setErroDetalhes("");
+
+            await cancelarAgendamento(
+                agendamentoSelecionado.id
+            );
+
+            await carregarDados();
+
+            setAgendamentoSelecionado(
+                null
+            );
+
+        } catch (error) {
+            console.error(
+                "Erro ao cancelar agendamento:",
+                error
+            );
+
+            setErroDetalhes(
+                error.response?.data?.message
+                ||
+                "Não foi possível cancelar o agendamento."
+            );
+
+        } finally {
+            setSalvandoDetalhes(false);
         }
     }
 
@@ -474,7 +619,8 @@ function Calendario() {
                 </div>
 
 
-                <button
+                {pode("OS.EDITAR") && <button
+                    type="button"
                     className="calendario-new"
                     onClick={() => {
                         setErroFormulario("");
@@ -484,13 +630,13 @@ function Calendario() {
                     <i className="bi bi-plus-lg" />
 
                     Agendar serviço
-                </button>
+                </button>}
 
             </header>
 
 
             {erro && (
-                <div className="calendario-error">
+                <div className="calendario-error" role="alert">
                     {erro}
                 </div>
             )}
@@ -505,6 +651,8 @@ function Calendario() {
                         <div className="calendar-navigation">
 
                             <button
+                                type="button"
+                                aria-label="Mês anterior"
                                 onClick={
                                     mesAnterior
                                 }
@@ -526,6 +674,8 @@ function Calendario() {
 
 
                             <button
+                                type="button"
+                                aria-label="Próximo mês"
                                 onClick={
                                     proximoMes
                                 }
@@ -550,7 +700,7 @@ function Calendario() {
 
                     {carregando ? (
 
-                        <div className="calendar-loading">
+                        <div className="calendar-loading" role="status" aria-live="polite">
 
                             <div className="spinner-border spinner-border-sm" />
 
@@ -642,13 +792,11 @@ function Calendario() {
                                                                         ordem?.titulo
                                                                         || "Agendamento"
                                                                     }
-                                                                    onClick={() => {
-                                                                        if (ordem) {
-                                                                            navigate(
-                                                                                `/ordens-servico/${ordem.id}`
-                                                                            );
-                                                                        }
-                                                                    }}
+                                                                    onClick={() =>
+                                                                        abrirAgendamento(
+                                                                            agendamento
+                                                                        )
+                                                                    }
                                                                 >
                                                                     <span>
                                                                         {
@@ -751,13 +899,11 @@ function Calendario() {
                                             key={
                                                 agendamento.id
                                             }
-                                            onClick={() => {
-                                                if (ordem) {
-                                                    navigate(
-                                                        `/ordens-servico/${ordem.id}`
-                                                    );
-                                                }
-                                            }}
+                                            onClick={() =>
+                                                abrirAgendamento(
+                                                    agendamento
+                                                )
+                                            }
                                         >
 
                                             <div className="upcoming-date">
@@ -795,6 +941,8 @@ function Calendario() {
                                                     {
                                                         responsavel?.nome
                                                         ||
+                                                        responsavel?.username
+                                                        ||
                                                         "Sem responsável"
                                                     }
                                                 </span>
@@ -818,7 +966,7 @@ function Calendario() {
             <AgendamentoModal
                 aberto={modalAberto}
                 ordens={ordensAgendaveis}
-                usuarios={usuarios}
+                usuarios={usuariosAtivos}
                 salvando={salvando}
                 erro={erroFormulario}
                 onClose={() =>
@@ -827,6 +975,63 @@ function Calendario() {
                 onSubmit={
                     salvarAgendamento
                 }
+            />
+
+
+            <AgendamentoDetalhesModal
+                podeEditar={pode("OS.EDITAR")}
+                podeCancelar={pode("OS.CANCELAR")}
+                aberto={
+                    Boolean(
+                        agendamentoSelecionado
+                    )
+                }
+                agendamento={
+                    agendamentoSelecionado
+                }
+                ordem={
+                    agendamentoSelecionado
+                        ? buscarOrdem(
+                            agendamentoSelecionado
+                                .ordem_servico_id
+                        )
+                        : null
+                }
+                usuarios={
+                    usuarios
+                }
+                salvando={
+                    salvandoDetalhes
+                }
+                erro={
+                    erroDetalhes
+                }
+                onClose={
+                    fecharDetalhes
+                }
+                onSalvar={
+                    salvarEdicaoAgendamento
+                }
+                onCancelar={
+                    cancelarAgendamentoSelecionado
+                }
+                onVerOS={() => {
+                    if (!agendamentoSelecionado) {
+                        return;
+                    }
+
+                    const ordem =
+                        buscarOrdem(
+                            agendamentoSelecionado
+                                .ordem_servico_id
+                        );
+
+                    if (ordem) {
+                        navigate(
+                            `/ordens-servico/${ordem.id}`
+                        );
+                    }
+                }}
             />
 
         </div>

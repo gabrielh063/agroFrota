@@ -25,6 +25,7 @@ import {
 } from "../../api/usuarioService";
 
 import "./NovaOrdemServico.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const FORM_INICIAL = {
@@ -47,9 +48,13 @@ const FORM_INICIAL = {
 function NovaOrdemServico() {
     const navigate =
         useNavigate();
+    const { pode, usuario } = useAuth();
+    const podeAtribuirUsuarios = pode("USUARIO_VISUALIZAR");
 
-    const [form, setForm] =
-        useState(FORM_INICIAL);
+    const [form, setForm] = useState(() => ({
+        ...FORM_INICIAL,
+        operadorId: podeAtribuirUsuarios ? "" : String(usuario?.id || ""),
+    }));
 
     const [maquinas, setMaquinas] =
         useState([]);
@@ -87,9 +92,7 @@ function NovaOrdemServico() {
             ] = await Promise.all([
                 listarMaquinas(),
                 listarEquipamentos(),
-                listarUsuarios({
-                    apenasAtivos: true,
-                }),
+                podeAtribuirUsuarios ? listarUsuarios({ apenasAtivos: true }) : Promise.resolve({ data: [] }),
             ]);
 
             setMaquinas(
@@ -263,14 +266,14 @@ function NovaOrdemServico() {
                         : null,
 
                 operador_id:
-                    form.operadorId
+                    (podeAtribuirUsuarios ? form.operadorId : usuario?.id)
                         ? Number(
-                            form.operadorId
+                            podeAtribuirUsuarios ? form.operadorId : usuario.id
                         )
                         : null,
 
                 responsavel_id:
-                    form.responsavelId
+                    (podeAtribuirUsuarios ? form.responsavelId : "")
                         ? Number(
                             form.responsavelId
                         )
@@ -409,7 +412,7 @@ function NovaOrdemServico() {
 
                         <div className="nova-os-grid">
 
-                            <div className="nova-os-field">
+                            {podeAtribuirUsuarios && <div className="nova-os-field">
                                 <label htmlFor="tipo">
                                     Tipo *
                                 </label>
@@ -435,10 +438,10 @@ function NovaOrdemServico() {
                                         Manutenção
                                     </option>
                                 </select>
-                            </div>
+                            </div>}
 
 
-                            <div className="nova-os-field">
+                            {podeAtribuirUsuarios && <div className="nova-os-field">
                                 <label htmlFor="prioridade">
                                     Prioridade *
                                 </label>
@@ -472,7 +475,7 @@ function NovaOrdemServico() {
                                         Urgente
                                     </option>
                                 </select>
-                            </div>
+                            </div>}
 
 
                             <div className="nova-os-field full">
@@ -787,7 +790,7 @@ function NovaOrdemServico() {
 
 
                 {erro && (
-                    <div className="nova-os-error">
+                    <div className="nova-os-error" role="alert">
 
                         <i className="bi bi-exclamation-circle" />
 

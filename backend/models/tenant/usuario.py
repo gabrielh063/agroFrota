@@ -56,6 +56,10 @@ class Usuario(TenantBase):
         default=True
     )
 
+    session_version: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+
     ultimo_login: Mapped[datetime | None] = mapped_column(
         DateTime,
         nullable=True

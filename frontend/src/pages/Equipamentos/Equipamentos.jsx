@@ -16,9 +16,14 @@ import EquipamentoFormModal
     from "../../components/EquipamentoFormModal/EquipamentoFormModal";
 
 import "./Equipamentos.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 function Equipamentos() {
+    const { pode } = useAuth();
+    const podeCriar = pode("EQUIPAMENTO_CRIAR");
+    const podeEditar = pode("EQUIPAMENTO_EDITAR");
+    const podeDesativar = pode("EQUIPAMENTO_DESATIVAR");
     const [equipamentos, setEquipamentos] =
         useState([]);
 
@@ -361,14 +366,14 @@ function Equipamentos() {
                 </div>
 
 
-                <button
+                {podeCriar && <button
                     className="equipamentos-new"
                     onClick={abrirCadastro}
                 >
                     <i className="bi bi-plus-lg" />
 
                     Novo equipamento
-                </button>
+                </button>}
 
             </header>
 
@@ -391,6 +396,7 @@ function Equipamentos() {
                     <i className="bi bi-search" />
 
                     <input
+                        aria-label="Buscar equipamento"
                         value={busca}
                         onChange={(event) =>
                             setBusca(
@@ -404,6 +410,7 @@ function Equipamentos() {
 
 
                 <select
+                    aria-label={`${({ TODOS: "Todos os status", DISPONIVEL: "Disponível", EM_USO: "Em uso", MANUTENCAO: "Manutenção", INATIVO: "Inativo" })[status]}, filtro de equipamentos`}
                     value={status}
                     onChange={(event) =>
                         setStatus(
@@ -434,6 +441,7 @@ function Equipamentos() {
 
 
                 <select
+                    aria-label={`${({ ATIVOS: "Ativos", INATIVOS: "Inativos", TODOS: "Todos" })[situacao]}, filtro de situação`}
                     value={situacao}
                     onChange={(event) =>
                         setSituacao(
@@ -458,7 +466,7 @@ function Equipamentos() {
 
 
             {erro && (
-                <div className="equipamentos-error">
+                <div className="equipamentos-error" role="alert">
                     {erro}
                 </div>
             )}
@@ -510,7 +518,7 @@ function Equipamentos() {
 
                 ) : (
 
-                    <div className="equipamentos-table-wrapper">
+                    <div className="equipamentos-table-wrapper" role="region" aria-label="Tabela de equipamentos" tabIndex={0}>
 
                         <table className="equipamentos-table">
 
@@ -522,7 +530,7 @@ function Equipamentos() {
                                     <th>Localização</th>
                                     <th>Status</th>
                                     <th>Situação</th>
-                                    <th />
+                                    <th scope="col">Ações</th>
                                 </tr>
                             </thead>
 
@@ -630,8 +638,12 @@ function Equipamentos() {
 
                                             <td className="equipamento-actions-cell">
 
-                                                <button
+                                                {(podeEditar || podeDesativar) && <button
                                                     className="equipamento-actions"
+                                                    type="button"
+                                                    aria-label={`Ações de ${equipamento.identificacao}`}
+                                                    aria-haspopup="menu"
+                                                    aria-expanded={menuAberto === equipamento.id}
                                                     onClick={() =>
                                                         setMenuAberto(
                                                             menuAberto
@@ -642,14 +654,16 @@ function Equipamentos() {
                                                     }
                                                 >
                                                     <i className="bi bi-three-dots" />
-                                                </button>
+                                                </button>}
 
 
                                                 {menuAberto === equipamento.id && (
 
-                                                    <div className="equipamento-action-menu">
+                                                    <div className="equipamento-action-menu" role="menu">
 
-                                                        <button
+                                                        {podeEditar && <button
+                                                            type="button"
+                                                            role="menuitem"
                                                             onClick={() =>
                                                                 abrirEdicao(
                                                                     equipamento
@@ -659,10 +673,12 @@ function Equipamentos() {
                                                             <i className="bi bi-pencil" />
 
                                                             Editar
-                                                        </button>
+                                                        </button>}
 
 
-                                                        <button
+                                                        {podeDesativar && <button
+                                                            type="button"
+                                                            role="menuitem"
                                                             className={
                                                                 equipamento.ativo
                                                                     ? "danger"
@@ -687,7 +703,7 @@ function Equipamentos() {
                                                                     ? "Desativar"
                                                                     : "Ativar"
                                                             }
-                                                        </button>
+                                                        </button>}
 
                                                     </div>
 

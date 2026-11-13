@@ -17,3 +17,8 @@ export async function buscarIndisponibilidade() {
 
     return resposta.data;
 }
+
+export async function buscarAtividade(meses = 12) {
+    const resposta = await api.get("/api/dashboard/atividade", { params: { meses } });
+    return resposta.data;
+}

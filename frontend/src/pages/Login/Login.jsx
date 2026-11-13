@@ -18,6 +18,7 @@ function Login() {
 
     const {
         entrar,
+        sessaoExpirada,
     } = useAuth();
 
     const [username, setUsername] =
@@ -70,11 +71,8 @@ function Login() {
             );
 
         } catch (error) {
-            const mensagem =
-                error.response?.data?.message
-                || "Não foi possível realizar o login.";
-
-            setErro(mensagem);
+            console.error("Falha ao autenticar usuário:", error);
+            setErro("Não foi possível entrar. Confira seus dados e tente novamente.");
 
         } finally {
             setCarregando(false);
@@ -85,7 +83,7 @@ function Login() {
     return (
         <div className="login-page">
 
-            <section className="login-brand">
+            <aside className="login-brand" aria-label="Sobre o AgroFrota">
 
                 <div className="login-logo">
                     <div className="login-logo-icon">
@@ -128,10 +126,10 @@ function Login() {
 
                 <div className="login-glow" />
 
-            </section>
+            </aside>
 
 
-            <section className="login-form-area">
+            <main className="login-form-area">
 
                 <div className="login-form-container">
 
@@ -194,7 +192,7 @@ function Login() {
                         </div>
 
 
-                        {erro && (
+                        {(erro || sessaoExpirada) && (
                             <div
                                 className="login-error"
                                 role="alert"
@@ -202,7 +200,7 @@ function Login() {
                                 <i className="bi bi-exclamation-circle" />
 
                                 <span>
-                                    {erro}
+                                    {erro || "Sua sessão expirou ou foi revogada. Entre novamente."}
                                 </span>
                             </div>
                         )}
@@ -241,7 +239,7 @@ function Login() {
 
                 </div>
 
-            </section>
+            </main>
 
         </div>
     );

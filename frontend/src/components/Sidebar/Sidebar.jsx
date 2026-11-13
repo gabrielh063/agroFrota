@@ -2,6 +2,7 @@ import {
     NavLink,
     useNavigate,
 } from "react-router-dom";
+import { useState } from "react";
 
 import {
     useAuth,
@@ -12,15 +13,22 @@ import "./Sidebar.css";
 
 function Sidebar() {
     const navigate = useNavigate();
+    const [menuAberto, setMenuAberto] = useState(false);
 
     const {
         usuario,
         sair,
+        pode,
     } = useAuth();
 
 
-    function handleLogout() {
-        sair();
+    async function handleLogout() {
+        try {
+            await sair();
+        } catch {
+            window.alert("Não foi possível encerrar a sessão no servidor. Tente novamente.");
+            return;
+        }
 
         navigate(
             "/login",
@@ -28,6 +36,7 @@ function Sidebar() {
                 replace: true,
             }
         );
+        setMenuAberto(false);
     }
 
 
@@ -38,9 +47,28 @@ function Sidebar() {
             ?.toUpperCase()
         || "U";
 
+    const operacional = [
+        ["/", "bi-house-door", "Visão geral", "DASHBOARD.VISUALIZAR"],
+        ["/assistente", "bi-chat-square-text", "Central de Operações", "MAQUINA_VISUALIZAR"],
+        ["/calendario", "bi-calendar3", "Calendário de serviços", "OS.VISUALIZAR"],
+        ["/ordens-servico", "bi-clipboard-check", "Ordens de serviço", "OS.VISUALIZAR"],
+        ["/maquinarios", "bi-truck-front", "Maquinários", "MAQUINA_VISUALIZAR"],
+        ["/equipamentos", "bi-tools", "Equipamentos", "EQUIPAMENTO_VISUALIZAR"],
+    ];
+
 
     return (
-        <aside className="sidebar">
+        <aside className="sidebar" aria-label="Navegação e sessão">
+
+            <div className="sidebar-mobile-bar">
+                <div className="sidebar-mobile-brand">
+                    <span className="sidebar-brand-icon"><i className="bi bi-truck" /></span>
+                    <strong>AgroFrota</strong>
+                </div>
+                <button className="sidebar-menu-toggle" type="button" aria-expanded={menuAberto} aria-controls="sidebar-navigation" aria-label={menuAberto ? "Fechar menu" : "Abrir menu"} onClick={() => setMenuAberto((aberto) => !aberto)}>
+                    <i className={`bi ${menuAberto ? "bi-x-lg" : "bi-list"}`} />
+                </button>
+            </div>
 
             <div className="sidebar-brand">
 
@@ -61,102 +89,23 @@ function Sidebar() {
             </div>
 
 
-            <nav className="sidebar-nav">
-
-                <NavLink
-                    to="/"
-                    end
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-house-door" />
-
-                    <span>
-                        Home
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/calendario"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-calendar3" />
-
-                    <span>
-                        Calendário de serviços
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/ordens-servico"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-clipboard-check" />
-
-                    <span>
-                        Ordens de serviço
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/maquinarios"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-truck-front" />
-
-                    <span>
-                        Maquinários
-                    </span>
-                </NavLink>
-
-
-                <NavLink
-                    to="/equipamentos"
-                    className={({ isActive }) =>
-                        `sidebar-link ${
-                            isActive
-                                ? "active"
-                                : ""
-                        }`
-                    }
-                >
-                    <i className="bi bi-tools" />
-
-                    <span>
-                        Equipamentos
-                    </span>
-                </NavLink>
-
+            <nav id="sidebar-navigation" aria-label="Menu principal" className={`sidebar-nav ${menuAberto ? "sidebar-nav-open" : ""}`}>
+                <div className="sidebar-group">
+                    <span className="sidebar-section-label">OPERAÇÕES</span>
+                    {operacional.filter(([, , , permission]) => pode(permission)).map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"} onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className={`bi ${icon}`} /><span>{label}</span></NavLink>)}
+                </div>
+                <div className="sidebar-group sidebar-management">
+                    <span className="sidebar-section-label">GESTÃO</span>
+                    <span className="sidebar-link sidebar-disabled" aria-disabled="true" title="Disponível em uma versão futura"><i className="bi bi-bar-chart-line" /><span>Relatórios e indicadores</span><small>Em breve</small></span>
+                    {pode("USUARIO_VISUALIZAR") && <NavLink to="/equipe-permissoes" onClick={() => setMenuAberto(false)} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><i className="bi bi-shield-check" /><span>Equipe e Permissões</span></NavLink>}
+                </div>
+                {import.meta.env.VITE_AGROFROTA_DEMO === "true" && <div className="sidebar-demo"><strong><i /> Ambiente demonstrativo</strong><span>Informações fictícias para apresentação do AgroFrota.</span></div>}
             </nav>
 
 
             <div className="sidebar-footer">
+
+                <span className="sidebar-section-label sidebar-account-label">CONTA</span>
 
                 <div className="sidebar-user">
 
@@ -172,8 +121,7 @@ function Sidebar() {
                         </strong>
 
                         <span>
-                            {usuario?.username
-                                || ""}
+                            {usuario?.perfil_nome || usuario?.username || "Sessão autenticada"}
                         </span>
 
                     </div>
@@ -183,7 +131,9 @@ function Sidebar() {
 
                 <button
                     className="sidebar-logout"
+                    aria-label="Sair da conta"
                     onClick={handleLogout}
+                    type="button"
                 >
                     <i className="bi bi-box-arrow-left" />
 

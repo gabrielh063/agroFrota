@@ -1,0 +1,1776 @@
+{
+  "axeVersion": "4.14.0",
+  "viewport": [
+    {
+      "width": 1600,
+      "height": 900,
+      "page": "login"
+    }
+  ],
+  "states": [],
+  "keyboard": {
+    "calendarTrigger": {
+      "label": "Agendar serviço",
+      "focused": true,
+      "html": "<button type=\"button\" class=\"calendario-new\"><i class=\"bi bi-plus-lg\"></i>Agendar serviço</button>"
+    },
+    "calendarDialog": {
+      "beforeFocus": "<button type=\"button\" aria-label=\"Fechar agendamento\"><i class=\"bi bi-x-lg\"></i></button>",
+      "shiftTab": "<button type=\"submit\" class=\"agendamento-submit\">Criar agendamento</button>",
+      "lastFocus": "<button type=\"submit\" class=\"agendamento-submit\">Criar agendamento</button>",
+      "tabWrap": "<button type=\"button\" aria-label=\"Fechar agendamento\"><i class=\"bi bi-x-lg\"></i></button>",
+      "closedByEscape": true,
+      "focusAfterClose": "<button type=\"button\" class=\"calendario-new\"><i class=\"bi bi-plus-lg\"></i>Agendar serviço</button>"
+    }
+  },
+  "pages": [
+    {
+      "label": "login",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 4
+        }
+      ],
+      "passes": 29,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 4
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "login-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ],
+      "passes": 29,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 2
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "login-error-validation",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 4
+        }
+      ],
+      "passes": 33,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 4
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "login-error-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ],
+      "passes": 33,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 2
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "dashboard",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 81
+        }
+      ],
+      "passes": 39,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 81
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "dashboard-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 80
+        }
+      ],
+      "passes": 37,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 80
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "maquinarios",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 33
+        }
+      ],
+      "passes": 37,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 33
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "maquinarios-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 8
+        }
+      ],
+      "passes": 35,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 8
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "equipamentos",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 24
+        }
+      ],
+      "passes": 42,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 24
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "equipamentos-filtros-alterados",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 3
+        }
+      ],
+      "passes": 32,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 3
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "equipamentos-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 3
+        }
+      ],
+      "passes": 30,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 3
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "ordens-servico",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 65
+        }
+      ],
+      "passes": 42,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 65
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "ordens-servico-filtros-alterados",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 12
+        }
+      ],
+      "passes": 32,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 12
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "ordens-servico-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 12
+        }
+      ],
+      "passes": 30,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 12
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "nova-os",
+      "violations": [],
+      "incomplete": [],
+      "passes": 33,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "nova-os-mobile",
+      "violations": [],
+      "incomplete": [],
+      "passes": 31,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "os-detail",
+      "violations": [],
+      "incomplete": [],
+      "passes": 28,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "os-detail-mobile",
+      "violations": [],
+      "incomplete": [],
+      "passes": 26,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "os-edit",
+      "violations": [],
+      "incomplete": [],
+      "passes": 33,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "os-edit-mobile",
+      "violations": [],
+      "incomplete": [],
+      "passes": 31,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "calendario",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 58
+        }
+      ],
+      "passes": 28,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 58
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "calendario-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 57
+        }
+      ],
+      "passes": 26,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 57
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "central",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 1
+        }
+      ],
+      "passes": 31,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 1
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "central-mobile",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 1
+        }
+      ],
+      "passes": 29,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 1
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "nova-os-validation-error",
+      "violations": [],
+      "incomplete": [],
+      "passes": 33,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [],
+        "violations": []
+      }
+    },
+    {
+      "label": "calendar-create-dialog",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 58
+        }
+      ],
+      "passes": 39,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 58
+          }
+        ],
+        "violations": []
+      }
+    },
+    {
+      "label": "calendar-conflict-error",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 58
+        }
+      ],
+      "passes": 39,
+      "colorContrast": {
+        "passed": true,
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": 58
+          }
+        ],
+        "violations": []
+      }
+    }
+  ],
+  "controlContrastByPage": [
+    {
+      "label": "login",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Usuário",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        },
+        {
+          "tag": "INPUT",
+          "label": "Senha",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        }
+      ]
+    },
+    {
+      "label": "login-mobile",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Usuário",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        },
+        {
+          "tag": "INPUT",
+          "label": "Senha",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        }
+      ]
+    },
+    {
+      "label": "login-error-validation",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Usuário",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        },
+        {
+          "tag": "INPUT",
+          "label": "Senha",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        }
+      ]
+    },
+    {
+      "label": "login-error-mobile",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Usuário",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        },
+        {
+          "tag": "INPUT",
+          "label": "Senha",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(12, 20, 14)",
+          "outer": "rgb(16, 26, 19)",
+          "borderVsOuter": 3.75,
+          "borderVsBackground": 3.94
+        }
+      ]
+    },
+    {
+      "label": "dashboard",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Período do histórico",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(19, 32, 23)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.55
+        }
+      ]
+    },
+    {
+      "label": "dashboard-mobile",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Período do histórico",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(19, 32, 23)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.55
+        }
+      ]
+    },
+    {
+      "label": "maquinarios",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar maquinários",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(13, 22, 16)",
+          "outer": "rgb(17, 26, 19)",
+          "borderVsOuter": 3.74,
+          "borderVsBackground": 3.88
+        },
+        {
+          "tag": "SELECT",
+          "label": "Filtrar por status operacional",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(13, 22, 16)",
+          "outer": "rgb(17, 26, 19)",
+          "borderVsOuter": 3.74,
+          "borderVsBackground": 3.88
+        },
+        {
+          "tag": "SELECT",
+          "label": "Filtrar por situação do cadastro",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(13, 22, 16)",
+          "outer": "rgb(17, 26, 19)",
+          "borderVsOuter": 3.74,
+          "borderVsBackground": 3.88
+        }
+      ]
+    },
+    {
+      "label": "maquinarios-mobile",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar maquinários",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(13, 22, 16)",
+          "outer": "rgb(17, 26, 19)",
+          "borderVsOuter": 3.74,
+          "borderVsBackground": 3.88
+        },
+        {
+          "tag": "SELECT",
+          "label": "Filtrar por status operacional",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(13, 22, 16)",
+          "outer": "rgb(17, 26, 19)",
+          "borderVsOuter": 3.74,
+          "borderVsBackground": 3.88
+        },
+        {
+          "tag": "SELECT",
+          "label": "Filtrar por situação do cadastro",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(13, 22, 16)",
+          "outer": "rgb(17, 26, 19)",
+          "borderVsOuter": 3.74,
+          "borderVsBackground": 3.88
+        }
+      ]
+    },
+    {
+      "label": "equipamentos",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar equipamento",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Todos os status, filtro de equipamentos",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Ativos, filtro de situação",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        }
+      ]
+    },
+    {
+      "label": "equipamentos-filtros-alterados",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar equipamento",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Disponível, filtro de equipamentos",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Inativos, filtro de situação",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        }
+      ]
+    },
+    {
+      "label": "equipamentos-mobile",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar equipamento",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Disponível, filtro de equipamentos",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Inativos, filtro de situação",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        }
+      ]
+    },
+    {
+      "label": "ordens-servico",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar ordem de serviço",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Todos os status, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Prioridades, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Todos os tipos, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        }
+      ]
+    },
+    {
+      "label": "ordens-servico-filtros-alterados",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar ordem de serviço",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Aberta, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Alta, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Manutenção, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        }
+      ]
+    },
+    {
+      "label": "ordens-servico-mobile",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Buscar ordem de serviço",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Aberta, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Alta, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        },
+        {
+          "tag": "SELECT",
+          "label": "Manutenção, filtro de ordens",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(17, 26, 19)",
+          "outer": "rgb(11, 17, 14)",
+          "borderVsOuter": 4.02,
+          "borderVsBackground": 3.74
+        }
+      ]
+    },
+    {
+      "label": "nova-os",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Tipo *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Prioridade *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Título *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Descrição",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Máquina *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Operador",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Prazo",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    },
+    {
+      "label": "nova-os-mobile",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Tipo *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Prioridade *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Título *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Descrição",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Máquina *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Operador",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Prazo",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    },
+    {
+      "label": "os-detail",
+      "controls": []
+    },
+    {
+      "label": "os-detail-mobile",
+      "controls": []
+    },
+    {
+      "label": "os-edit",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Tipo *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Prioridade *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Título *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Descrição",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Máquina *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Operador",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Prazo",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    },
+    {
+      "label": "os-edit-mobile",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Tipo *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Prioridade *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Título *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Descrição",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Máquina *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Operador",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Prazo",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    },
+    {
+      "label": "calendario",
+      "controls": []
+    },
+    {
+      "label": "calendario-mobile",
+      "controls": []
+    },
+    {
+      "label": "central",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Descreva o que precisa consultar ou planejar",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(14, 23, 17)",
+          "outer": "rgb(17, 27, 20)",
+          "borderVsOuter": 3.71,
+          "borderVsBackground": 3.85
+        }
+      ]
+    },
+    {
+      "label": "central-mobile",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "label": "Descreva o que precisa consultar ou planejar",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(14, 23, 17)",
+          "outer": "rgb(17, 27, 20)",
+          "borderVsOuter": 3.71,
+          "borderVsBackground": 3.85
+        }
+      ]
+    },
+    {
+      "label": "nova-os-validation-error",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Tipo *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Prioridade *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Título *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Descrição",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Máquina *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Operador",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Prazo",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    },
+    {
+      "label": "calendar-create-dialog",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Ordem de serviço *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Início *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Fim *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Observações",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    },
+    {
+      "label": "calendar-conflict-error",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "label": "Ordem de serviço *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Início *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "INPUT",
+          "label": "Fim *",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "SELECT",
+          "label": "Responsável",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        },
+        {
+          "tag": "TEXTAREA",
+          "label": "Observações",
+          "border": "rgb(96, 121, 101)",
+          "background": "rgb(8, 15, 10)",
+          "outer": "rgb(13, 20, 14)",
+          "borderVsOuter": 3.93,
+          "borderVsBackground": 4.08
+        }
+      ]
+    }
+  ],
+  "osControls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Abrir menu"
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Sair"
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Ordens de serviço"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "id": "tipo",
+      "name": "",
+      "label": "Tipo *",
+      "text": "Serviço\nManutenção"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "id": "prioridade",
+      "name": "",
+      "label": "Prioridade *",
+      "text": "Baixa\nMédia\nAlta\nUrgente"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "id": "titulo",
+      "name": "",
+      "label": "Título *",
+      "text": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "id": "descricao",
+      "name": "",
+      "label": "Descrição",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Máquina"
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Equipamento"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "id": "ativo",
+      "name": "",
+      "label": "Máquina *",
+      "text": "Selecione...\nDEMO-TR-01 — John Deere 6110J\nDEMO-TR-02 — Massey Ferguson MF 6713\nDEMO-TR-03 — Valtra A114\nDEMO-CO-01 — New Holland TC5.80\nDEMO-PU-01 — Jacto Uniport 3030"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "id": "operador",
+      "name": "",
+      "label": "Operador",
+      "text": "Não definido\nAdministrador Demo"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "id": "responsavel",
+      "name": "",
+      "label": "Responsável",
+      "text": "Não definido\nAdministrador Demo"
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "id": "prazo",
+      "name": "",
+      "label": "Prazo",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Cancelar"
+    },
+    {
+      "tag": "BUTTON",
+      "type": "submit",
+      "id": "",
+      "name": "",
+      "label": "",
+      "text": "Criar ordem de serviço"
+    }
+  ],
+  "calendarButtons": [
+    {
+      "text": "",
+      "aria": "Abrir menu",
+      "title": ""
+    },
+    {
+      "text": "Sair",
+      "aria": "Sair da conta",
+      "title": ""
+    },
+    {
+      "text": "Agendar serviço",
+      "aria": null,
+      "title": ""
+    },
+    {
+      "text": "",
+      "aria": "Mês anterior",
+      "title": ""
+    },
+    {
+      "text": "",
+      "aria": "Próximo mês",
+      "title": ""
+    },
+    {
+      "text": "Hoje",
+      "aria": null,
+      "title": ""
+    },
+    {
+      "text": "09:00OS #1 Revisão preventiva do trator",
+      "aria": null,
+      "title": "Revisão preventiva do trator"
+    },
+    {
+      "text": "13/11\n09:00\nOS #1 · Revisão preventiva do trator\nSem responsável",
+      "aria": null,
+      "title": ""
+    }
+  ],
+  "calendarDialog": {
+    "dialogs": [
+      {
+        "name": "Agendar serviço",
+        "modal": "true",
+        "activeInside": true,
+        "fields": [
+          {
+            "id": "agendamento-os",
+            "label": "Ordem de serviço *",
+            "required": true,
+            "describedBy": null
+          },
+          {
+            "id": "agendamento-inicio",
+            "label": "Início *",
+            "required": true,
+            "describedBy": null
+          },
+          {
+            "id": "agendamento-fim",
+            "label": "Fim *",
+            "required": true,
+            "describedBy": null
+          },
+          {
+            "id": "agendamento-responsavel",
+            "label": "Responsável",
+            "required": false,
+            "describedBy": null
+          },
+          {
+            "id": "agendamento-observacoes",
+            "label": "Observações",
+            "required": false,
+            "describedBy": null
+          }
+        ]
+      }
+    ],
+    "active": "<button type=\"button\" aria-label=\"Fechar agendamento\"><i class=\"bi bi-x-lg\"></i></button>"
+  },
+  "focusIndicator": {
+    "visible": true,
+    "outlineStyle": "solid",
+    "outlineWidth": "2px",
+    "outlineColor": "rgb(114, 204, 136)",
+    "background": "rgba(0, 0, 0, 0)"
+  },
+  "calendarDialogControlsContrast": [
+    {
+      "tag": "SELECT",
+      "label": "Ordem de serviço *",
+      "border": "rgb(96, 121, 101)",
+      "background": "rgb(8, 15, 10)",
+      "outer": "rgb(13, 20, 14)",
+      "borderVsOuter": 3.93,
+      "borderVsBackground": 4.08
+    },
+    {
+      "tag": "INPUT",
+      "label": "Início *",
+      "border": "rgb(96, 121, 101)",
+      "background": "rgb(8, 15, 10)",
+      "outer": "rgb(13, 20, 14)",
+      "borderVsOuter": 3.93,
+      "borderVsBackground": 4.08
+    },
+    {
+      "tag": "INPUT",
+      "label": "Fim *",
+      "border": "rgb(96, 121, 101)",
+      "background": "rgb(8, 15, 10)",
+      "outer": "rgb(13, 20, 14)",
+      "borderVsOuter": 3.93,
+      "borderVsBackground": 4.08
+    },
+    {
+      "tag": "SELECT",
+      "label": "Responsável",
+      "border": "rgb(96, 121, 101)",
+      "background": "rgb(8, 15, 10)",
+      "outer": "rgb(13, 20, 14)",
+      "borderVsOuter": 3.93,
+      "borderVsBackground": 4.08
+    },
+    {
+      "tag": "TEXTAREA",
+      "label": "Observações",
+      "border": "rgb(96, 121, 101)",
+      "background": "rgb(8, 15, 10)",
+      "outer": "rgb(13, 20, 14)",
+      "borderVsOuter": 3.93,
+      "borderVsBackground": 4.08
+    }
+  ],
+  "calendarConflictSeed": {
+    "id": 1,
+    "osId": 1,
+    "inicio": "2026-11-13T09:00",
+    "fim": "2026-11-13T11:00"
+  },
+  "calendarConflict": {
+    "message": "Conflito com outro agendamento.",
+    "dialogOpen": true,
+    "status": "alert"
+  },
+  "accessibilityFinalSummary": {
+    "axeVersion": "4.14.0",
+    "stateCount": 27,
+    "confirmedViolations": 0,
+    "automatedColorContrastViolations": 0,
+    "automatedColorContrastIncompleteNodeCounts": 566,
+    "measuredControlCount": 89,
+    "minControlBorderContrastAgainstAdjacentSurface": 3.71,
+    "minControlBorderContrastAgainstFieldFill": 3.55,
+    "testedViewportSizes": [
+      "1600x900",
+      "375x812"
+    ],
+    "screenReader": "NOT_EXECUTED - isolated Orca/Xvfb attempt did not provide an active accessible Chrome window; host desktop session not touched",
+    "centralDynamicLoadingAndNetworkError": "NOT_EXECUTED - final browser runner could not retain an authenticated Central session for request interception; static Central states scanned with axe and live-region semantics inspected in source"
+  }
+}
