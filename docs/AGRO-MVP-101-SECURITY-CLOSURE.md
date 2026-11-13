@@ -7,15 +7,15 @@ Data: 13/11/2026. **Status: `AGRO_MVP_101_SECURITY_ACTION_REQUIRED`.** Não faze
 - Worktree preservada: `/home/gabriel/Documents/projetos_portifolio/agrofrota-local`.
 - Branch: `feat/agro-mvp-100-resume`.
 - HEAD de entrada verificado: `8fa78c40bf168fca00ad5548264d1b906c647354`, igual ao HEAD remoto da PR #13 no início desta missão.
-- HEAD com este relatório e CI concluída antes desta atualização documental: `12b34b7b3e263d5d16207f233b28bf46a68c9c7e`.
-- PR #13: aberta contra `Main`, `CLEAN`, checks backend MariaDB e frontend aprovados no HEAD de entrada. Nenhum merge realizado. Estado atual: [PR #13](https://github.com/gabrielh063/agroFrota/pull/13).
+- HEAD verificado no início desta retomada e de código aprovado pela CI antes desta atualização documental: `8c8c88412bfa59ff73ee22a63d3a55cc37f2b434`.
+- PR #13: aberta contra `Main`, `CLEAN`, checks backend MariaDB e frontend aprovados no HEAD `8c8c884`; run [43499917867](https://github.com/gabrielh063/agroFrota/actions/runs/43499917867). Nenhum merge realizado. Estado atual: [PR #13](https://github.com/gabrielh063/agroFrota/pull/13).
 - PR #12: aberta, `CLEAN`, checks aprovados; branch e evidências preservadas, sem alterações. [PR #12](https://github.com/gabrielh063/agroFrota/pull/12).
 - Arquivos locais não rastreados, worktrees e backups existentes foram preservados.
-- Nenhum acesso de escrita, restart, migration ou deploy foi feito no `techcell`.
+- Não houve mudança na aplicação, banco persistente, serviços ou configuração do `techcell`. Foram criados somente o dump lógico solicitado e relatórios privados; não houve restart, migration ou deploy.
 
 ## M1 — validação SSH
 
-**Causa identificada:** `ssh -G techcell` resolve para usuário `gabriel`, host `techcell`, porta 22 e `StrictHostKeyChecking ask`. Não existe registro para `techcell` nem para `techcell.tailac6509.ts.net` em `~/.ssh/known_hosts`; `known_hosts2` também não existe. A tentativa em modo não interativo encontrou uma chave de primeira conexão e falhou porque não podia pedir confirmação. Não há evidência de chave antiga alterada ou de ataque.
+**Causa identificada:** `ssh -G techcell` resolve para usuário `gabriel`, host `techcell`, porta 22 e `StrictHostKeyChecking ask`. Não havia registro para `techcell` nem para o FQDN em `~/.ssh/known_hosts`; `known_hosts2` não existe. A falha anterior era uma chave de primeira conexão sem confirmação disponível, não evidência de chave alterada.
 
 Uma consulta `ssh-keyscan` obteve fingerprints **não verificados** da rede:
 
@@ -23,38 +23,76 @@ Uma consulta `ssh-keyscan` obteve fingerprints **não verificados** da rede:
 - ECDSA: `SHA256:wFkGLaPD7d6hn4HMUa6aSrIGRYG/BXE2qhHOkAAD23A`
 - RSA: `SHA256:4wNrOnxwVPiApdDVNRoCvhz0mvUMDTW4AveR8qpl/O4`
 
-Esses valores não foram adicionados a `known_hosts` e não autenticam o host por si sós. **Ação humana:** comparar algoritmo e fingerprint com leitura local no console confiável do servidor, por exemplo `sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`. Se coincidir, o operador pode aceitar a conexão SSH interativa, ou salvar a chave coletada somente depois da comparação. Se não coincidir, não conectar e investigar rotação/reinstalação do host.
+O operador confirmou no console local que ED25519 corresponde ao fingerprint informado. O Codex repetiu a consulta e comparou novamente antes de usar uma cópia temporária em `/tmp/agro-mvp-101-techcell-key.candidate`; `ssh` com `StrictHostKeyChecking=yes` autenticou o host. A cópia temporária foi usada como `UserKnownHostsFile` isolado; `~/.ssh/known_hosts` não foi modificado. Todas as conexões seguintes mantiveram verificação estrita.
 
 ## M2 — credenciais do histórico público
 
 - Blob: `backend/backups/tenants_antes_migration.sql`; introduzido em `cef6af8ea94f8f9786a855928c48620f0e19c80f` e removido da árvore em `3028d7c8d204fdbb34cd9961010123045d416c6a`. Continua recuperável da história pública.
 - Reinspeção sanitizada em memória: 6 valores em campos de e-mail (5 distintos), 7 hashes scrypt distintos e nenhum domínio reservado de exemplo/teste. Marcadores demonstrativos no dump não provam origem sintética. Nenhum valor sensível foi impresso ou incluído neste relatório.
-- Não foi possível determinar correspondência com usuários **ativos**: o banco do servidor não foi consultado. A revisão anterior não encontrou correspondência direta com usernames do seed demonstrativo atual, o que não comprova inatividade ou origem sintética.
-- Relatório privado/sanitizado criado em `/tmp/agro-mvp-101-private-credential-review.md`, modo `0600`. Contém apenas contagens, referências públicas de commit, status de correlação e procedimento; não contém e-mails, hashes, dados de produção ou senhas.
-- Não foram alteradas contas, senhas ou sessões; não foi copiado banco de produção. Classificar todas as possíveis correspondências como potencialmente comprometidas até confirmação.
+- Correlação somente de leitura executada no próprio `techcell` sobre um tenant ativo: 7 linhas históricas, 5 usernames distintos, 6 valores de e-mail (5 distintos) e 7 hashes scrypt; **zero correspondências ativas** por username, e-mail ou hash exato. Também não houve correspondência com username de conta demo ativa.
+- O resultado detalhado privado está em `~/Backups/agrofrota/agro-mvp-101-correlation-full-20261113-180823.txt`, modo `0600`; contém somente referências internas e flags, sem nomes, usernames, e-mails ou hashes. Uma cópia sanitizada sem referências está em `/tmp/agro-mvp-101-private-credential-review.md`, modo `0600`.
+- A correlação negativa reduz o risco de contas AgroFrota atuais diretamente atingidas; não prova que o dump seja sintético nem exclui senha reutilizada fora do AgroFrota ou mudança histórica de identificador. Não foi identificada conta ativa que exija rotação no AgroFrota nesta verificação.
+- Não foram alteradas contas, senhas, hashes ou sessões; não foi copiado banco de produção para o notebook. O responsável ainda precisa decidir a comunicação/rotação de credenciais reutilizadas para titulares históricos, sem publicar identidades.
 
 ### Rotação segura após acesso autorizado
 
-1. Confirmar por canal privado que pelo menos um administrador autorizado consegue autenticar e que há uma via de recuperação.
-2. No host, correlacionar em memória os e-mails do blob com usuários ativos e produzir apenas referências internas/status sanitizados em armazenamento privado restrito.
-3. Para cada conta ativa correspondente, forçar redefinição de senha e incrementar `session_version` para invalidar JWTs/sessões existentes. Confirmar e revogar tokens de recuperação, caso existam.
-4. Validar novamente o login do administrador preservado antes de alterar ou desativar qualquer conta administrativa.
-5. Orientar troca da mesma senha em quaisquer outros serviços onde possa ter sido reutilizada.
-6. Depois da rotação, revisar convites pendentes emitidos por contas atingidas e revogar os que não forem mais autorizados. Não expor tokens; confirmar por testes sintéticos que tokens continuam hashed, expiram, são de uso único e não podem ser emitidos por perfis sem permissão.
-7. Não reescrever o histórico público sem aprovação e coordenação; clones e caches podem manter o conteúdo após eventual rewrite.
+1. Preservar e testar o login de um administrador autorizado antes de qualquer ação futura.
+2. Como não houve correspondência ativa, não redefinir contas AgroFrota nesta missão. O responsável deve decidir se notifica titulares históricos para trocar senhas reutilizadas em outros serviços.
+3. Se surgir correspondência posterior: forçar reset aprovado, incrementar `session_version`, invalidar sessões/tokens e validar acesso administrativo antes de alterar qualquer administrador.
+4. Após eventual rotação, revisar convites pendentes das contas afetadas e revogar os não autorizados. Não expor tokens; validar o fluxo com tokens sintéticos.
+5. Não reescrever o histórico público sem aprovação e coordenação; clones e caches podem manter o conteúdo após eventual rewrite.
 
 ## M3 — servidor, backup e Restic
 
-Não iniciei as verificações remotas, pois o usuário condicionou o acesso à validação da chave. Assim, nesta sessão:
+### Recursos e stack
 
-- Memória, swap, PSI, OOM, containers e limites ativos de recursos: **não verificados**.
-- Cron/timer das 03:30 e primeira execução automática: **não verificados**. Uma execução manual do script, se existir, não comprova o agendamento futuro.
-- Último backup AgroFrota, retenção, espaço, integridade e restore isolado atual: **não verificados**. Há registro histórico de backup/restauração em ambiente isolado, mas não foi tratado como estado atual.
-- Configuração do Restic do Immich e `restic check`: **não identificados/executados**; não se usou config presumida e não houve alteração no Immich ou ROMM.
-- O checkpoint AGRO-MVP-100 anterior registrou health HTTPS de AgroFrota com `200` e `status=online` em `https://techcell.tailac6509.ts.net:8443/api/health`; essa consulta não foi repetida nesta missão.
-- Nenhum reboot, `prune`, `forget`, `repair`, restore em dados reais, `down -v`, alteração de sudoers ou contorno de autenticação ocorreu.
+- Amostra `2026-11-13 18:02 -03`: RAM total 3.44 GB, usada 2.59 GB, disponível 845 MB; swap total 4.01 GB, usada 722 MB. PSI `avg10/avg60/avg300` voltou a `0.00`; `oom_kill=0`.
+- Durante o teste temporário de restore houve amostra transitória com 350 MB disponíveis e PSI full `avg300=0.05`; na amostra posterior a memória disponível se recuperou. Não houve OOM.
+- AgroFrota: frontend/backend/MariaDB `healthy`. Limites atuais confirmados: 64/320/384 MiB, respectivamente, com memory+swap igual ao limite. Não foram alterados.
+- Immich server/Postgres/Redis `healthy`. ROMM está `running`, sem healthcheck no app, e seu banco `healthy`. Outros containers observados não foram alterados.
+- Health local `http://127.0.0.1:18088/api/health` respondeu `{"status":"online","success":true}`. HTTPS público permaneceu inalterado; o checkpoint anterior tinha respondido 200.
+- Espaço: `/` com 57 GB livres; `/srv/icloud` com 430 GB livres.
 
-Depois de validar a chave, executar as coletas read-only documentadas em [AGRO-MVP-100-RELEASE-GATE.md](AGRO-MVP-100-RELEASE-GATE.md). Identificar a unidade Restic e executar exclusivamente o comando existente que comprovadamente chama `restic check`, de preferência fora do horário de pico. Nunca imprimir configurações, tokens, conteúdo dos dumps ou ambiente com segredos.
+### Backup AgroFrota e cron
+
+- Crontab do usuário contém agendamento `30 3 * * *` para `/home/gabriel/.local/bin/agrofrota-backup` (modo `0700`; mtime 13:21). O wrapper chama o backup da stack em `/srv/agrofrota/app` e grava em `~/Backups/agrofrota`.
+- Execução manual às 17:50, sem alterar o banco, terminou com exit 0 e criou `database-20261113-175004.sql`, 30.269 bytes, modo `0600`. Arquivos anteriores observados: `pre-validation-20261113-1305.sql` (28.884 bytes, `0600`) e `private-config-20261113-132109.tar.gz` (1.241 bytes, `0600`). Nenhum conteúdo foi lido.
+- Não há `cron.log` e não foi comprovado backup automático no dia 13. A execução manual não comprova o cron; o próximo horário é **14/11/2026 às 03:30 -03** e precisa ser confirmado após ocorrer.
+- O wrapper não tem retenção própria e nenhum job de retenção foi identificado nos timers/crontab consultados. Retenção automática permanece sem evidência; arquivos ficam na partição `/`.
+
+### Restore e Restic
+
+- Foi tentado restore da cópia recém-criada em MariaDB `mariadb:11.4` temporário, sem rede/portas/volumes persistentes, dump read-only e limite de 384 MiB. O healthcheck não ficou `healthy` em 60 s; o import não começou, portanto a integridade por restauração deste dump **não foi validada**. Uma consulta posterior confirmou que não restou container temporário. O banco persistente não foi tocado.
+- O timer `immich-restic-backup.timer` mostra última ativação às 04:00:02 de 13/11 e próxima às 04:00 de 14/11; `Result=success`, `ExecMainStatus=0`. Isso comprova o acionamento e sucesso reportado pelo systemd, não uma verificação de integridade do repositório.
+- Unidade identificada: `/etc/systemd/system/immich-restic-backup.service`; executável root-only `/usr/local/sbin/immich-restic-backup` modo `0700`. `sudo -n` não autorizou leitura do script e o caminho da configuração Restic permaneceu desconhecido. `restic check` **não foi executado**; não se usou configuração presumida. Immich e ROMM não foram alterados.
+- Para obter a estrutura sem expor valores, o operador pode executar em terminal interativo confiável o comando sanitizado abaixo; ele pode solicitar senha sudo e imprime somente nomes de variáveis, caminhos de include e ações Restic, nunca valores/argumentos:
+
+```bash
+sudo python3 - <<'PY'
+from pathlib import Path
+import re
+
+p = Path('/usr/local/sbin/immich-restic-backup')
+for n, raw in enumerate(p.read_text(errors='replace').splitlines(), 1):
+    line = raw.strip()
+    if not line or line.startswith('#'):
+        continue
+    if re.search(r'password|secret|token|credential|authorization', line, re.I):
+        names = sorted(set(re.findall(r'\b[A-Z][A-Z0-9_]{2,}\b', line)))
+        print(f'{n}: sensitive_line_redacted names={",".join(names)}')
+    elif re.search(r'\b(?:source|\.)\s+', line):
+        paths = re.findall(r'/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+', line)
+        print(f'{n}: include_paths={",".join(paths)}')
+    elif 'restic' in line.lower():
+        actions = [x for x in ('backup', 'check', 'forget', 'prune', 'repair') if re.search(r'\b' + x + r'\b', line)]
+        print(f'{n}: restic_action={",".join(actions) or "unspecified"}; arguments_redacted=yes')
+    elif re.search(r'\b[A-Z][A-Z0-9_]{2,}\s*=', line):
+        names = re.findall(r'\b([A-Z][A-Z0-9_]{2,})\s*=', line)
+        print(f'{n}: variable_names={",".join(names)}; values_redacted=yes')
+PY
+```
+
+Depois de confirmar o arquivo/configuração e horário de baixo uso, executar somente `restic check` com essa configuração. Não usar `prune`, `forget`, `repair` ou restore sobre dados reais.
 
 ## M4 — revisão final da PR #13
 
@@ -64,7 +102,7 @@ Depois de validar a chave, executar as coletas read-only documentadas em [AGRO-M
 - **Proxy/rate limit:** backend não publica porta de host e recebe tráfego do Nginx pela bridge privada. Portanto os limites por `request.remote_addr` são compartilhados por usuários atrás desse peer: login 120/minuto, validação 120/minuto e registro 20/15 minutos; registro também limita por token. É um risco operacional P2 em pico de onboarding, não uma forma de falsificar IP ou contornar autenticação. Não foi alterado sem evidência de volume incompatível.
 - **Central de IA:** cobertura anterior inclui consulta, histórico, proposta, confirmação/cancelamento, concorrência, rollback, Ollama indisponível, exceção, recursos insuficientes e autorização/tenant. Logs sanitizados preservam identificador de correlação sem conteúdo de conversa/SQL/segredos. A causa específica dos 500 históricos de AGRO-SERVER-01 não pode ser recuperada.
 - **Migrações:** validação anterior registrou upgrade/downgrade e re-upgrade em MariaDB descartável. DDL MariaDB pode não ser transacional; falha de migration exige inspeção e correção forward-only, sem downgrade automático. Nenhuma migration foi aplicada ao banco de produção.
-- **PR/CI:** os checks backend MariaDB e frontend passaram no HEAD `12b34b7b3e263d5d16207f233b28bf46a68c9c7e`, já incluindo este relatório, no run [43498512701](https://github.com/gabrielh063/agroFrota/actions/runs/43498512701); a PR estava `CLEAN`. Se houver novo commit, aguardar e conferir seus próprios checks antes da integração.
+- **PR/CI:** os checks backend MariaDB e frontend passaram no HEAD `8c8c88412bfa59ff73ee22a63d3a55cc37f2b434` no run [43499917867](https://github.com/gabrielh063/agroFrota/actions/runs/43499917867); a PR estava `CLEAN`. Este relatório será atualizado na PR e seu novo HEAD também precisa de CI verde.
 - **Testes registrados:** 10 testes de convites passaram no MariaDB descartável no checkpoint anterior, incluindo a nova regressão de aceite/revogação. CI de backend e frontend passou no HEAD acima. Os 284 testes completos, build, lint, Chrome e axe-core são evidências do checkpoint anterior, não foram repetidos nesta rodada sem mudança correspondente.
 - A instalação atual, os dados e os serviços do servidor devem continuar intactos até autorização separada.
 
@@ -80,8 +118,8 @@ Depois de validar a chave, executar as coletas read-only documentadas em [AGRO-M
 
 ## Pendências para encerrar o gate
 
-1. Operador fornecer o fingerprint SSH esperado, obtido no console confiável, para comparação com a chave apresentada.
-2. Após validação, executar correlação privada das contas, decidir/autorizar redefinições e invalidação de sessões e confirmar acesso administrativo.
-3. Verificar recursos, cron/execução automática, último backup, retenção, espaço, restore isolado e `restic check` com a configuração autorizada do Immich.
-4. A CI no HEAD documentado passou. Se novas evidências forem adicionadas em outro commit, aguardar CI verde nesse novo HEAD.
-5. Aguardar autorização explícita e separada para merge e publicação. **A PR não foi integrada e o servidor não foi atualizado.**
+1. A correlação não encontrou contas ativas correspondentes; o responsável deve decidir se a incerteza sobre origem/reutilização externa requer aviso/rotação de titulares históricos.
+2. Confirmar o primeiro backup automático às 03:30 de 14/11; definir retenção e corrigir/validar o processo se não houver arquivo novo.
+3. Repetir restore isolado do dump em janela de recursos adequada, investigando o healthcheck temporário que falhou, sem tocar no banco persistente.
+4. Obter com sudo interativo a configuração Restic sem exibir segredos e executar `restic check` em horário de baixo uso.
+5. Aguardar CI verde no HEAD que incluir esta atualização do relatório; depois, aprovar merge e publicação separadamente. **A PR não foi integrada e a instalação do servidor não foi atualizada.**
